@@ -5,6 +5,9 @@ int main (int argc, char* argv[]) {
 	
 	std::string hostname;
 	std::string url;
+	int port;
+	std::string serverIdentifier;
+	std::string ip_address
 	
 
 	if (argc < 2){
@@ -28,9 +31,21 @@ int main (int argc, char* argv[]) {
 		if (clientSocket < 0) {
 			std::cerr << "Socket creating failed: " <<strerror(errno) << "\n";
 			return 1;
-		}
-		
+		}	
 		// 2.) Specify the Server Address
+		//we utilize a structure for the address
+		// 2a.) declare the structure
+		sockadrr_in serverAddress;
+		// 2b.) set the IP Family
+		serverAddress.sin_family = AF_INET;
+		// 2c.) set the port number
+		//	utilize htons to ensure big endian
+		serverAdderss.sin_port = htons(port); 
+		// 2d.) set the IP Address
+		// we utilize (inet_pton) a function to convert the IP address from text form into binary
+		// since we are utilizing a function we are going to pass the ip variable by reference of the structure
+		inet_port(AF_INET,ip_address,&serverAddress.sin_adr);
+		
 		// 3.) Connect to the server (.connect())
 		// 4.) Send the request (.request())
 		// 5.) recived the request (.recv())
