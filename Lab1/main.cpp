@@ -16,22 +16,36 @@ int main (int argc, char* argv[]) {
 	
 	std::string hostname;
 	std::string url;
-	char h_option;
+	std::string option;
 	std::string serverIdentifier;
 	std::string ip_address;
 	std::string httpRequest;
+	bool hOption = false;
 
 	if (argc < 2){
 			std::cout << "Please enter the correct format for the program: ./main hostname (-H for headers only) IP Adress:Port/path to document" << "\n";
-	}else{ 
-		h_option = argv[1][1];
+	}
+	
+	// check if the flag is provided 
+	if(std::string(argv[1]) == "-h"){
+		if (argc < 4) {
+			std::cerr << "Error: Missing hostname or URL.\n";
+			return 1;
+		}
+		hOption = true;
+		option = argv[1];
 		hostname  = argv[2];
-		//split this into multiple parts 
+		url = argv[3];
+	}else{
+		//no -h option given
+	 	hostname = argv[1];
+	 	url = argv[2];	
+	}
+		//split the url into multiple parts 
 		//1.) IP
 		//2.) Port
 		//3.) Document Path
-		url = argv[3];
-		
+
 	        // Step 1: Find ':' (split IP and port)
     	        size_t colonPos = url.find(':');
                 std::string ip = url.substr(0, colonPos);
@@ -47,14 +61,13 @@ int main (int argc, char* argv[]) {
 		std::cout << "First Command Input: " << argv[0] << "\n";
 		std::cout << "Second Command Input: " << hostname << "\n";
 		std::cout << "Third Command Input: " << url << "\n";
-		std::cout << "Fourth Comman Input: " << h_option << "\n";
     	        std::cout << "IP: " << ip << "\n";
                 std::cout << "Port: " << port << "\n";
-    	        std::cout << "Path: " << path << "\n";
+    	       // std::cout << "Path: " << path << "\n";
 
 		
 
-
+		std::cout << "Creating Socket" << "\n";
 		// 1.) Create a Socket(file descriptor)	
 		int clientSocket = socket(AF_INET,SOCK_STREAM,0);
 		//error has occured creating socket 
@@ -84,6 +97,8 @@ int main (int argc, char* argv[]) {
 		// 3.)Intiate a TCP connection to the server (.connect())
 		// what does .connect() do?
 		// connect intiates a tcp connection through the socket to the server address (being the socket structure of the server) 
+		std::cout << "Initiating TCP Connection" << "\n";
+		
 		if (connect(clientSocket,(struct sockaddr*)&serverAddress,sizeof(serverAddress)) < 0){
 		// check for different error:
 		// if connections was sucessful connect returns 0, if error return -1
@@ -116,10 +131,10 @@ int main (int argc, char* argv[]) {
 		// 1.) Method: GET/HEAD
 		// 2.) URL : url provided by client
 		// 3.) Version: we will use HTTP/1.1
-		if (h_option){
+		if (hOption){
 		//  4a.) if the h option is set the http request METHOD TO head
 			httpRequest = "GET" + path + "HTTP/1,1" + "\n";
-			std::cout << httpRequest << "\n";
+			//std::cout << httpRequest << "\n";
 		} 
 		// 4b.) else use the regualar GET METHOD
 		
@@ -129,6 +144,5 @@ int main (int argc, char* argv[]) {
 		//  5b.) else reverse the respose and write into a file
 		// 5b.)
 		// 6.) Close the socket (.close())
-	}
 	return 0;
 }
