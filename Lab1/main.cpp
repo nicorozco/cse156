@@ -83,8 +83,9 @@ int main (int argc, char* argv[]) {
 		// 4.) Send the request (.request())
 		// 5.) recived the request (.recv())
 		//  5a.) if the h option is set only give the headers
+		//
 		if (h_option){
-			std::cout << "Printing to File" << "\n";
+			std::cout << "Sending HEAD METHOD into packet" << "\n";
 		}
 		//  5b.) else reverse the respose and write into a file
 		// 5b.)
