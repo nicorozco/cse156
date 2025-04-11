@@ -21,7 +21,8 @@ int main (int argc, char* argv[]) {
 	std::string ip_address;
 	std::string httpRequest;
 	bool hOption = false;
-
+	char buffer[1024];
+	int bytesRecieved;
 	if (argc < 2){
 			std::cout << "Please enter the correct format for the program: ./main hostname (-H for headers only) IP Adress:Port/path to document" << "\n";
 	}
@@ -133,16 +134,29 @@ int main (int argc, char* argv[]) {
 		// 3.) Version: we will use HTTP/1.1
 		if (hOption){
 		//  4a.) if the h option is set the http request METHOD TO head
-			httpRequest = "GET" + path + "HTTP/1,1" + "\n";
+			httpRequest = "HEAD" + path + "HTTP/1,1" + "\n";
 			//std::cout << httpRequest << "\n";
-		} 
+		}	
 		// 4b.) else use the regualar GET METHOD
-		
-		//  5b.) else reverse the respose and write into a file
+		httpRequest = "GET" + path + "HTTP/1,1" + "\n";
+		// the second argument is a pointer to where you want to store the response
+		send(clientSocket, &httpRequest, sizeof(httpRequest), 0);
+
 		// 5.) recived the request (.recv())
-		//
+		if ( bytesRecieved = recv(clientSocket, &buffer, sizeof(buffer),0) < 1 ){ 
+		// what does recieved return if succesful the number of bytes actually read into the buffer, if uncessful, returns negative value 
+			std::cerr << "Error recieving" << "\n";
+		}
+		if (hOption == false){
+			//create a file 
+			std::ofstream outfile("output.txt);
+			// read from the buffer and input into the file
+			// Note reverse the output 
+	
+		}
 		//  5b.) else reverse the respose and write into a file
 		// 5b.)
 		// 6.) Close the socket (.close())
+		clientSocket.close();
 	return 0;
 }
