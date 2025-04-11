@@ -1,5 +1,8 @@
 #include <iostream>
+#include <fstream>
 #include <string>
+#include <algorithm>
+#include <vector>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -21,7 +24,9 @@ int main (int argc, char* argv[]) {
 	std::string ip_address;
 	std::string httpRequest;
 	bool hOption = false;
-
+	char buffer[1024];
+	int bytesRecieved;
+	std::vector<char> fullData; // vector to hold all the data to pass into file
 	if (argc < 2){
 			std::cout << "Please enter the correct format for the program: ./main hostname (-H for headers only) IP Adress:Port/path to document" << "\n";
 	}
@@ -75,10 +80,10 @@ int main (int argc, char* argv[]) {
 			std::cerr << "Socket creating failed: " <<strerror(errno) << "\n";
 			return 1;
 		}	
-		// 2.) Specify the Server Address
-		//we utilize a structure for the address
+		// 2.) Specify the Server Address we utilize a structure for the address
 		// 2a.) declare the structure
-		sockaddr_in serverAddress;
+		sockaddr_in serverAddress; 
+		// 2a.) declare the structure
 		// 2b.) set the IP Family
 		serverAddress.sin_family = AF_INET;
 		// 2c.) set the port number
@@ -89,7 +94,7 @@ int main (int argc, char* argv[]) {
 		// since we are utilizing a function we are going to pass the ip variable by reference of the structure
 		//inet expects a constant string type, type cast the string in to a pointer
 		
-		if (inet_pton(AF_INET,ip_address.c_str(),&serverAddress.sin_addr) <= 0 ){
+		if (inet_pton(AF_INET,ip_address.c_str(),&serverAddress.sin_addr) < 0 ){
 		// check for errors: 1 means address was set succesfuly, anything less than 1 means error
 			std::cerr << "Invalid Address / Address not Supported" << "\n";
 			return -1;
@@ -104,20 +109,20 @@ int main (int argc, char* argv[]) {
 		// if connections was sucessful connect returns 0, if error return -1
 		// error message is stored in errno
 			switch(errno) {
-				case ETIMEDOUT:
 				// client tcp connection intiatiation recieves no response 
+				case ETIMEDOUT:
 					std::cerr << "Error: Connection timed out (ETIMEDOUT)" << "\n";	
 					break;
+				//server sends reset, refusing to connect to client
 				case ECONNREFUSED:
 					std::cerr << "Error: Connection refused (ECONNREFUSED)" << "\n";	
 					break;
-				//server sends reset, refusing to connect to client
-				case EHOSTUNREACH:
 				//unable to reach the host
+				case EHOSTUNREACH:
 					std::cerr << "Error: Host Unreachable  (EHOSTUNREACH)" << "\n";	
 					break;
-				case ENETUNREACH:
 				// unable to reach the network
+				case ENETUNREACH:
 					std::cerr << "Error: Network Unreachable (ENETUNREACH)" << "\n";	
 					break;
 				default:
@@ -141,11 +146,31 @@ int main (int argc, char* argv[]) {
 		// the second argument is a pointer to where you want to store the response
 		send(clientSocket, &httpRequest, sizeof(httpRequest), 0);
 
-		//  5b.) else reverse the respose and write into a file
 		// 5.) recived the request (.recv())
-		//
-		//  5b.) else reverse the respose and write into a file
-		// 5b.)
-		// 6.) Close the socket (.close())
+		while((bytesRecieved = recv(clientSocket, &buffer, sizeof(buffer),0) > 0) ){ 
+		
+			// what does recieved return if succesful the number of bytes actually read into the buffer, if uncessful, returns negative value 
+			fullData.insert(fullData.end(), buffer, buffer + bytesRecieved);
+			
+		}
+		if (bytesRecieved < 0){
+			std::cerr << "Error recieving" << "\n";
+		}
+
+		if (hOption == false){
+			//utilize reverse algorithm to reverse the data
+			std::reverse(fullData.begin(), fullData.end());
+			//create a file 
+			std::ofstream outfile("output.txt");
+			//check for error openning file
+			if (!outfile) {
+				std::cerr << "Failed to open file for writing" << "\n";
+			}else{
+				//write from the fulldata input into the file
+				outfile.write(fullData.data(),fullData.size());
+				outfile.close();
+			}
+		}
+		close(clientSocket);
 	return 0;
 }
