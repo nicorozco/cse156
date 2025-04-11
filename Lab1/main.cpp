@@ -1,5 +1,8 @@
 #include <iostream>
+#include <fstream>
 #include <string>
+#include <algorithm>
+#include <vector>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -23,6 +26,7 @@ int main (int argc, char* argv[]) {
 	bool hOption = false;
 	char buffer[1024];
 	int bytesRecieved;
+	std::vector<char> fullData; // vector to hold all the data to pass into file
 	if (argc < 2){
 			std::cout << "Please enter the correct format for the program: ./main hostname (-H for headers only) IP Adress:Port/path to document" << "\n";
 	}
@@ -143,20 +147,30 @@ int main (int argc, char* argv[]) {
 		send(clientSocket, &httpRequest, sizeof(httpRequest), 0);
 
 		// 5.) recived the request (.recv())
-		if ( bytesRecieved = recv(clientSocket, &buffer, sizeof(buffer),0) < 1 ){ 
-		// what does recieved return if succesful the number of bytes actually read into the buffer, if uncessful, returns negative value 
+		while((bytesRecieved = recv(clientSocket, &buffer, sizeof(buffer),0) > 0) ){ 
+		
+			// what does recieved return if succesful the number of bytes actually read into the buffer, if uncessful, returns negative value 
+			fullData.insert(fullData.end(), buffer, buffer + bytesRecieved);
+			
+		}
+		if (bytesRecieved < 0){
 			std::cerr << "Error recieving" << "\n";
 		}
+
 		if (hOption == false){
+			//utilize reverse algorithm to reverse the data
+			std::reverse(fullData.begin(), fullData.end());
 			//create a file 
-			std::ofstream outfile("output.txt);
-			// read from the buffer and input into the file
-			// Note reverse the output 
-	
+			std::ofstream outfile("output.txt");
+			//check for error openning file
+			if (!outfile) {
+				std::cerr << "Failed to open file for writing" << "\n";
+			}else{
+				//write from the fulldata input into the file
+				outfile.write(fullData.data(),fullData.size());
+				outfile.close();
+			}
 		}
-		//  5b.) else reverse the respose and write into a file
-		// 5b.)
-		// 6.) Close the socket (.close())
-		clientSocket.close();
+		close(clientSocket);
 	return 0;
 }
