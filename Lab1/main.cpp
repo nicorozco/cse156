@@ -62,13 +62,14 @@ int main (int argc, char* argv[]) {
 		int portInt = std::stoi(port);
 		
 		// Prints for Troubleshooting:
-		std::cout << "Number of Arguments Provided:  "<< argc << "\n";
-		std::cout << "First Command Input: " << argv[0] << "\n";
+		//std::cout << "Number of Arguments Provided:  "<< argc << "\n";
+		//std::cout << "First Command Input: " << argv[0] << "\n";
 		std::cout << "Second Command Input: " << hostname << "\n";
-		std::cout << "Third Command Input: " << url << "\n";
-    	        std::cout << "IP: " << ip << "\n";
-                std::cout << "Port: " << port << "\n";
-    	       // std::cout << "Path: " << path << "\n";
+		//std::cout << "Third Command Input: " << url << "\n";
+		std::cout << "Host Name" << hostname << "\n";
+		//std::cout << "IP: " << ip << "\n";
+                //std::cout << "Port: " << port << "\n";
+    	        std::cout << "Path: " << path << "\n";
 
 		
 
@@ -81,25 +82,23 @@ int main (int argc, char* argv[]) {
 			return 1;
 		}	
 		// 2.) Specify the Server Address we utilize a structure for the address
-		// 2a.) declare the structure
 		sockaddr_in serverAddress; 
-		// 2a.) declare the structure
 		// 2b.) set the IP Family
 		serverAddress.sin_family = AF_INET;
 		// 2c.) set the port number
-		//	utilize htons to ensure big endian
+		//utilize htons to ensure big endian
 	        serverAddress.sin_port = htons(portInt); 
 		// 2d.) set the IP Address
-		// we utilize (inet_pton) a function to convert the IP address from text form into binary
-		// since we are utilizing a function we are going to pass the ip variable by reference of the structure
-		//inet expects a constant string type, type cast the string in to a pointer
-		
-		if (inet_pton(AF_INET,ip_address.c_str(),&serverAddress.sin_addr) < 0 ){
+		// we utilize (inet_pton) a function to convert the IP address from text form into binary	
+		std::cout << "IP Address: " << ip<< "\n";
+		if (inet_pton(AF_INET,ip.c_str(),&serverAddress.sin_addr) < 0 ){
 		// check for errors: 1 means address was set succesfuly, anything less than 1 means error
 			std::cerr << "Invalid Address / Address not Supported" << "\n";
 			return -1;
 		}
 		// 3.)Intiate a TCP connection to the server (.connect())
+		//std::cout << "Server IP Address: " << inet_ntoa(serverAddress.sin_addr) << "\n";
+		//std::cout << "Server Port: " << ntohs( serverAddress.sin_port) << "\n";
 		// what does .connect() do?
 		// connect intiates a tcp connection through the socket to the server address (being the socket structure of the server) 
 		std::cout << "Initiating TCP Connection" << "\n";
@@ -136,23 +135,34 @@ int main (int argc, char* argv[]) {
 		// 1.) Method: GET/HEAD
 		// 2.) URL : url provided by client
 		// 3.) Version: we will use HTTP/1.1
+		std::cout << "Connection established" << "\n";
+		
 		if (hOption){
+			std::cout << "Sending HEAD request" << "\n";
 		//  4a.) if the h option is set the http request METHOD TO head
-			httpRequest = "HEAD" + path + "HTTP/1,1" + "\n";
-			//std::cout << httpRequest << "\n";
+			httpRequest = "HEAD " + path + " HTTP/1.1" + "\r\n";
+			std::cout << httpRequest << "\n";
 		}	
-		// 4b.) else use the regualar GET METHOD
-		httpRequest = "GET" + path + "HTTP/1,1" + "\n";
+		// 4b.) else use the regular GET METHOD
+		std::cout << "Sending Get Request" << "\n";
+		httpRequest = "GET " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "Connection: open\r\n\r\n";
+		std::cout << httpRequest << "\n";
 		// the second argument is a pointer to where you want to store the response
-		send(clientSocket, &httpRequest, sizeof(httpRequest), 0);
+		send(clientSocket, httpRequest.c_str(), httpRequest.length(), 0);
 
 		// 5.) recived the request (.recv())
-		while((bytesRecieved = recv(clientSocket, &buffer, sizeof(buffer),0) > 0) ){ 
-		
+		while((bytesRecieved = recv(clientSocket, buffer, sizeof(buffer),0) > 0) ){ 
+			std::cout << "Recieving Data" << "\n";	
+			std::cout << "Bytes Recieved" << bytesRecieved << "\n";
 			// what does recieved return if succesful the number of bytes actually read into the buffer, if uncessful, returns negative value 
 			fullData.insert(fullData.end(), buffer, buffer + bytesRecieved);
 			
 		}
+		std::cout << "Printing Out Contents: ";
+		for(size_t i=0; i < fullData.size(); i++){
+			std::cout << fullData[i];
+		}
+
 		if (bytesRecieved < 0){
 			std::cerr << "Error recieving" << "\n";
 		}
@@ -167,10 +177,12 @@ int main (int argc, char* argv[]) {
 				std::cerr << "Failed to open file for writing" << "\n";
 			}else{
 				//write from the fulldata input into the file
+				std::cout << "Writing Final Data to File" << "\n";
 				outfile.write(fullData.data(),fullData.size());
 				outfile.close();
 			}
 		}
+		std::cout << "Closing Socket" << "\n";
 		close(clientSocket);
 	return 0;
 }
