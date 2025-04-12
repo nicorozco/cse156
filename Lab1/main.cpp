@@ -138,12 +138,12 @@ int main (int argc, char* argv[]) {
 		if (hOption){
 			//std::cout << "Sending HEAD request" << "\n";
 		//  4a.) if the h option is set the http request METHOD TO head
-			httpRequest = "HEAD " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "Connection: close\r\n \r\n";
+			httpRequest = "HEAD " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "Connection: close\r\n" + "\r\n";
 		}
 		
 		// 4b.) else use the regular GET METHOD
 		//std::cout << "Sending Get Request" << "\n";
-		httpRequest = "GET " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "Connection: close\r\n \r\n";
+		httpRequest = "GET " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "Connection: close\r\n" + "\r\n";
 		// the second argument is a pointer to where you want to store the response
 		send(clientSocket, httpRequest.c_str(), httpRequest.length(), 0);
 		
@@ -184,7 +184,7 @@ int main (int argc, char* argv[]) {
 				std::cerr << "Failed to open file for writing" << "\n";
 			}else{
 				//write from the fulldata input into the file
-				std::cout << "Writing Final Data to File" << "\n";
+				//std::cout << "Writing Final Data to File" << "\n";
 				outfile.write(fullData.data(),fullData.size());
 				outfile.close();
 			}
