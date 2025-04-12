@@ -24,8 +24,8 @@ int main (int argc, char* argv[]) {
 	std::string ip_address;
 	std::string httpRequest;
 	bool hOption = false;
-	char buffer[1024];
-	int bytesRecieved;
+	char buffer[4096];
+	int bytesrecv;
 	std::vector<char> fullData; // vector to hold all the data to pass into file
 	if (argc < 2){
 			std::cout << "Please enter the correct format for the program: ./main hostname (-H for headers only) IP Adress:Port/path to document" << "\n";
@@ -64,12 +64,12 @@ int main (int argc, char* argv[]) {
 		// Prints for Troubleshooting:
 		//std::cout << "Number of Arguments Provided:  "<< argc << "\n";
 		//std::cout << "First Command Input: " << argv[0] << "\n";
-		std::cout << "Second Command Input: " << hostname << "\n";
+		//std::cout << "Second Command Input: " << hostname << "\n";
 		//std::cout << "Third Command Input: " << url << "\n";
-		std::cout << "Host Name" << hostname << "\n";
+		//std::cout << "Host Name" << hostname << "\n";
 		//std::cout << "IP: " << ip << "\n";
                 //std::cout << "Port: " << port << "\n";
-    	        std::cout << "Path: " << path << "\n";
+    	        //std::cout << "Path: " << path << "\n";
 
 		
 
@@ -90,7 +90,7 @@ int main (int argc, char* argv[]) {
 	        serverAddress.sin_port = htons(portInt); 
 		// 2d.) set the IP Address
 		// we utilize (inet_pton) a function to convert the IP address from text form into binary	
-		std::cout << "IP Address: " << ip<< "\n";
+		//std::cout << "IP Address: " << ip<< "\n";
 		if (inet_pton(AF_INET,ip.c_str(),&serverAddress.sin_addr) < 0 ){
 		// check for errors: 1 means address was set succesfuly, anything less than 1 means error
 			std::cerr << "Invalid Address / Address not Supported" << "\n";
@@ -142,31 +142,47 @@ int main (int argc, char* argv[]) {
 		//  4a.) if the h option is set the http request METHOD TO head
 			httpRequest = "HEAD " + path + " HTTP/1.1" + "\r\n";
 			std::cout << httpRequest << "\n";
-		}	
+		}
+		
 		// 4b.) else use the regular GET METHOD
 		std::cout << "Sending Get Request" << "\n";
-		httpRequest = "GET " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "Connection: open\r\n\r\n";
-		std::cout << httpRequest << "\n";
+		httpRequest = "GET " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "Connection: close\r\n \r\n";
+		//std::cout << "Path: " << path << "\n";
+		//std::cout << "Host: " << hostname << "\n";
+		//std::cout << "HTTP Request: "  << httpRequest << "\n";
 		// the second argument is a pointer to where you want to store the response
 		send(clientSocket, httpRequest.c_str(), httpRequest.length(), 0);
+		//std::cout << "Bytes Sent: " << send(clientSocket, httpRequest.c_str(), httpRequest.length(), 0) << "\n";
+		
+		/*
+		for(size_t i = 0; i < httpRequest.size();i++){
+			std::cout << std::hex << (int)(unsigned char)httpRequest[i] << " ";
+		}
+		*/
 
 		// 5.) recived the request (.recv())
-		while((bytesRecieved = recv(clientSocket, buffer, sizeof(buffer),0) > 0) ){ 
-			std::cout << "Recieving Data" << "\n";	
-			std::cout << "Bytes Recieved" << bytesRecieved << "\n";
+		std::cout << "Recieving Data" << "\n";	
+		while((bytesrecv = recv(clientSocket, buffer, sizeof(buffer),0)) > 0) { 
+			std::cout << "Bytes Recieved" << bytesrecv<< "\n";
 			// what does recieved return if succesful the number of bytes actually read into the buffer, if uncessful, returns negative value 
-			fullData.insert(fullData.end(), buffer, buffer + bytesRecieved);
-			
+			// while we are recieving write the buffer into the file 
+			fullData.insert(fullData.end(), buffer, buffer + bytesrecv);	
 		}
-		std::cout << "Printing Out Contents: ";
+		//std::cout << "First byte recieved (hex): " << std::hex << (int)(unsigned char)buffer[0] << "\n";
+		
+		//std::cout << "Second byte recieved (hex): " << std::hex << (int)(unsigned char)buffer[1] << "\n";
+		std::cout << "Printing Out Contents: " << "\n";
+		//std::cout << "Vector Data Size" << fullData.size() << "\n";
 		for(size_t i=0; i < fullData.size(); i++){
 			std::cout << fullData[i];
 		}
 
-		if (bytesRecieved < 0){
+		if (bytesrecv < 0){
 			std::cerr << "Error recieving" << "\n";
 		}
+		std::cout << "\n";
 
+		
 		if (hOption == false){
 			//utilize reverse algorithm to reverse the data
 			std::reverse(fullData.begin(), fullData.end());
