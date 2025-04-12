@@ -47,9 +47,7 @@ int main (int argc, char* argv[]) {
 	 	url = argv[2];	
 	}
 		//split the url into multiple parts 
-		//1.) IP
-		//2.) Port
-		//3.) Document Path
+		//1.) IP 2.) Port 3.) Document Path
 
 	        // Step 1: Find ':' (split IP and port)
     	        size_t colonPos = url.find(':');
@@ -73,7 +71,7 @@ int main (int argc, char* argv[]) {
 
 		
 
-		std::cout << "Creating Socket" << "\n";
+		//std::cout << "Creating Socket" << "\n";
 		// 1.) Create a Socket(file descriptor)	
 		int clientSocket = socket(AF_INET,SOCK_STREAM,0);
 		//error has occured creating socket 
@@ -101,7 +99,7 @@ int main (int argc, char* argv[]) {
 		//std::cout << "Server Port: " << ntohs( serverAddress.sin_port) << "\n";
 		// what does .connect() do?
 		// connect intiates a tcp connection through the socket to the server address (being the socket structure of the server) 
-		std::cout << "Initiating TCP Connection" << "\n";
+		//std::cout << "Initiating TCP Connection" << "\n";
 		
 		if (connect(clientSocket,(struct sockaddr*)&serverAddress,sizeof(serverAddress)) < 0){
 		// check for different error:
@@ -135,47 +133,40 @@ int main (int argc, char* argv[]) {
 		// 1.) Method: GET/HEAD
 		// 2.) URL : url provided by client
 		// 3.) Version: we will use HTTP/1.1
-		std::cout << "Connection established" << "\n";
+		//std::cout << "Connection established" << "\n";
 		
 		if (hOption){
-			std::cout << "Sending HEAD request" << "\n";
+			//std::cout << "Sending HEAD request" << "\n";
 		//  4a.) if the h option is set the http request METHOD TO head
-			httpRequest = "HEAD " + path + " HTTP/1.1" + "\r\n";
-			std::cout << httpRequest << "\n";
+			httpRequest = "HEAD " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "Connection: close\r\n \r\n";
 		}
 		
 		// 4b.) else use the regular GET METHOD
-		std::cout << "Sending Get Request" << "\n";
+		//std::cout << "Sending Get Request" << "\n";
 		httpRequest = "GET " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "Connection: close\r\n \r\n";
-		//std::cout << "Path: " << path << "\n";
-		//std::cout << "Host: " << hostname << "\n";
-		//std::cout << "HTTP Request: "  << httpRequest << "\n";
 		// the second argument is a pointer to where you want to store the response
 		send(clientSocket, httpRequest.c_str(), httpRequest.length(), 0);
-		//std::cout << "Bytes Sent: " << send(clientSocket, httpRequest.c_str(), httpRequest.length(), 0) << "\n";
 		
-		/*
-		for(size_t i = 0; i < httpRequest.size();i++){
-			std::cout << std::hex << (int)(unsigned char)httpRequest[i] << " ";
-		}
-		*/
 
 		// 5.) recived the request (.recv())
-		std::cout << "Recieving Data" << "\n";	
+		//std::cout << "Recieving Data" << "\n";	
 		while((bytesrecv = recv(clientSocket, buffer, sizeof(buffer),0)) > 0) { 
-			std::cout << "Bytes Recieved" << bytesrecv<< "\n";
+			//std::cout << "Bytes Recieved" << bytesrecv<< "\n";
 			// what does recieved return if succesful the number of bytes actually read into the buffer, if uncessful, returns negative value 
 			// while we are recieving write the buffer into the file 
 			fullData.insert(fullData.end(), buffer, buffer + bytesrecv);	
+			if(hOption){
+				std::cout.write(buffer,bytesrecv);
+			}
 		}
-		//std::cout << "First byte recieved (hex): " << std::hex << (int)(unsigned char)buffer[0] << "\n";
 		
-		//std::cout << "Second byte recieved (hex): " << std::hex << (int)(unsigned char)buffer[1] << "\n";
-		std::cout << "Printing Out Contents: " << "\n";
+		//std::cout << "Printing Out Contents: " << "\n";
 		//std::cout << "Vector Data Size" << fullData.size() << "\n";
-		for(size_t i=0; i < fullData.size(); i++){
+		/*for(size_t i=0; i < fullData.size(); i++){
 			std::cout << fullData[i];
+			For testing correct contents in the vector
 		}
+		*/
 
 		if (bytesrecv < 0){
 			std::cerr << "Error recieving" << "\n";
@@ -198,7 +189,8 @@ int main (int argc, char* argv[]) {
 				outfile.close();
 			}
 		}
-		std::cout << "Closing Socket" << "\n";
+		//std::cout << "Closing Socket" << "\n";
 		close(clientSocket);
+	
 	return 0;
 }
