@@ -27,8 +27,10 @@ int main (int argc, char* argv[]) {
 	char buffer[4096];
 	int bytesrecv;
 	std::vector<char> fullData; // vector to hold all the data to pass into file
-	if (argc < 2){
-			std::cout << "Please enter the correct format for the program: ./main hostname (-H for headers only) IP Adress:Port/path to document" << "\n";
+	if (argc < 3){
+		std::cerr << "Error: not enough arguments.\n";
+		std::cerr << "Usage: ./main <hostname> <IP Address:Port Number(Optional)> <-h (for headers only)>" << "\n";
+		return EXIT_FAILURE;
 	}
 	
 	// check if the flag is provided 
@@ -41,7 +43,8 @@ int main (int argc, char* argv[]) {
 	 	hostname = argv[1];
 	 	url = argv[2];	
 	} else {
-		std::cerr << "Usage: ./main <hostname> <IP Address:Port Number(Optional)> <-h (for headers only)>" << "\n";
+		std::cerr << "Error: Invalid Arguments" << "\n";
+		return EXIT_FAILURE;
 
 	}
 	//split the url into multiple parts 
@@ -91,9 +94,9 @@ int main (int argc, char* argv[]) {
 	// 2d.) set the IP Address
 	// we utilize (inet_pton) a function to convert the IP address from text form into binary	
 		//std::cout << "IP Address: " << ip<< "\n";
-	if (inet_pton(AF_INET,ip.c_str(),&serverAddress.sin_addr) < 0 ){
+	if (inet_pton(AF_INET,ip.c_str(),&serverAddress.sin_addr) <= 0 ){
 		// check for errors: 1 means address was set succesfuly, anything less than 1 means error
-		std::cerr << "Invalid Address / Address not Supported" << "\n";
+		std::cerr << "Invalid Address" << "\n";
 		close(clientSocket);
 		return 7;
 	}
@@ -143,12 +146,13 @@ int main (int argc, char* argv[]) {
 		if (hOption){
 			//std::cout << "Sending HEAD request" << "\n";
 		//  4a.) if the h option is set the http request METHOD TO head
-			httpRequest = "HEAD " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "Connection: close\r\n" + "\r\n";
+			httpRequest = "HEAD " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "X-UCSC-Student-ID: norozco6 \r\n" + "Connection: close\r\n" +"\r\n";
 		}
 		
 		// 4b.) else use the regular GET METHOD
 		//std::cout << "Sending Get Request" << "\n";
-		httpRequest = "GET " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "Connection: close\r\n" + "\r\n";
+		httpRequest = "GET " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "X-UCSC-Student-ID: norozco6 \r\n" + "Connection: close\r\n" + "\r\n";
+		//std::cout << httpRequest << "\n";
 		// the second argument is a pointer to where you want to store the response
 		if ((send(clientSocket, httpRequest.c_str(), httpRequest.length(), 0)) < 1){
 			std::cerr << "Error Sending HTTP Request" << "\n";
