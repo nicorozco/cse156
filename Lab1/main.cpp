@@ -1,8 +1,10 @@
 #include <iostream>
+#include <sstream> // for stream 
+#include <cctype> // to test character classification
 #include <fstream>
 #include <string>
 #include <algorithm>
-#include <vector>
+#include <vector> // for vector
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -61,6 +63,11 @@ int main (int argc, char* argv[]) {
 		//Format is: ip:port/path
 		ip = url.substr(0, colonPos);
 		std::string portStr = url.substr(colonPos+1,slashPos - colonPos - 1);
+		if(!std::all_of(portStr.begin(),portStr.end(),::isdigit)){
+
+			std::cerr << "Error: Port containts non-numeric characters\n";
+			return 6;
+		}
 		port = std::stoi(portStr);
 
 	} else {
@@ -178,7 +185,7 @@ int main (int argc, char* argv[]) {
 		while((bytesrecv = recv(clientSocket, buffer, sizeof(buffer),0)) > 0) { 
 			//std::cout << "Bytes Recieved" << bytesrecv<< "\n";
 			// what does recieved return if succesful the number of bytes actually read into the buffer, if uncessful, returns negative value 
-			// while we are recieving write the buffer into the file 
+			// while we are recieving write the buffer into the the full data vector
 			fullData.insert(fullData.end(), buffer, buffer + bytesrecv);	
 			if(hOption){
 				//h option write out to terminal
@@ -198,6 +205,35 @@ int main (int argc, char* argv[]) {
 			std::cerr << "Error recieving" << "\n";
 			close(clientSocket);
 		}
+
+		// convert the vector to a string
+		std::string response(fullData.begin(), fullData.end());
+		
+		// Get the status line (first line)
+		std::istringstream responseStream(response); // create an input stream from the response string, in order to read line by line
+		std::string statusLine; //string to hold the first line of the HTTP Response
+		std::getline(responseStream,statusLine); // utilize to get line to read up the new line and store the first line
+
+		//parse the statusline to find the response code
+		std::istringstream statusLineStream(statusLine); //  turn the line into a input stream, in order to read each word
+		std::string httpVersion; // hold the http version
+		int statusCode; //to hold the status code
+		std::string statusMessage; // status message
+		
+		//utilize >> to extract the words from the statsLineStream
+		if (statusLineStream >> httpVersion >> statusCode) {
+			//std::cout << "Status Line :" << statusLine << "\n";
+			//std::cout << "HTTP Version: " << httpVersion << "\n";
+			//std::cout << "Status Code: " << statusCode << "\n";
+
+			if(statusCode >= 400){
+				return 9;
+			}
+		} else {
+			std::cerr << "Failed to parse HTTP status line.\n";
+		}
+
+	
 		
 		if (hOption == false){
 			//utilize reverse algorithm to reverse the data
