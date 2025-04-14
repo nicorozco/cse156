@@ -1,0 +1,11 @@
+CSE156/L Spring 2025 Programming Lab 1
+Nicolas Orozco (norozco6)
+
+Purpose:
+Ddevelop the client side of a simple HTTP-based download application similar to curl or wget
+Files:
+	-src:
+		-main.cpp
+	-doc:
+		-README
+	-bin: 

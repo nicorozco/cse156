@@ -3,10 +3,10 @@ CXX = clang++
 CXXFLAGS = -Wall -std=c++17
 
 #Executable name
-TARGET = main
+TARGET = bin/main
 
 #Source Files
-SRCS = main.cpp
+SRCS = src/main.cpp
 
 #Object Files
 OBJS = $(SRCS:.cpp=.o)
