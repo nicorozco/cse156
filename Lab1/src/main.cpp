@@ -213,6 +213,27 @@ int main (int argc, char* argv[]) {
 		std::istringstream responseStream(response); // create an input stream from the response string, in order to read line by line
 		std::string statusLine; //string to hold the first line of the HTTP Response
 		std::getline(responseStream,statusLine); // utilize to get line to read up the new line and store the first line
+		std::string contentLine;
+		
+		for (int i = 0; i < 3; i++) {
+			std::getline(responseStream,contentLine);
+		}
+		std::cout << "Content Line" << contentLine << "\n";
+
+		
+		//make a input stream from the string
+		std::istringstream contentLineStream(contentLine);
+		std::string contentHeader;
+		std::string byteLenght;
+
+		if(contentLineStream >> contentHeader >> byteLenght ) {
+
+			std::cout << "Content-Header: " << contentHeader << "\n";
+			std::cout << "Byte-Lenght: " << byteLenght << "\n";
+
+
+		}
+
 
 		//parse the statusline to find the response code
 		std::istringstream statusLineStream(statusLine); //  turn the line into a input stream, in order to read each word
