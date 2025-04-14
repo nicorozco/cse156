@@ -25,8 +25,11 @@ int main (int argc, char* argv[]) {
 	std::string httpRequest;
 	bool hOption = false;
 	char buffer[4096];
+	std::string ip, path;
+	int port = 80;
 	int bytesrecv;
-	std::vector<char> fullData; // vector to hold all the data to pass into file
+	std::vector<char> fullData; //vector to hold all the data to pass into file
+				    
 	if (argc < 3){
 		std::cerr << "Error: not enough arguments.\n";
 		std::cerr << "Usage: ./main <hostname> <IP Address:Port Number(Optional)> <-h (for headers only)>" << "\n";
@@ -51,12 +54,22 @@ int main (int argc, char* argv[]) {
 	//1.) IP 2.) Port 3.) Document Path
 	// Step 1: Find ':' (split IP and port)
     	size_t colonPos = url.find(':');
-        std::string ip = url.substr(0, colonPos);
+        size_t slashPos = url.find('/');
 	// Step 2: Find '/' after the colon (split port and path)
-        size_t slashPos = url.find('/', colonPos);
-	std::string port = url.substr(colonPos + 1, slashPos - colonPos - 1);
-        std::string path = url.substr(slashPos); // from slash to end
-	int portInt = std::stoi(port);
+	
+	if(colonPos != std::string::npos && colonPos < slashPos){
+		//Format is: ip:port/path
+		ip = url.substr(0, colonPos);
+		std::string portStr = url.substr(colonPos+1,slashPos - colonPos - 1);
+		port = std::stoi(portStr);
+
+	} else {
+		//Format is: ip/path
+		ip = url.substr(0,slashPos);
+	}
+
+        path = url.substr(slashPos); // from slash to end
+	
 		
 		// Prints for Troubleshooting:
 		//std::cout << "Number of Arguments Provided:  "<< argc << "\n";
@@ -85,12 +98,12 @@ int main (int argc, char* argv[]) {
 	// 2c.) set the port number
 	//utilize htons to ensure big endian
 	//checking if port is valid
-	if (portInt < 1 || portInt > 65535){
+	if (port < 1 || port > 65535){
 		std::cerr << "Error: Invalid port number\n";
 		return 6;
 		
 	}
-	serverAddress.sin_port = htons(portInt); 
+	serverAddress.sin_port = htons(port); 
 	// 2d.) set the IP Address
 	// we utilize (inet_pton) a function to convert the IP address from text form into binary	
 		//std::cout << "IP Address: " << ip<< "\n";
