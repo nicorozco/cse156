@@ -194,8 +194,8 @@ int main (int argc, char* argv[]) {
 		
 		// 5.) recived the request (.recv())
 		//Step1: we are going to recieved until headers are complete headers are complete when we find \r\n\r\n
-		//std::cout << "Recieving Data" << "\n";	
 		while((bytesrecv = recv(clientSocket, buffer, sizeof(buffer),0)) > 0) { 
+			std::cout << "Recieving Data" << "\n";	
 			// insert chunked data into the vector	
 			fullData.insert(fullData.end(), buffer, buffer + bytesrecv);	
 			//when do we know when to stop reading bytes, utilize the content lenght 
@@ -265,41 +265,18 @@ int main (int argc, char* argv[]) {
 			close(clientSocket);
 		}
 
-		// convert the vector to a string
-		std::string response(fullData.begin(), fullData.end());
-		
-		// Get the status line (first line)
-		std::istringstream responseStream(response); // create an input stream from the response string, in order to read line by line
-		std::string statusLine; //string to hold the first line of the HTTP Response
-		std::getline(responseStream,statusLine); // utilize to get line to read up the new line and store the first line
-		std::string contentLine;
-		
-		for (int i = 0; i < 3; i++) {
-			std::getline(responseStream,contentLine);
-		}
-		std::cout << "Content Line" << contentLine << "\n";
+		// Checking for Status Code
+		//convering vector to string
+		std::string response(fullData.begin(), fullData.end()); // create an input stream from the response string in order to read line by line
+		// Get the first line
+		std::istringstream responseStream(response); 
+		std::string statusLine; //holder for the first line of HTTP response
+		std::getline(responseStream,statusLine); // utilize the get line reads up to \n
+		std::istringstream statusLineStream(statusLine);
+		std::string httpVersion;
+		int statusCode;
+		std::string statusMessage;
 
-		
-		//make a input stream from the string
-		std::istringstream contentLineStream(contentLine);
-		std::string contentHeader;
-		std::string byteLenght;
-
-		if(contentLineStream >> contentHeader >> byteLenght ) {
-
-			std::cout << "Content-Header: " << contentHeader << "\n";
-			std::cout << "Byte-Lenght: " << byteLenght << "\n";
-
-
-		}
-
-
-		//parse the statusline to find the response code
-		std::istringstream statusLineStream(statusLine); //  turn the line into a input stream, in order to read each word
-		std::string httpVersion; // hold the http version
-		int statusCode; //to hold the status code
-		std::string statusMessage; // status message
-		
 		//utilize >> to extract the words from the statsLineStream
 		if (statusLineStream >> httpVersion >> statusCode) {
 			//std::cout << "Status Line :" << statusLine << "\n";
@@ -312,6 +289,7 @@ int main (int argc, char* argv[]) {
 		} else {
 			std::cerr << "Failed to parse HTTP status line.\n";
 		}
+		
 
 	
 		
