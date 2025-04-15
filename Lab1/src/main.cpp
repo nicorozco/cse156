@@ -1,4 +1,5 @@
 #include <iostream>
+#include <regex>
 #include <sstream> // for stream 
 #include <cctype> // to test character classification
 #include <fstream>
@@ -14,7 +15,11 @@
 #include <errno.h>       // for errno
 #include <cstdlib> // for stoi()
 
+bool isValidIPv4Format(const std::string& ip){
 
+	std::regex ipv4Pattern(R"(^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$)");
+	return std::regex_match(ip, ipv4Pattern); 
+}
 
 
 int main (int argc, char* argv[]) {
@@ -31,7 +36,8 @@ int main (int argc, char* argv[]) {
 	int port = 80;
 	int bytesrecv;
 	std::vector<char> fullData; //vector to hold all the data to pass into file
-				    
+
+
 	if (argc < 3){
 		std::cerr << "Error: not enough arguments.\n";
 		std::cerr << "Usage: ./main <hostname> <IP Address:Port Number(Optional)> <-h (for headers only)>" << "\n";
@@ -73,11 +79,16 @@ int main (int argc, char* argv[]) {
 	} else {
 		//Format is: ip/path
 		ip = url.substr(0,slashPos);
-	}
 
-        path = url.substr(slashPos); // from slash to end
+	}
 	
-		
+	path = url.substr(slashPos); // from slash to end
+	//after we have extracted the ip address we check if it's valid
+	if (isValidIPv4Format(ip)){
+		std::cout << ip << " Is a valid IPv4 format." << "\n";
+	}else{
+		std::cout << ip << " is not a valid IPv4 format" << "\n";
+	}
 		// Prints for Troubleshooting:
 		//std::cout << "Number of Arguments Provided:  "<< argc << "\n";
 		//std::cout << "First Command Input: " << argv[0] << "\n";
@@ -89,7 +100,6 @@ int main (int argc, char* argv[]) {
     	        //std::cout << "Path: " << path << "\n";
 
 		
-
 	//std::cout << "Creating Socket" << "\n";
 	// 1.) Create a Socket(file descriptor)	
 	int clientSocket = socket(AF_INET,SOCK_STREAM,0);
@@ -108,8 +118,8 @@ int main (int argc, char* argv[]) {
 	if (port < 1 || port > 65535){
 		std::cerr << "Error: Invalid port number\n";
 		return 6;
-		
 	}
+
 	serverAddress.sin_port = htons(port); 
 	// 2d.) set the IP Address
 	// we utilize (inet_pton) a function to convert the IP address from text form into binary	
@@ -167,26 +177,33 @@ int main (int argc, char* argv[]) {
 			//std::cout << "Sending HEAD request" << "\n";
 		//  4a.) if the h option is set the http request METHOD TO head
 			httpRequest = "HEAD " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "X-UCSC-Student-ID: norozco6 \r\n" + "Connection: close\r\n" +"\r\n";
-		}
+			//std::cout << httpRequest << "\n";
+		}else{
 		
-		// 4b.) else use the regular GET METHOD
-		//std::cout << "Sending Get Request" << "\n";
-		httpRequest = "GET " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "X-UCSC-Student-ID: norozco6 \r\n" + "Connection: close\r\n" + "\r\n";
-		//std::cout << httpRequest << "\n";
+			// 4b.) else use the regular GET METHOD
+			//std::cout << "Sending Get Request" << "\n";
+			httpRequest = "GET " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "X-UCSC-Student-ID: norozco6 \r\n" + "Connection: close\r\n" + "\r\n";
+			//std::cout << httpRequest << "\n";
+		}
 		// the second argument is a pointer to where you want to store the response
 		if ((send(clientSocket, httpRequest.c_str(), httpRequest.length(), 0)) < 1){
 			std::cerr << "Error Sending HTTP Request" << "\n";
 			close(clientSocket);
 		}
 		
-
+		// int myCounter; 
 		// 5.) recived the request (.recv())
 		//std::cout << "Recieving Data" << "\n";	
 		while((bytesrecv = recv(clientSocket, buffer, sizeof(buffer),0)) > 0) { 
+			
+			
+			//when do we know when to stop reading bytes, without waiting for a time 
+			// utilize the content lenght 
 			//std::cout << "Bytes Recieved" << bytesrecv<< "\n";
 			// what does recieved return if succesful the number of bytes actually read into the buffer, if uncessful, returns negative value 
 			// while we are recieving write the buffer into the the full data vector
 			fullData.insert(fullData.end(), buffer, buffer + bytesrecv);	
+			
 			if(hOption){
 				//h option write out to terminal
 				std::cout.write(buffer,bytesrecv);
