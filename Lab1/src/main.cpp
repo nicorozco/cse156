@@ -43,7 +43,7 @@ int main (int argc, char* argv[]) {
 	if (argc < 3){
 		std::cerr << "Error: not enough arguments.\n";
 		std::cerr << "Usage: ./main <hostname> <IP Address:Port Number(Optional)> <-h (for headers only)>" << "\n";
-		return EXIT_FAILURE;
+		return 11;
 	}
 	
 	// check if the flag is provided 
@@ -93,9 +93,7 @@ int main (int argc, char* argv[]) {
 	}
 	
 	//after we have extracted the ip address we check if it's valid
-	if (isValidIPv4Format(ip)){
-		std::cout << ip << " Is a valid IPv4 format." << "\n";
-	}else{
+	if (isValidIPv4Format(ip) == false){
 		std::cout << ip << " is not a valid IPv4 format" << "\n";
 	}
 		// Prints for Troubleshooting:
@@ -206,6 +204,13 @@ int main (int argc, char* argv[]) {
 		while((bytesrecv = recv(clientSocket, buffer, sizeof(buffer),0)) > 0) { 
 			//std::cout << "Recieving Data" << "\n";	
 			// insert chunked data into the vector	
+			
+			if(hOption){
+				//h option write out to terminal
+				//std::cout << "Writing Content to Buffer \n";
+				std::cout.write(buffer,bytesrecv);
+			}
+			
 			fullData.insert(fullData.end(), buffer, buffer + bytesrecv);	
 			//when do we know when to stop reading bytes, utilize the content lenght 
 			// 1.) First we need to for the end of header in the vector
@@ -253,12 +258,7 @@ int main (int argc, char* argv[]) {
 
 				}
 			}
-				//std::cout << "Bytes Recieved" << bytesrecv<< "\n";
 			
-				if(hOption){
-					//h option write out to terminal
-					std::cout.write(buffer,bytesrecv);
-				}
 		}
 		
 		//std::cout << "Printing Out Contents: " << "\n";
@@ -299,9 +299,10 @@ int main (int argc, char* argv[]) {
 			std::cerr << "Failed to parse HTTP status line.\n";
 		}
 		
-		std::cout << "Index of Header End:" << headerEndIndex << "\n";
-		std::cout << "Content Lenght: " << contentLenght << "\n";
+		//std::cout << "Index of Header End:" << headerEndIndex << "\n";
+		//std::cout << "Content Lenght: " << contentLenght << "\n";
 		std::vector<char> body;
+		
 		if (hOption == false){
 			//if h option is not available means we recieved a get message with http body, which we need to extract
 			// since we already have a vector with the entire HTTP Reponse
