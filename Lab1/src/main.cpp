@@ -33,6 +33,7 @@ int main (int argc, char* argv[]) {
 	bool hOption = false;
 	char buffer[4096];
 	std::string ip, path;
+	path = "/";
 	int port = 80;
 	int bytesrecv;
 	std::vector<char> fullData; //vector to hold all the data to pass into file
@@ -65,7 +66,15 @@ int main (int argc, char* argv[]) {
     	size_t colonPos = url.find(':');
         size_t slashPos = url.find('/');
 	// Step 2: Find '/' after the colon (split port and path)
-	
+	// if no path is found meaning slashpos == npos
+	// we set the path to the root ("/")
+	// else if there is a dash we set the path from the slash to the end
+	if (slashPos == std::string::npos){
+		path = "/";
+
+	}else {
+		path = url.substr(slashPos); // from slash to end
+	}
 	if(colonPos != std::string::npos && colonPos < slashPos){
 		//Format is: ip:port/path
 		ip = url.substr(0, colonPos);
@@ -83,7 +92,6 @@ int main (int argc, char* argv[]) {
 
 	}
 	
-	path = url.substr(slashPos); // from slash to end
 	//after we have extracted the ip address we check if it's valid
 	if (isValidIPv4Format(ip)){
 		std::cout << ip << " Is a valid IPv4 format." << "\n";
@@ -193,16 +201,17 @@ int main (int argc, char* argv[]) {
 		}
 		
 		// 5.) recived the request (.recv())
+		size_t headerEndIndex;// grab the index where the headers end
 		//Step1: we are going to recieved until headers are complete headers are complete when we find \r\n\r\n
 		while((bytesrecv = recv(clientSocket, buffer, sizeof(buffer),0)) > 0) { 
-			std::cout << "Recieving Data" << "\n";	
+			//std::cout << "Recieving Data" << "\n";	
 			// insert chunked data into the vector	
 			fullData.insert(fullData.end(), buffer, buffer + bytesrecv);	
 			//when do we know when to stop reading bytes, utilize the content lenght 
 			// 1.) First we need to for the end of header in the vector
 
 			if (!headerParse){
-				std::cout << "Reading Headers \n";
+				//std::cout << "Reading Headers \n";
 				
 				std::string delimiter = "\r\n\r\n";
 				// utilize search to find where the end of headers are
@@ -210,15 +219,15 @@ int main (int argc, char* argv[]) {
 			
 				//2.) We need to confirm the end of header marker was found
 				if (it != fullData.end()){ // if it == fullData.end means we didn't find the header
-					size_t headerEndIndex = std::distance(fullData.begin(), it) + delimiter.length();
+					headerEndIndex = std::distance(fullData.begin(), it) + delimiter.length();
 					headerParse = true;
 
-					std::cout << "Extracting Header\n";
+					//std::cout << "Extracting Header\n";
 					//extract the headers
 					std::string headers(fullData.begin(), fullData.begin() + headerEndIndex);
 
 					//Parse the Content-Lenght:
-					size_t pos = headers.find("Content-Lenght:");
+					size_t pos = headers.find("Content-Length:");
 					if (pos != std::string::npos){
 						std::string lenStr = headers.substr(pos + 15);
 						lenStr = lenStr.substr(0, lenStr.find("\r\n"));
@@ -234,7 +243,7 @@ int main (int argc, char* argv[]) {
 					}
 				}else{
 					//Headers already parsed, just recieved the body
-					std::cout << "Header already pasred, just recieving the body\n"; 
+					//std::cout << "Header already pasred, just recieving the body\n"; 
 					size_t headerEndIndex = std::string(fullData.begin(), fullData.end()).find("\r\n\r\n") + 4;
 					int bodySize = fullData.size() - headerEndIndex;
 					//stop recieving data
@@ -290,12 +299,17 @@ int main (int argc, char* argv[]) {
 			std::cerr << "Failed to parse HTTP status line.\n";
 		}
 		
-
-	
-		
+		std::cout << "Index of Header End:" << headerEndIndex << "\n";
+		std::cout << "Content Lenght: " << contentLenght << "\n";
+		std::vector<char> body;
 		if (hOption == false){
+			//if h option is not available means we recieved a get message with http body, which we need to extract
+			// since we already have a vector with the entire HTTP Reponse
+			// we utilize the headerEndIndex, where tell us where the body 
+			//also utilize contentLnenght -> to know how many bytes to read from the body 
+			body.insert(body.end(),fullData.begin() + headerEndIndex, fullData.begin() + headerEndIndex + contentLenght); 
 			//utilize reverse algorithm to reverse the data
-			std::reverse(fullData.begin(), fullData.end());
+			//std::reverse(fullData.begin(), fullData.end());
 			//create a file 
 			std::ofstream outfile("slug_download_norozco6.dat",std::ios::binary);
 			//check for error openning file
@@ -305,7 +319,7 @@ int main (int argc, char* argv[]) {
 			}else{
 				//write from the fulldata input into the file
 				//std::cout << "Writing Final Data to File" << "\n";
-				outfile.write(fullData.data(),fullData.size());
+				outfile.write(body.data(),body.size());
 				outfile.close();
 			}
 		}
