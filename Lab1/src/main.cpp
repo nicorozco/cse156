@@ -30,6 +30,14 @@ bool isValidHost(const std::string& hostname){
 	return std::regex_match(hostname, pattern);
 }
 
+bool isValidPath(const std::string& path){
+	if(path.length() > 2000){
+		return false;
+	}	
+	std::regex pattern(R"(^\/[a-zA-Z0-9\-._~\/]*$)");
+	return std::regex_match(path,pattern);
+}
+
 int main (int argc, char* argv[]) {
 	
 	std::string hostname;
@@ -110,10 +118,17 @@ int main (int argc, char* argv[]) {
 	//after we have extracted the ip address we check if it's valid
 	if (isValidIPv4Format(ip) == false){
 		std::cout << ip << " is not a valid IPv4 format" << "\n";
+		return 11;
 	}
 	if (isValidHost(hostname) == false){
 
-		std::cout << hostname << "is not a valid host name format" << "\n";	
+		std::cout << hostname << " is not a valid host name format" << "\n";	
+		return 11;
+	}
+	if (isValidPath(path) == false){
+
+		std::cout << path << " is not a valid path format" << "\n";
+		return 11;
 	}
 		// Prints for Troubleshooting:
 		//std::cout << "Number of Arguments Provided:  "<< argc << "\n";
