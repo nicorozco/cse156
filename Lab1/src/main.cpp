@@ -355,13 +355,14 @@ int main (int argc, char* argv[]) {
 			//also utilize contentLnenght -> to know how many bytes to read from the body 
 			body.insert(body.end(),fullData.begin() + headerEndIndex, fullData.begin() + headerEndIndex + contentLenght); 
 			//utilize reverse algorithm to reverse the data
-			std::reverse(fullData.begin(), fullData.end());
+			std::reverse(body.begin(), body.end());
 			//create a file 
 			std::ofstream outfile("slug_download_norozco6.dat",std::ios::binary);
 			//check for error openning file
 			if (!outfile) {
 				std::cerr << "Failed to open file for writing" << "\n";
 				close(clientSocket);
+				return 10;
 			}else{
 				//write from the fulldata input into the file
 				//std::cout << "Writing Final Data to File" << "\n";
