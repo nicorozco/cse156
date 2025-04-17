@@ -20,7 +20,15 @@ bool isValidIPv4Format(const std::string& ip){
 	std::regex ipv4Pattern(R"(^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$)");
 	return std::regex_match(ip, ipv4Pattern); 
 }
+bool isValidHost(const std::string& hostname){
+	//function to allow DNS valid hostnames
+	if (hostname.length() > 253){
+		return false;
+	}
 
+	std::regex pattern(R"(^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$)");
+	return std::regex_match(hostname, pattern);
+}
 
 int main (int argc, char* argv[]) {
 	
@@ -47,17 +55,24 @@ int main (int argc, char* argv[]) {
 	}
 	
 	// check if the flag is provided 
-	if (argc == 4 && std::string(argv[3]) == "-h") {
-		hOption = true;
-		hostname  = argv[1];
-		url = argv[2];
+	if (argc == 4){ 
+		//if we have 4 arguments that means we should have the -h flag in the 3rd
+		if (std::string(argv[3]) == "-h") {
+			hOption = true;
+			hostname  = argv[1];
+			url = argv[2];
+		}else{
+			std::cerr << "Error: '-h' flag must be in the correct position (the last argument)."<< "\n";
+			return 11;
+
+		}
 	}else if (argc == 3){
 		//no -h option given
 	 	hostname = argv[1];
 	 	url = argv[2];	
 	} else {
 		std::cerr << "Error: Invalid Arguments" << "\n";
-		return EXIT_FAILURE;
+		return 11;
 
 	}
 	//split the url into multiple parts 
@@ -95,6 +110,10 @@ int main (int argc, char* argv[]) {
 	//after we have extracted the ip address we check if it's valid
 	if (isValidIPv4Format(ip) == false){
 		std::cout << ip << " is not a valid IPv4 format" << "\n";
+	}
+	if (isValidHost(hostname) == false){
+
+		std::cout << hostname << "is not a valid host name format" << "\n";	
 	}
 		// Prints for Troubleshooting:
 		//std::cout << "Number of Arguments Provided:  "<< argc << "\n";
