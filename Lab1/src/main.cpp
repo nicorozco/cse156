@@ -154,13 +154,15 @@ int main (int argc, char* argv[]) {
 	// 2b.) set the IP Family
 	serverAddress.sin_family = AF_INET;
 	// 2c.) set the port number
+
 	//utilize htons to ensure big endian
+	
 	//checking if port is valid
 	if (port < 1 || port > 65535){
 		std::cerr << "Error: Invalid port number\n";
+		close(clientSocket);
 		return 6;
 	}
-
 	serverAddress.sin_port = htons(port); 
 	// 2d.) set the IP Address
 	// we utilize (inet_pton) a function to convert the IP address from text form into binary	
@@ -272,6 +274,13 @@ int main (int argc, char* argv[]) {
 						lenStr = lenStr.substr(0, lenStr.find("\r\n"));
 						contentLenght = std::stoi(lenStr);
 					}
+					if (headers.find("Transfer-Enconding: Chunked") != std::string::npos){
+						std::cerr << "Error: 'Transfer-Encoding: Chunked' Not supported\n";
+						close(clientSocket);
+						return 11;
+					}
+
+
 					//calculate how much of the body we have
 					int fullDataBytes = fullData.size() - headerEndIndex;
 
@@ -303,7 +312,9 @@ int main (int argc, char* argv[]) {
 		}
 		*/
 
-		if (bytesrecv < 0){
+		if(bytesrecv == 0){
+			std::cout << "Connection closed by server (EOF reached)\n";
+		}else if (bytesrecv < 0){
 			std::cerr << "Error recieving" << "\n";
 			close(clientSocket);
 		}
@@ -344,7 +355,7 @@ int main (int argc, char* argv[]) {
 			//also utilize contentLnenght -> to know how many bytes to read from the body 
 			body.insert(body.end(),fullData.begin() + headerEndIndex, fullData.begin() + headerEndIndex + contentLenght); 
 			//utilize reverse algorithm to reverse the data
-			//std::reverse(fullData.begin(), fullData.end());
+			std::reverse(fullData.begin(), fullData.end());
 			//create a file 
 			std::ofstream outfile("slug_download_norozco6.dat",std::ios::binary);
 			//check for error openning file
