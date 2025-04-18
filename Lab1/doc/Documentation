@@ -39,5 +39,8 @@ Internal Design:
 					- As we recieved data from the socket, we compare the bytes recieved with the content-lenght:
 						- if these values are equal we break from recieving
 		7.) Process the Information Recievd:
+			- Create an input stream from the vector
+				- extract the statuscode, if the status code is greater than 400 we return 9
 
+		8.) Outputting the Data
 Shortcomings:
