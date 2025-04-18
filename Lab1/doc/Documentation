@@ -45,4 +45,17 @@ Internal Design:
 		8.) Outputting the Data:
 			- We extract the data from the full body vector into a vector only containing the body of the message
 			- Reverse the Data & Output to a file
+
+
+Functions:
+	- bool isValidIPVv4Format();
+		- Function utilizing regex to ensure the IP Address provided is an argument
+		is in compliance with IPv4 standard, return true if valid else return false
+		if invalid IPv4 Address
+	- bool isValidHost();
+		- Function utilizing regex to ensure the host name provided adheres to DNS regulations
+		ensuring the hostname is able to be request in HTTP Request
+	- bool isValidPath();
+		- Function to ensure the path provided for the specific file is valid by being a certain size
+		under 2000 character and able to utilize certain characters.
 Shortcomings:
