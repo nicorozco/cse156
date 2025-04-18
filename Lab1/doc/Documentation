@@ -13,5 +13,26 @@ To utilize this program, 3 arguments can be provided:
 	3.) -h flag (Optional): this option is utilized to request only the HTTP headers of server response. When enabled, the program prints the headers directly to the terminal and omits the body of the response. print to the terminal.
  
 Internal Design:
+	1.) Structure of the Program:
+	- Options are provided by the users, the program parses and set's the appropriate field
+	- The program then utilizes these inputs to create a connection with the server:
+		1a.) Create a client socket, for the purpose of connecting,sending and recieving message between server
+		1b.) Create a server socket struture and input the provided arguments to connect to the server
+		1c.) HTTP Request Creation:
+			- if the h flag was provided we create a http request message with the "HEAD" method to only recieved the headers, 
+			by design we set the connection to close to ensure our code isn't remained in a state of recieving once the server has finished sending the request
+			- By Default: the client will create a http request message with the "GET" method
+
+		1d.) Send the HTTP Request out of the client file descriptor 
+		1e.) Run a while look to recievied from the client socket until not further bytes are recieved
+			- H Option:
+				If the h-option is provided we print directly from the buffer into the terminal
+			- Default: 
+				The program will store the data into a vector as it recieved from the socket
+
+			- Stoping Condition for Loop:
+			 	-To ensure we stop when the socket no longer recievies data, we parse the headers
+			 we parse the headers to know the content-lenght field
+				
 
 Shortcomings:
