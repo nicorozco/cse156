@@ -279,6 +279,7 @@ int main (int argc, char* argv[]) {
 
 		if(bytesrecv == 0){
 			std::cout << "Connection closed by server (EOF reached)\n";
+			close(clientSocket);
 		}else if (bytesrecv < 0){
 			std::cerr << "Error recieving" << "\n";
 			close(clientSocket);
@@ -292,10 +293,20 @@ int main (int argc, char* argv[]) {
 		if (statusLineStream >> httpVersion >> statusCode) {
 
 			if(statusCode >= 400){
-				return 9;
+				std::ofstream outfile("slug_download_norozco6.dat",std::ios::binary);
+				if (!outfile) {
+					std::cerr << "Failed to open file for writing" << "\n";
+					close(clientSocket);
+					return 10;
+				}else{
+					outfile.write(fullData.data(),fullData.size());
+					outfile.close();
+					return 9;
+				}
 			}
 		}else {
 			std::cerr << "Failed to parse HTTP status line.\n";
+			return 11;
 		}
 			
 		if (hOption == false){
