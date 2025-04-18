@@ -59,3 +59,5 @@ Functions:
 		- Function to ensure the path provided for the specific file is valid by being a certain size
 		under 2000 character and able to utilize certain characters.
 Shortcomings:
+	- Opted to utilize the default kernel connection termination, 
+	will lead to a longer connection termination when connection errrors occur
