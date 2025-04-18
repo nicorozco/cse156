@@ -1,3 +1,17 @@
 Usage: 
+	./main <hostname> <IP Address of host server:Port Number(optional)/path to resource> -h (optional)
+
+To utilize this program, 3 arguments can be provided: 
+
+	1.) Hostname - Specifies the domain name of the target server(www.google.com). This allows the client to request the specific website hosted on a shared server. Note: the host name must be follow the DNS rules, else it will be rejected by the program
+
+	2.) URL: 
+          - IP Address: - Identifies the server hosting the requested website. By default, the program connects to port 80, the standard port for HTTP Traffic. 
+	 - Port (Optional): If you'd like to specify a different port that is allowed, otherwise as before the deault will remain 80
+	- Path: The allows us to request the specific resource you want to access. Note: If not path is provided the path will default to the root path (/)
+	
+	3.) -h flag (Optional): this option is utilized to request only the HTTP headers of server response. When enabled, the program prints the headers directly to the terminal and omits the body of the response. print to the terminal.
+ 
 Internal Design:
+
 Shortcomings:
