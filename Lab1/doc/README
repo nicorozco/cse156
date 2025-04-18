@@ -3,7 +3,8 @@ Simple HTTP Client
 Nicolas Orozco (norozco6)
 
 Purpose:
-Develop the client side of a simple HTTP-based download application similar to curl or wget
+A client side of a simple HTTP-based download application similar to curl or wget
+
 Files:
 	-src:
 		-main.cpp
