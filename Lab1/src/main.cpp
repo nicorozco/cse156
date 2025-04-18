@@ -73,7 +73,11 @@ int main (int argc, char* argv[]) {
 	// check if the flag is provided 
 	if (argc == 4){ 
 		//if we have 4 arguments that means we should have the -h flag in the 3rd
-		if (std::string(argv[3]) == "-h") {
+		
+		std::string flag = argv[3];
+		std::transform(flag.begin(),flag.end(),flag.begin(), ::tolower);
+		
+		if (flag  == "-h") {
 			hOption = true;
 			hostname  = argv[1];
 			url = argv[2];
@@ -89,8 +93,8 @@ int main (int argc, char* argv[]) {
 	} else {
 		std::cerr << "Error: Invalid Arguments" << "\n";
 		return 11;
-
 	}
+
 	//split the url into multiple parts 
     	colonPos = url.find(':');
         slashPos = url.find('/');
@@ -100,6 +104,7 @@ int main (int argc, char* argv[]) {
 	}else {
 		path = url.substr(slashPos); // from slash to end
 	}
+
 	if(colonPos != std::string::npos && colonPos < slashPos){
 		//Format is: ip:port/path
 		ip = url.substr(0, colonPos);
@@ -132,7 +137,6 @@ int main (int argc, char* argv[]) {
 		std::cout << path << " is not a valid path format" << "\n";
 		return 11;
 	}
-
 	// 1.) Create a Socket(file descriptor)	
 	int clientSocket = socket(AF_INET,SOCK_STREAM,0);
 	//error has occured creating socket 
@@ -223,9 +227,7 @@ int main (int argc, char* argv[]) {
 
 			if (!headerParse){
 				//std::cout << "Reading Headers \n";
-				
-				std::string delimiter = "\r\n\r\n";
-				// utilize search to find where the end of headers are
+				std::string delimiter = "\r\n\r\n";	
 		        	auto it = std::search(fullData.begin(),fullData.end(),delimiter.begin(),delimiter.end());	
 			
 				//2.) We need to confirm the end of header marker was found
@@ -292,7 +294,7 @@ int main (int argc, char* argv[]) {
 			if(statusCode >= 400){
 				return 9;
 			}
-		} else {
+		}else {
 			std::cerr << "Failed to parse HTTP status line.\n";
 		}
 			
