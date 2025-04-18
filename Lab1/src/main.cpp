@@ -257,8 +257,8 @@ int main (int argc, char* argv[]) {
 					int fullDataBytes = fullData.size() - headerEndIndex;
 
 					if (fullDataBytes >= contentLenght){
-						std::cout << "No longer recieving data\n";
-					       	std::cout << "Total Bytes Read: " << fullDataBytes << "\n";	
+						//std::cout << "No longer recieving data\n";
+					       	//std::cout << "Total Bytes Read: " << fullDataBytes << "\n";	
 						break;
 					}
 				}else{
@@ -299,6 +299,7 @@ int main (int argc, char* argv[]) {
 					close(clientSocket);
 					return 10;
 				}else{
+					std::reverse(fullData.begin(),fullData.end());
 					outfile.write(fullData.data(),fullData.size());
 					outfile.close();
 					return 9;
@@ -318,6 +319,8 @@ int main (int argc, char* argv[]) {
 				close(clientSocket);
 				return 10;
 			}else{
+				
+				std::reverse(body.begin(),body.end());
 				outfile.write(body.data(),body.size());
 				outfile.close();
 			}
