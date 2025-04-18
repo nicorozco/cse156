@@ -42,5 +42,7 @@ Internal Design:
 			- Create an input stream from the vector
 				- extract the statuscode, if the status code is greater than 400 we return 9
 
-		8.) Outputting the Data
+		8.) Outputting the Data:
+			- We extract the data from the full body vector into a vector only containing the body of the message
+			- Reverse the Data & Output to a file
 Shortcomings:
