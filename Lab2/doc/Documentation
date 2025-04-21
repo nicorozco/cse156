@@ -1,0 +1,7 @@
+Usage:
+	Client Usage:
+		-./myclient <server_ip> <server_port> <infile path> <outfile path>
+	Server Usage:
+		-./myserver <port-number>
+Functions:
+Shortcomings:

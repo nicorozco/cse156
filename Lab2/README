@@ -1,0 +1,20 @@
+CSE156/L Spring 2025 Programming Lab 2
+Echo Application utilizing UDP
+
+Nicolas Orozco (norozco6)
+
+Purpose:
+Ddevelop a UDP client and server, for the server to echo the exact file sent by client and store it 
+Files:
+	-src:
+		-main.cpp
+
+	-doc:
+		-README
+		- Documentation
+	
+	-bin: 
+		-main (executable) main file to be ran 
+	
+	-Makefile:
+		- to generate executable in bin
