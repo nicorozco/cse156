@@ -110,6 +110,8 @@ int main (int argc, char* argv[]) {
 		perror("Error Recieving");
 		return -1;
 	}
+	std::cout << "Recieved: " << buffer << "from" << inet_ntoa(serverAddress.sin_addr) << ":" << ntohs(serverAddress.sin_port) << "\n";
+
 	close(clientSocket);
 	return 0;
 }
