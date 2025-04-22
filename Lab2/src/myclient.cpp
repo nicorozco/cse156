@@ -1,0 +1,115 @@
+#include <iostream>
+#include <regex>
+#include <sstream> // for stream 
+#include <cctype> // to test character classification
+#include <fstream>
+#include <string>
+#include <algorithm>
+#include <vector> // for vector
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>      // for close()
+#include <cstring>       // for memset()
+#include <errno.h>       // for errno
+#include <cstdlib> // for stoi()
+#include "client.h"
+
+bool isValidIPv4Format(const std::string& ip){	
+	std::regex ipv4Pattern(R"(^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$)");
+	return std::regex_match(ip, ipv4Pattern);
+}
+
+int main (int argc, char* argv[]) {
+	
+	std::string serverIP;
+	std::string Port;
+	std::string infilePath;
+	std::string outfilePath;
+	char buffer[1024];
+	
+	if (argc < 3){
+		std::cerr << "Error: not enough arguments.\n";
+		std::cerr << "Usage: ./myclient <sever_ip> <server port> <infile path> <outfile path>" << "\n";
+	}
+	
+	if (argc == 5){ 
+		//if we have 4 arguments that means we should have the -h flag in the 3rd		
+		serverIP = argv[1];
+		Port = argv[2];
+		infilePath = argv[3];
+		outfilePath = argv[4];
+	} else {
+		std::cerr << "Error: Invalid Arguments" << "\n";
+	}
+
+	int serverPort = std::stoi(Port);
+
+	//after we have extracted the ip address we check if it's valid
+	if (isValidIPv4Format(serverIP) == false){
+		std::cout << serverIP << " is not a valid IPv4 format" << "\n";
+		return 11;
+	}
+
+	// 1.) Create a UDP Socket(file descriptor)	
+	int clientSocket = socket(AF_INET,SOCK_DGRAM,0);
+	//error has occured creating socket 
+	if (clientSocket < 0) {
+		std::cerr << "Socket creating failed: " << strerror(errno) << "\n";
+		return 1;
+	}	
+	// 2.) Specify the Server Address we utilize a structure for the address	
+	sockaddr_in serverAddress; 
+	serverAddress.sin_family = AF_INET;
+	
+	//checking if port is valid
+	if (serverPort < 1 || serverPort > 65535){
+		std::cerr << "Error: Invalid port number\n";
+		close(clientSocket);
+		return 6;
+	}
+	serverAddress.sin_port = htons(serverPort); 
+	
+	// 2d.) set the IP Address
+	if (inet_pton(AF_INET,serverIP.c_str(),&serverAddress.sin_addr) <= 0 ){
+		// check for errors: 1 means address was set succesfuly, anything less than 1 means error
+		std::cerr << "Invalid Address" << "\n";
+		close(clientSocket);
+		return 7;
+	}
+	
+	//3.) Client reads a file from disk & Sends it over UDP Socket
+	//a.) Sending Data over a UDP Socket 
+	// utilize sendto() Note: each call to sendto() sends a single UDP Diagram
+	
+	// create a message 
+	const char* message = "Hello, UDP server!";
+	
+	ssize_t sentBytes = sendto(clientSocket,message,strlen(message),0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
+
+	if(sentBytes < 0){
+		perror("sendto failed");
+		close(clientSocket);
+		return -1;
+
+	}
+	// therefore if you want to send a whole file you must have a loop that sends until the end of the file is reach
+	//	a.) In order to send the file client must break the file in mss byte size packets (1500 bytes)-> Max sending size
+	//	b.) Client should be able to detect packet losses
+	//4.) Client recieved echo package from the server
+	// Recieving from udp socket 
+	
+	// utilize recvfrom() Note: returns one UDP Packet per call
+	// recvfrom() returns the number of bytes recievied from the scoket 
+	socklen_t addrlen = sizeof(serverAddress);
+	int bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);
+	// note: you can get the sender address (helpful when handling multiple sources)-> Server	
+	
+	if (bytes_recieved < 0){
+		perror("Error Recieving");
+		return -1;
+	}
+	close(clientSocket);
+	return 0;
+}

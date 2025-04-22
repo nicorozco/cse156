@@ -5,6 +5,15 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+
+bool isPortValid(int port){
+ if ( port < 1024 || port > 65553){
+	return false;
+}
+	return true;
+}	
+
+
 int main(int argc, char* argv[]){
 
 	std::string portStr;
@@ -14,13 +23,18 @@ int main(int argc, char* argv[]){
 	if (argc < 2){
 
 		std::cerr << "Please provide a port number for the server";
-
+		return -1;
 	} else if (argc == 2) {
 
 		portStr = argv[1];
 
 	}
 	port = std::stoi(portStr);
+
+	if (isPortValid(port) == false){
+		perror("Please enter a valid port");
+		return -1;
+	}
 
 	//1.) create a UDP Server
 	//a.) create a UDP socket
@@ -40,13 +54,20 @@ int main(int argc, char* argv[]){
 		perror("Bind failed");
 		close(serverSocket);
 		return 1;
-
 	}
-	// To continusly listen for packet will need a while loop but for not just doing basic function of recieving packet
+	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
+	//d.) recieved a packet
 	
+	struct sockaddr_in clientAddr;
+	socklen_t clientLen = sizeof(clientAddr);
+	
+	int bytesRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
 
-
-
+	if (bytesRecieved < 0){
+		perror("Error: Recieving");
+		return -1;
+	}
+	std::cout << "Recieved: " << buffer << "from" << inet_ntoa(clientAddr.sin_addr) << ":"<< ntohs(clientAddr.sin_port) << "\n";	
 
 	close(serverSocket);
 	return 0;
