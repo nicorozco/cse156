@@ -34,12 +34,12 @@ int main (int argc, char* argv[]) {
 		std::cerr << "Usage: ./myclient <sever_ip> <server port> <infile path> <outfile path>" << "\n";
 	}
 	
-	if (argc == 5){ 
+	if (argc == 3){ 
 		//if we have 4 arguments that means we should have the -h flag in the 3rd		
 		serverIP = argv[1];
 		Port = argv[2];
-		infilePath = argv[3];
-		outfilePath = argv[4];
+		//infilePath = argv[3];
+		//outfilePath = argv[4];
 	} else {
 		std::cerr << "Error: Invalid Arguments" << "\n";
 	}

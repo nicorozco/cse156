@@ -6,19 +6,38 @@
 #include <arpa/inet.h>
 
 
+
+void echoLoop(int serverSocket){
+	char buffer[1024];
+	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
+	struct sockaddr_in clientAddr;
+	socklen_t clientLen = sizeof(clientAddr);
+	
+	while(true){
+
+		ssize_t bytesRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
+
+		if (bytesRecieved < 0){
+		perror("Error: Recieving");
+	}
+		std::cout << "Recieved: " << buffer << "from" << inet_ntoa(clientAddr.sin_addr) << ":"<< ntohs(clientAddr.sin_port) << "\n";	
+
+	//echo it back to the client, meaning just send it back
+	sendto(serverSocket, buffer, bytesRecieved,0, (struct sockaddr*)&clientAddr, clientLen);
+	
+	}
+}
+
 bool isPortValid(int port){
  if ( port < 1024 || port > 65553){
 	return false;
 }
 	return true;
 }	
-
-
 int main(int argc, char* argv[]){
 
 	std::string portStr;
 	int port;
-	char buffer[1024];
 	
 	if (argc < 2){
 
@@ -55,20 +74,10 @@ int main(int argc, char* argv[]){
 		close(serverSocket);
 		return 1;
 	}
+
+	echoLoop(serverSocket);
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	//d.) recieved a packet
-	
-	struct sockaddr_in clientAddr;
-	socklen_t clientLen = sizeof(clientAddr);
-	
-	int bytesRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
-
-	if (bytesRecieved < 0){
-		perror("Error: Recieving");
-		return -1;
-	}
-	std::cout << "Recieved: " << buffer << "from" << inet_ntoa(clientAddr.sin_addr) << ":"<< ntohs(clientAddr.sin_port) << "\n";	
-
 	close(serverSocket);
 	return 0;
 }
