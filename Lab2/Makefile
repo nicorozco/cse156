@@ -1,23 +1,34 @@
 #Compiler
-CXX = clang++
+CXX = g++
 CXXFLAGS = -Wall -std=c++17
 
-#Executable name
-TARGET = bin/myclient bin/myserver
+BINDIR = bin
+SRCDIR = src
+
+#Executable names 
+CLIENT = $(BINDIR)/myclient
+SERVER = $(BINDIR)/myserver
+TARGET = $(CLIENT) $(SERVER)
+
 
 #Source Files
-SRCS = src/client.cpp src/server.cpp
+SRCS = $(SRCDIR)/myclient.cpp $(SRCDIR)/myserver.cpp
 
-#Object Files
-OBJS = $(SRCS:.cpp=.o)
+#Default rule
+all: $(TARGET)
 
-#Rule to build the executable
-$(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
+#Rule to build myclient
+$(CLIENT): src/myclient.o
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+#Rule to build myserver
+$(SERVER): src/myserver.o
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
 #Rule to build object files
-%.o: %.cpp
+$(SRCDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+
 #Clean Rule
 clean:
-	rm -f $(TARGET) $(OBJS)
+	rm -f $(CLIENT) $(SERVER) $(SRCDIR)/*.o
