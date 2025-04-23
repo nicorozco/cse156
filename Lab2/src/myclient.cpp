@@ -4,8 +4,6 @@
 #include <cctype> // to test character classification
 #include <fstream>
 #include <string>
-#include <algorithm>
-#include <vector> // for vector
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -15,6 +13,8 @@
 #include <errno.h>       // for errno
 #include <cstdlib> // for stoi()
 #include "client.h"
+#include <cerrno>
+#include <cstring>
 
 bool isValidIPv4Format(const std::string& ip){	
 	std::regex ipv4Pattern(R"(^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$)");
@@ -28,7 +28,8 @@ int main (int argc, char* argv[]) {
 	std::string infilePath;
 	std::string outfilePath;
 	char buffer[1024];
-	
+	std::string line;
+
 	if (argc < 3){
 		std::cerr << "Error: not enough arguments.\n";
 		std::cerr << "Usage: ./myclient <sever_ip> <server port> <infile path> <outfile path>" << "\n";
@@ -82,11 +83,26 @@ int main (int argc, char* argv[]) {
 	//3.) Client reads a file from disk & Sends it over UDP Socket
 	//a.) Sending Data over a UDP Socket 
 	// utilize sendto() Note: each call to sendto() sends a single UDP Diagram
+	// open the file 
+	//infilePath = "file.txt"; 
+	std::ifstream file("file.txt");
+	// check for error when opening file
+	if(!file.is_open()){
+		std::cerr << "Error: " << std::strerror(errno) << "\n";
+		return -1;
+	}
+
+	//read the file line by line
+	while(std::getline(file,line)){
+		std::cout << line << "\n"; //print out the line for testing
+	}
+
+	file.close(); //close the file after reading
 	
-	// create a message 
-	const char* message = "Hello, UDP server!";
-	
-	ssize_t sentBytes = sendto(clientSocket,message,strlen(message),0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
+	//const char* message = "Hello, UDP server!";
+
+	//sending the message	
+	/*ssize_t sentBytes = sendto(clientSocket,message,strlen(message),0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
 
 	if(sentBytes < 0){
 		perror("sendto failed");
@@ -94,11 +110,42 @@ int main (int argc, char* argv[]) {
 		return -1;
 
 	}
+	*/
 	// therefore if you want to send a whole file you must have a loop that sends until the end of the file is reach
-	//	a.) In order to send the file client must break the file in mss byte size packets (1500 bytes)-> Max sending size
+	
+
+
+
+
+	//a.) In order to send the file client must break the file in mss byte size packets (1500 bytes)-> Max sending size
+
+
+
+
+
+
+
 	//	b.) Client should be able to detect packet losses
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	//4.) Client recieved echo package from the server
-	// Recieving from udp socket 
 	
 	// utilize recvfrom() Note: returns one UDP Packet per call
 	// recvfrom() returns the number of bytes recievied from the scoket 
