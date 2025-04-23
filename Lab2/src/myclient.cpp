@@ -85,7 +85,7 @@ int main (int argc, char* argv[]) {
 	// utilize sendto() Note: each call to sendto() sends a single UDP Diagram
 	// open the file 
 	//infilePath = "file.txt"; 
-	std::ifstream file("file.txt");
+	std::ifstream file("test.txt");
 	// check for error when opening file
 	if(!file.is_open()){
 		std::cerr << "Error: " << std::strerror(errno) << "\n";
@@ -94,15 +94,18 @@ int main (int argc, char* argv[]) {
 	uint32_t sequence = 0;
 	//else process data in while loop
 	while(file){
+		//std::cout << "Sequence:" << sequence << "\n";
 		//create an udp packet
 		UDPPacket packet;
 		packet.sequenceNumber = htons(sequence++);
 		file.read(packet.data,sizeof(packet.data));
 		std::streamsize bytesRead = file.gcount();
+		//std::cout << "Bytes Read: " << bytesRead << "\n";
 
 		//if the bytesRead is less than zero meaning we have data send it 
 		if(bytesRead > 0){
 			// send the data
+			//std::cout << "Sending Data" << "\n";
 			ssize_t sentBytes = sendto(clientSocket,&packet, sizeof(uint32_t) + bytesRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
 
 			if(sentBytes < 0){
@@ -113,59 +116,29 @@ int main (int argc, char* argv[]) {
 
 		}
 
-
-
 	}
 	
 	file.close(); //close the file after reading
-	
-	// therefore if you want to send a whole file you must have a loop that sends until the end of the file is reach
-	
-
-
-
-
-	//a.) In order to send the file client must break the file in mss byte size packets (1500 bytes)-> Max sending size
-
-
-
-
-
-
-
-	//	b.) Client should be able to detect packet losses
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	//b.) Client should be able to detect packet losses
+	// utilize sequence numbers
 
 	//4.) Client recieved echo package from the server
-	
 	// utilize recvfrom() Note: returns one UDP Packet per call
 	// recvfrom() returns the number of bytes recievied from the scoket 
 	socklen_t addrlen = sizeof(serverAddress);
-	int bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);
+	int bytes_recieved;
+	while((bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen)) > 0){
 	// note: you can get the sender address (helpful when handling multiple sources)-> Server	
 	
+		std::cout << "Recieved: " << buffer << "from" << inet_ntoa(serverAddress.sin_addr) << ":" << ntohs(serverAddress.sin_port) << "\n";
+	
+	}
+
 	if (bytes_recieved < 0){
 		perror("Error Recieving");
 		return -1;
 	}
-	std::cout << "Recieved: " << buffer << "from" << inet_ntoa(serverAddress.sin_addr) << ":" << ntohs(serverAddress.sin_port) << "\n";
+
 
 	close(clientSocket);
 	return 0;
