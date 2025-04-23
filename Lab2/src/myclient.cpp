@@ -91,18 +91,42 @@ int main (int argc, char* argv[]) {
 		std::cerr << "Error: " << std::strerror(errno) << "\n";
 		return -1;
 	}
+	uint32_t sequence = 0;
+	//else process data in while loop
+	while(file){
+		//create an udp packet
+		UDPPacket packet;
+		packet.squenceNum = hton(sequence++);
+		file.read(packet.data,sizeof(packet.data));
+		std::streamsize bytesRead = file.gcount()
 
-	//read the file line by line
-	while(std::getline(file,line)){
-		std::cout << line << "\n"; //print out the line for testing
+		//if the bytesRead is less than zero meaning we have data send it 
+		if(bytesRead > 0){
+			ssize_t sentBytes = sendto(clientSocket,&packet, sizeof(uint32_t) + bytesRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
+
+			if(sentBytes < 0){
+				perror("sendto failed");
+				close(clientSocket);
+				return -1;
+			}
+
+		}
+
+
+
 	}
+	// add the data from the buffer into the data section of the structure
+	
 
 	file.close(); //close the file after reading
 	
+	*/
+
 	//const char* message = "Hello, UDP server!";
 
 	//sending the message	
-	/*ssize_t sentBytes = sendto(clientSocket,message,strlen(message),0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
+	const char* message = "Hello from Client";	
+	ssize_t sentBytes = sendto(clientSocket,message,strlen(message),0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
 
 	if(sentBytes < 0){
 		perror("sendto failed");
@@ -110,7 +134,7 @@ int main (int argc, char* argv[]) {
 		return -1;
 
 	}
-	*/
+
 	// therefore if you want to send a whole file you must have a loop that sends until the end of the file is reach
 	
 
