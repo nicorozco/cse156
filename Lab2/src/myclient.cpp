@@ -35,11 +35,11 @@ int main (int argc, char* argv[]) {
 		std::cerr << "Usage: ./myclient <sever_ip> <server port> <infile path> <outfile path>" << "\n";
 	}
 	
-	if (argc == 3){ 
+	if (argc == 4){ 
 		//if we have 4 arguments that means we should have the -h flag in the 3rd		
 		serverIP = argv[1];
 		Port = argv[2];
-		//infilePath = argv[3];
+		infilePath = argv[3];
 		//outfilePath = argv[4];
 	} else {
 		std::cerr << "Error: Invalid Arguments" << "\n";
@@ -85,7 +85,7 @@ int main (int argc, char* argv[]) {
 	// utilize sendto() Note: each call to sendto() sends a single UDP Diagram
 	// open the file 
 	//infilePath = "file.txt"; 
-	std::ifstream file("test.txt");
+	std::ifstream file(infilePath);
 	// check for error when opening file
 	if(!file.is_open()){
 		std::cerr << "Error: " << std::strerror(errno) << "\n";
@@ -98,9 +98,17 @@ int main (int argc, char* argv[]) {
 		//create an udp packet
 		UDPPacket packet;
 		packet.sequenceNumber = htons(sequence++);
+		//add the data to the packet
 		file.read(packet.data,sizeof(packet.data));
 		std::streamsize bytesRead = file.gcount();
 		//std::cout << "Bytes Read: " << bytesRead << "\n";
+		
+		//for testing data 
+		/*for(int i = 0; i < bytesRead; i++){
+			std::cout << packet.data[i];
+		}
+		std::cout << "\n";
+		*/
 
 		//if the bytesRead is less than zero meaning we have data send it 
 		if(bytesRead > 0){
@@ -130,7 +138,7 @@ int main (int argc, char* argv[]) {
 	while((bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen)) > 0){
 	// note: you can get the sender address (helpful when handling multiple sources)-> Server	
 	
-		std::cout << "Recieved: " << buffer << "from" << inet_ntoa(serverAddress.sin_addr) << ":" << ntohs(serverAddress.sin_port) << "\n";
+		std::cout << "Printing Data Echoed: " << buffer << "\n";  //inet_ntoa(serverAddress.sin_addr) << ":" << ntohs(serverAddress.sin_port) << "\n";
 	
 	}
 
