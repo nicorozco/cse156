@@ -27,7 +27,7 @@ int main (int argc, char* argv[]) {
 	std::string Port;
 	std::string infilePath;
 	std::string outfilePath;
-	char buffer[1024];
+	char buffer[1472];
 	std::string line;
 
 	if (argc < 3){
@@ -137,8 +137,12 @@ int main (int argc, char* argv[]) {
 	int bytes_recieved;
 	while((bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen)) > 0){
 	// note: you can get the sender address (helpful when handling multiple sources)-> Server	
-	
-		std::cout << "Printing Data Echoed: " << buffer << "\n";  //inet_ntoa(serverAddress.sin_addr) << ":" << ntohs(serverAddress.sin_port) << "\n";
+	//calculate the true payload recieved
+	size_t payloadLenght = bytes_recieved - sizeof(uint32_t);
+	// since the data stored in the buffer are raw bytes, we need to cast back into UDP Struct to interpret the data
+	UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
+	std::cout << "Sequence: " << ntohl(receivedPacket->sequenceNumber) << "Data: " << std::string(receivedPacket->data,payloadLenght) << "\n";
+		//std::cout << "Printing Data Echoed: " << buffer << "\n";  //inet_ntoa(serverAddress.sin_addr) << ":" << ntohs(serverAddress.sin_port) << "\n";
 	
 	}
 
