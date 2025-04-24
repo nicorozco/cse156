@@ -35,12 +35,12 @@ int main (int argc, char* argv[]) {
 		std::cerr << "Usage: ./myclient <sever_ip> <server port> <infile path> <outfile path>" << "\n";
 	}
 	
-	if (argc == 4){ 
+	if (argc == 5){ 
 		//if we have 4 arguments that means we should have the -h flag in the 3rd		
 		serverIP = argv[1];
 		Port = argv[2];
 		infilePath = argv[3];
-		//outfilePath = argv[4];
+		outfilePath = argv[4];
 	} else {
 		std::cerr << "Error: Invalid Arguments" << "\n";
 	}
@@ -135,15 +135,25 @@ int main (int argc, char* argv[]) {
 	// recvfrom() returns the number of bytes recievied from the scoket 
 	socklen_t addrlen = sizeof(serverAddress);
 	int bytes_recieved;
+
+	std::ofstream outFile(outfilePath);//open file path for writing
+	if(!outFile.is_open()){
+		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
+		return -1;
+	}
+
 	while((bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen)) > 0){
 	// note: you can get the sender address (helpful when handling multiple sources)-> Server	
 	//calculate the true payload recieved
-	size_t payloadLenght = bytes_recieved - sizeof(uint32_t);
+	//size_t payloadLenght = bytes_recieved - sizeof(uint32_t);
 	// since the data stored in the buffer are raw bytes, we need to cast back into UDP Struct to interpret the data
 	UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
-	std::cout << "Sequence: " << ntohl(receivedPacket->sequenceNumber) << "Data: " << std::string(receivedPacket->data,payloadLenght) << "\n";
-		//std::cout << "Printing Data Echoed: " << buffer << "\n";  //inet_ntoa(serverAddress.sin_addr) << ":" << ntohs(serverAddress.sin_port) << "\n";
-	
+	//std::cout << "Sequence: " << ntohl(receivedPacket->sequenceNumber) << "Data: " << std::string(receivedPacket->data,payloadLenght) << "\n";
+		
+	//std::cout << "Printing Data Echoed: " << buffer << "\n";  //inet_ntoa(serverAddress.sin_addr) << ":" << ntohs(serverAddress.sin_port) << "\n";
+
+	//write data to file 
+	outFile << std::string(receivedPacket->data);
 	}
 
 	if (bytes_recieved < 0){
@@ -152,6 +162,7 @@ int main (int argc, char* argv[]) {
 	}
 
 
+	outFile.close();
 	close(clientSocket);
 	return 0;
 }
