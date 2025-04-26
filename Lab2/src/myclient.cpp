@@ -165,20 +165,19 @@ int main (int argc, char* argv[]) {
 		//correct packet order handling
 		//exctract the sequence number
 		seqNum = ntohs(receivedPacket->sequenceNumber);
-       		recievedPacket[seqNum] = receivedPacket;	
+       		recievedPackets[seqNum] = *receivedPacket;	
 		//instert the pair in the map
 	
 		//while the sequence number is in the map
 		//put the packet into the outfile
 		//increase the expected sequence number
 		//erase from the map
-		while(receivedPackets.count(expectedSeqNum)){
-			UDPPacket& pkt = recievedPackets[expectedSeq];
-			std::cout << "Packet: " expectedSeqNum << ": " << ptk.data << "\n";
-		
+		while(recievedPackets.count(expectedSeqNum)){
+			UDPPacket& pkt = recievedPackets[expectedSeqNum];
+			std::cout << "Packet: " << expectedSeqNum << ": " << pkt.data << "\n";
 			outFile << pkt.data;
 			recievedPackets.erase(expectedSeqNum);
-			expectedSeq++;
+			expectedSeqNum++;
 
 		}
 		if(recievedPackets.size() > 10) {
