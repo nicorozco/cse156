@@ -99,7 +99,7 @@ int main (int argc, char* argv[]) {
 	uint32_t sequence = 0;
 	//else process data in while loop
 	while(file){
-		std::cout << "Reading File" << "\n";
+		//std::cout << "Reading File" << "\n";
 		//std::cout << "Sequence:" << sequence << "\n";
 		//create an udp packet
 		UDPPacket packet;
@@ -131,7 +131,7 @@ int main (int argc, char* argv[]) {
 
 		}
 	}
-	std::cout << "Finished Reading File" << "\n";
+	//std::cout << "Finished Reading File" << "\n";
 	file.close(); //close the file after reading
 	//b.) Client should be able to detect packet losses
 	// utilize sequence numbers
@@ -148,15 +148,15 @@ int main (int argc, char* argv[]) {
 		return -1;
 	}
 	
-	std::cout << "Before recieiving packets" << "\n";
+	//std::cout << "Before recieiving packets" << "\n";
 	
 	while((bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen)) > 0){
 	// note: you can get the sender address (helpful when handling multiple sources)-> Server	
 	//calculate the true payload recieved
 	//size_t payloadLenght = bytes_recieved - sizeof(uint32_t);
 	// since the data stored in the buffer are raw bytes, we need to cast back into UDP Struct to interpret the data
-		std::cout << "Recieving for Echo Server" << "\n";
-		UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
+	//std::cout << "Recieving for Echo Server" << "\n";
+	UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
 	//std::cout << "Sequence: " << ntohl(receivedPacket->sequenceNumber) << "Data: " << std::string(receivedPacket->data,payloadLenght) << "\n";
 		
 	//std::cout << "Printing Data Echoed: " << buffer << "\n";  //inet_ntoa(serverAddress.sin_addr) << ":" << ntohs(serverAddress.sin_port) << "\n";
@@ -180,6 +180,7 @@ int main (int argc, char* argv[]) {
 			expectedSeqNum++;
 
 		}
+		
 		if(recievedPackets.size() > 10) {
 			std::cerr << "Potential Packet Loss: Unable to find the packet within 10 packets" << "\n";
 		}
@@ -191,6 +192,7 @@ int main (int argc, char* argv[]) {
 		perror("Error Recieving");
 		return -1;
 	}
+
 	std::cout << "Closing Connection" << "\n";
 	outFile.close();
 	close(clientSocket);
