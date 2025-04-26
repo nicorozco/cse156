@@ -15,6 +15,7 @@
 #include "client.h"
 #include <cerrno>
 #include <cstring>
+#include <map>
 
 bool isValidIPv4Format(const std::string& ip){	
 	std::regex ipv4Pattern(R"(^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$)");
@@ -29,6 +30,9 @@ int main (int argc, char* argv[]) {
 	std::string outfilePath;
 	char buffer[1472];
 	std::string line;
+	std::map<uint32_t,UDPPacket> recievedPackets;
+	uint32_t expectedSeqNum = 0;
+	uint32_t seqNum;
 
 	if (argc < 3){
 		std::cerr << "Error: not enough arguments.\n";
@@ -91,13 +95,16 @@ int main (int argc, char* argv[]) {
 		std::cerr << "Error: " << std::strerror(errno) << "\n";
 		return -1;
 	}
+
 	uint32_t sequence = 0;
 	//else process data in while loop
 	while(file){
+		std::cout << "Reading File" << "\n";
 		//std::cout << "Sequence:" << sequence << "\n";
 		//create an udp packet
 		UDPPacket packet;
 		packet.sequenceNumber = htons(sequence++);
+		//std::cout << "Packet Sequence Number"<< htons(packet.sequenceNumber) <<"\n"; 
 		//add the data to the packet
 		file.read(packet.data,sizeof(packet.data));
 		std::streamsize bytesRead = file.gcount();
@@ -123,9 +130,8 @@ int main (int argc, char* argv[]) {
 			}
 
 		}
-
 	}
-	
+	std::cout << "Finished Reading File" << "\n";
 	file.close(); //close the file after reading
 	//b.) Client should be able to detect packet losses
 	// utilize sequence numbers
@@ -141,27 +147,52 @@ int main (int argc, char* argv[]) {
 		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
 		return -1;
 	}
-
+	
+	std::cout << "Before recieiving packets" << "\n";
+	
 	while((bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen)) > 0){
 	// note: you can get the sender address (helpful when handling multiple sources)-> Server	
 	//calculate the true payload recieved
 	//size_t payloadLenght = bytes_recieved - sizeof(uint32_t);
 	// since the data stored in the buffer are raw bytes, we need to cast back into UDP Struct to interpret the data
-	UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
+		std::cout << "Recieving for Echo Server" << "\n";
+		UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
 	//std::cout << "Sequence: " << ntohl(receivedPacket->sequenceNumber) << "Data: " << std::string(receivedPacket->data,payloadLenght) << "\n";
 		
 	//std::cout << "Printing Data Echoed: " << buffer << "\n";  //inet_ntoa(serverAddress.sin_addr) << ":" << ntohs(serverAddress.sin_port) << "\n";
 
-	//write data to file 
-	outFile << std::string(receivedPacket->data);
-	}
+		//write data to file 
+		//correct packet order handling
+		//exctract the sequence number
+		seqNum = ntohs(receivedPacket->sequenceNumber);
+       		recievedPacket[seqNum] = receivedPacket;	
+		//instert the pair in the map
+	
+		//while the sequence number is in the map
+		//put the packet into the outfile
+		//increase the expected sequence number
+		//erase from the map
+		while(receivedPackets.count(expectedSeqNum)){
+			UDPPacket& pkt = recievedPackets[expectedSeq];
+			std::cout << "Packet: " expectedSeqNum << ": " << ptk.data << "\n";
+		
+			outFile << pkt.data;
+			recievedPackets.erase(expectedSeqNum);
+			expectedSeq++;
 
+		}
+		if(recievedPackets.size() > 10) {
+			std::cerr << "Potential Packet Loss: Unable to find the packet within 10 packets" << "\n";
+		}
+	}
+	
+
+	
 	if (bytes_recieved < 0){
 		perror("Error Recieving");
 		return -1;
 	}
-
-
+	std::cout << "Closing Connection" << "\n";
 	outFile.close();
 	close(clientSocket);
 	return 0;
