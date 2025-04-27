@@ -154,63 +154,56 @@ int main (int argc, char* argv[]) {
 	//hanging is going on here 	
 	//utilize select() to know when to socket is ready for reading	
 	fd_set rset; // create socket set
-	FD_ZERO(&rset)//clear the socket set
-	FD_SET(clientSocket,&rset; //add the clientsocket to the set 
+	FD_ZERO(&rset);//clear the socket set
+	FD_SET(clientSocket,&rset); //add the clientsocket to the set 
 	//set a timer utilize select to prevent hanging forever while waiting to recieved packeyt 
-	struct timeval timeout = {10,0}
+	struct timeval timeout = {10,0};
 	while(true){
-	// since the data stored in the buffer are raw bytes, we need to cast back into UDP Struct to interpret the data
-	//std::cout << "Recieving for Echo Server" << "\n";
-	// call select() to check if the socket is reading, if the socket is ready call recvfrom()
-	int active = select(clientSocket+1,&rset,NULL,NULL,&timeout);
+		// since the data stored in the buffer are raw bytes, we need to cast back into UDP Struct to interpret the data
+		//std::cout << "Recieving for Echo Server" << "\n";
+		// call select() to check if the socket is reading, if the socket is ready call recvfrom()
+		int active = select(clientSocket+1,&rset,NULL,NULL,&timeout);
 
-	//check for errors 
-	if (active == 0){
-		std::cerr << "Timeout Occured, clientSocket is not ready"<<"\n";
-	} else if (active < 0){
-		std::cerr << "Select Error Occured" << "\n";
-	}
-
-	//check if the clientSocket is ready
-	if (FD_ISSET(clientSocket, &rset)){
-		
-		bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen) > 0
-		
-		// we are recieving data
-		if(bytes_recieved > 0){
-			//process the packet
-			UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
-		
-
-			//write data to file 
-			//correct packet order handling
-			//exctract the sequence number
-			seqNum = ntohs(receivedPacket->sequenceNumber);
-       			recievedPackets[seqNum] = *receivedPacket;	
-			//instert the pair in the map
-	
-			//while the sequence number is in the map
-			//put the packet into the outfile
-			//increase the expected sequence number
-			//erase from the map
-			while(recievedPackets.count(expectedSeqNum)){
-				UDPPacket& pkt = recievedPackets[expectedSeqNum];
-				//std::cout << "Packet: " << expectedSeqNum << ": " << pkt.data << "\n";
-				outFile << pkt.data;
-				recievedPackets.erase(expectedSeqNum);
-				expectedSeqNum++;
-
+		//check for errors 
+		if (active == 0){
+			std::cerr << "Timeout Occured, clientSocket is not ready"<<"\n";
+		} else if (active < 0){
+			std::cerr << "Select Error Occured" << "\n";
 		}
-		
-			if(recievedPackets.size() > 10) {
-				std::cerr << "Packet Loss Detected" << "\n";
-				return 2;
-		}	
-	}
-	//std::cout << "Sequence: " << ntohl(receivedPacket->sequenceNumber) << "Data: " << std::string(receivedPacket->data,payloadLenght) << "\n";
-		
-	//std::cout << "Printing Data Echoed: " << buffer << "\n";  //inet_ntoa(serverAddress.sin_addr) << ":" << ntohs(serverAddress.sin_port) << "\n";
 
+		//check if the clientSocket is ready
+		if (FD_ISSET(clientSocket, &rset)){	
+			bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen); 
+			// we are recieving data
+			if(bytes_recieved > 0){
+				//process the packet
+				UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
+				//exctract the sequence number
+				seqNum = ntohs(receivedPacket->sequenceNumber);
+       				recievedPackets[seqNum] = *receivedPacket;	
+				//instert the pair in the map
+		
+				//while the sequence number is in the map
+				//put the packet into the outfile
+				//increase the expected sequence number
+				//erase from the map
+				while(recievedPackets.count(expectedSeqNum)){
+					UDPPacket& pkt = recievedPackets[expectedSeqNum];
+					//std::cout << "Packet: " << expectedSeqNum << ": " << pkt.data << "\n";
+					outFile << pkt.data;
+					recievedPackets.erase(expectedSeqNum);
+					expectedSeqNum++;
+
+				}
+			
+				if(recievedPackets.size() > 10) {
+					std::cerr << "Packet Loss Detected" << "\n";
+					return 2;
+				}	
+			}
+		}
+	}
+		
 	
 	std::cout << "Closing Connection" << "\n";
 	outFile.close();
