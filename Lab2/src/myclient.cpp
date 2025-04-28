@@ -204,9 +204,9 @@ int main (int argc, char* argv[]) {
 					if (bytes_reRead <= 0){
 						if(file.eof()){
 							std::cerr << "EOF Reached, no more data." << "\n";
-						} else if (file.fail()){
+						} else if(file.fail()){
 							std::cerr << "Read failed due to logical error" << "\n";
-						} else if {
+						} else if(file.bad()){
 							std::cerr << "Severe read error"<< "\n";
 						}else{
 							std::cerr <<"Failed to read missing data from file" << "\n";
