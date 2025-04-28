@@ -35,6 +35,7 @@ int main (int argc, char* argv[]) {
 	std::map<uint32_t,UDPPacket> recievedPackets;
 	uint32_t expectedSeqNum = 0;
 	uint32_t seqNum;
+	std::map<uint32_t,UDPPacket> sentPackets;
 
 	if (argc < 3){
 		std::cerr << "Error: not enough arguments.\n";
@@ -123,8 +124,9 @@ int main (int argc, char* argv[]) {
 		if(bytesRead > 0){
 			// send the data
 			//std::cout << "Sending Data" << "\n";
-			ssize_t sentBytes = sendto(clientSocket,&packet, sizeof(uint32_t) + bytesRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
-
+			ssize_t sentBytes = sendto(clientSocket,&packet, sizeof(uint32_t) + bytesRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));			// insert the packet into the sent packet
+			sentPackets[sequence] = packet;
+			
 			if(sentBytes < 0){
 				perror("sendto failed");
 				close(clientSocket);
@@ -187,22 +189,25 @@ int main (int argc, char* argv[]) {
 				//put the packet into the outfile
 				//increase the expected sequence number
 				//erase from the map
-				while(recievedPackets.count(expectedSeqNum)){
+				if (recievedPackets.count(expectedSeqNum){
 					UDPPacket& pkt = recievedPackets[expectedSeqNum];
 					//std::cout << "Packet: " << expectedSeqNum << ": " << pkt.data << "\n";
 					outFile << pkt.data;
 					recievedPackets.erase(expectedSeqNum);
 					expectedSeqNum++;
-
 				}
-			
+				//packet loss:		
 				if(recievedPackets.size() > 10) {
-					std::cerr << "Packet Loss Detected" << "\n";
+					std::cerr << "Packet" << expectedSeqNum << "Loss Detected" << "\n";
+					//once we detect a packet loss access the sequence in the map of packetSent
+					UDPPacket lostPacket = sentPacket[expectedSeqNum];	
+					// then retransmit the packet, do until we know the packet has forsure been received 
+					ssize_t sentBytes = sendto(clientSocket,&lostPacket, sizeof(uint32_t) + bytesRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
 					return 2;
-				}	
+				}
+					
 			}
 		}
-	}
 		
 	
 	std::cout << "Closing Connection" << "\n";
