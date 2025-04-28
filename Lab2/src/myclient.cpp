@@ -35,7 +35,6 @@ int main (int argc, char* argv[]) {
 	std::map<uint32_t,UDPPacket> recievedPackets;
 	uint32_t expectedSeqNum = 0;
 	uint32_t seqNum;
-	std::map<uint32_t,UDPPacket> sentPackets;
 
 	if (argc < 3){
 		std::cerr << "Error: not enough arguments.\n";
@@ -109,6 +108,7 @@ int main (int argc, char* argv[]) {
 		packet.sequenceNumber = htons(sequence++);
 		//std::cout << "Packet Sequence Number"<< htons(packet.sequenceNumber) <<"\n"; 
 		//add the data to the packet
+
 		file.read(packet.data,sizeof(packet.data));
 		std::streamsize bytesRead = file.gcount();
 		//std::cout << "Bytes Read: " << bytesRead << "\n";
@@ -124,9 +124,7 @@ int main (int argc, char* argv[]) {
 		if(bytesRead > 0){
 			// send the data
 			//std::cout << "Sending Data" << "\n";
-			ssize_t sentBytes = sendto(clientSocket,&packet, sizeof(uint32_t) + bytesRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));			// insert the packet into the sent packet
-			sentPackets[sequence] = packet;
-			
+			ssize_t sentBytes = sendto(clientSocket,&packet, sizeof(uint32_t) + bytesRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));			// insert the packet into the sent packet	
 			if(sentBytes < 0){
 				perror("sendto failed");
 				close(clientSocket);
@@ -136,7 +134,7 @@ int main (int argc, char* argv[]) {
 		}
 	}
 	//std::cout << "Finished Reading File" << "\n";
-	file.close(); //close the file after reading
+	// file.close(); don't close the file until we are finished with everything as we still need it to retransmit lost data
 	//b.) Client should be able to detect packet losses
 	// utilize sequence numbers
 
@@ -175,6 +173,7 @@ int main (int argc, char* argv[]) {
 
 		//check if the clientSocket is ready
 		if (FD_ISSET(clientSocket, &rset)){	
+			//if the socket is ready we recieved data
 			bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen); 
 			// we are recieving data
 			if(bytes_recieved > 0){
@@ -185,25 +184,31 @@ int main (int argc, char* argv[]) {
        				recievedPackets[seqNum] = *receivedPacket;	
 				//instert the pair in the map
 		
-				//while the sequence number is in the map
-				//put the packet into the outfile
-				//increase the expected sequence number
-				//erase from the map
+				//if the sequence number is in the map
 				if (recievedPackets.count(expectedSeqNum){
 					UDPPacket& pkt = recievedPackets[expectedSeqNum];
 					//std::cout << "Packet: " << expectedSeqNum << ": " << pkt.data << "\n";
-					outFile << pkt.data;
-					recievedPackets.erase(expectedSeqNum);
-					expectedSeqNum++;
+					outFile << pkt.data; //write into the oufile
+					recievedPackets.erase(expectedSeqNum); //erase from the recieved map
+					expectedSeqNum++; // increase the sequence nubmer
 				}
-				//packet loss:		
+				//if we detect packet loss, within 10 packets		
 				if(recievedPackets.size() > 10) {
 					std::cerr << "Packet" << expectedSeqNum << "Loss Detected" << "\n";
-					//once we detect a packet loss access the sequence in the map of packetSent
-					UDPPacket lostPacket = sentPacket[expectedSeqNum];	
-					// then retransmit the packet, do until we know the packet has forsure been received 
+					
+					UDPPacket lostPacket; //set the data	
+					lostPacket.sequenceNumber = htons(expectedSeqNum);//set the sequence number	
+					//once we detect a packet loss access the data associated wtih the sequence number from the original file using fseek()
+					//find the data using fseek()
+					long offset = expectedSeqNum * 1468
+					fseek(file,offset,SEEK_SET); //utilize SEEK_SET to go from the beginning of the file
+					size_t bytes_reRead = fread(lost.Packet.data,1,1468,file)//utilize fread to read into the buffer
+					if (bytres_reRead <=){
+						std::cerr <<"Failed to read missing data from file" << "\n";
+					}
+					//once the data is succesfuly read retransmit the packet and go back to the top of the while loop for recieving
 					ssize_t sentBytes = sendto(clientSocket,&lostPacket, sizeof(uint32_t) + bytesRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
-					return 2;
+					continue;
 				}
 					
 			}
