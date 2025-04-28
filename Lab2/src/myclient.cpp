@@ -171,10 +171,9 @@ int main (int argc, char* argv[]) {
 			std::cerr << "Select Error Occured" << "\n";
 		}
 
-		//check if the clientSocket is ready
+		//check if the clientSocket is ready, if this is true meaning the socket is ready to recievied data
 		if (FD_ISSET(clientSocket, &rset)){	
-			//if the socket is ready we recieved data
-			bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen); 
+			bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 
 			// we are recieving data
 			if(bytes_recieved > 0){
 				//process the packet
@@ -185,7 +184,7 @@ int main (int argc, char* argv[]) {
 				//instert the pair in the map
 		
 				//if the sequence number is in the map
-				if (recievedPackets.count(expectedSeqNum){
+				if (recievedPackets.count(expectedSeqNum)){
 					UDPPacket& pkt = recievedPackets[expectedSeqNum];
 					//std::cout << "Packet: " << expectedSeqNum << ": " << pkt.data << "\n";
 					outFile << pkt.data; //write into the oufile
@@ -193,26 +192,26 @@ int main (int argc, char* argv[]) {
 					expectedSeqNum++; // increase the sequence nubmer
 				}
 				//if we detect packet loss, within 10 packets		
-				if(recievedPackets.size() > 10) {
+				if(recievedPackets.size() > 10){
 					std::cerr << "Packet" << expectedSeqNum << "Loss Detected" << "\n";
-					
-					UDPPacket lostPacket; //set the data	
+					UDPPacket lostPacket; //create the packet
 					lostPacket.sequenceNumber = htons(expectedSeqNum);//set the sequence number	
 					//once we detect a packet loss access the data associated wtih the sequence number from the original file using fseek()
-					//find the data using fseek()
-					long offset = expectedSeqNum * 1468
-					fseek(file,offset,SEEK_SET); //utilize SEEK_SET to go from the beginning of the file
-					size_t bytes_reRead = fread(lost.Packet.data,1,1468,file)//utilize fread to read into the buffer
-					if (bytres_reRead <=){
+					long offset = expectedSeqNum * 1468;
+					file.seekg(offset, std::ios::beg); //utilize seekg() to point the fd to the data and use SEEK_SET to go from the beginning of the file
+					file.read(lostPacket.data,1468); //utilize read to read into the data
+					std::streamsize bytes_reRead = file.gcount();
+					if (bytes_reRead <= 0){
 						std::cerr <<"Failed to read missing data from file" << "\n";
 					}
 					//once the data is succesfuly read retransmit the packet and go back to the top of the while loop for recieving
-					ssize_t sentBytes = sendto(clientSocket,&lostPacket, sizeof(uint32_t) + bytesRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
+					sendto(clientSocket,&lostPacket, sizeof(uint32_t) + bytes_reRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
 					continue;
 				}
 					
 			}
 		}
+	}
 		
 	
 	std::cout << "Closing Connection" << "\n";
