@@ -167,6 +167,7 @@ int main (int argc, char* argv[]) {
 		//check for errors 
 		if (active == 0){
 			std::cerr << "Timeout Occured, clientSocket is not ready"<<"\n";
+			return -1;
 		} else if (active < 0){
 			std::cerr << "Select Error Occured" << "\n";
 		}
@@ -191,8 +192,8 @@ int main (int argc, char* argv[]) {
 					recievedPackets.erase(expectedSeqNum); //erase from the recieved map
 					expectedSeqNum++; // increase the sequence nubmer
 				}
-				//if we detect packet loss, within 10 packets		
-				if(recievedPackets.size() > 10){
+				//if we detect packet loss, within 5 packets		
+				if(recievedPackets.size() > 5){
 					std::cerr << "Packet" << expectedSeqNum << "Loss Detected" << "\n";
 					UDPPacket lostPacket; //create the packet
 					lostPacket.sequenceNumber = htons(expectedSeqNum);//set the sequence number	
