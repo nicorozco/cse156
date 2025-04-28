@@ -202,7 +202,15 @@ int main (int argc, char* argv[]) {
 					file.read(lostPacket.data,1468); //utilize read to read into the data
 					std::streamsize bytes_reRead = file.gcount();
 					if (bytes_reRead <= 0){
-						std::cerr <<"Failed to read missing data from file" << "\n";
+						if(file.eof()){
+							std::cerr << "EOF Reached, no more data." << "\n";
+						} else if (file.fail()){
+							std::cerr << "Read failed due to logical error" << "\n";
+						} else if {
+							std::cerr << "Severe read error"<< "\n";
+						}else{
+							std::cerr <<"Failed to read missing data from file" << "\n";
+						}
 					}
 					//once the data is succesfuly read retransmit the packet and go back to the top of the while loop for recieving
 					sendto(clientSocket,&lostPacket, sizeof(uint32_t) + bytes_reRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
