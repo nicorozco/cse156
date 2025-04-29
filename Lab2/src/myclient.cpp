@@ -162,24 +162,28 @@ int main (int argc, char* argv[]) {
 	
 	//std::cout << "Before recieiving packets" << "\n";
 	//hanging is going on here 	
-	//utilize select() to know when to socket is ready for reading	
-	fd_set rset; // create socket set
-	FD_ZERO(&rset);//clear the socket set
-	FD_SET(clientSocket,&rset); //add the clientsocket to the set 
-	//set a timer utilize select to prevent hanging forever while waiting to recieved packeyt 
-	struct timeval timeout = {60,0};
-	
-	
 	//Recieving echoed packets
 	while(true){
 		// since the data stored in the buffer are raw bytes, we need to cast back into UDP Struct to interpret the data
 		//std::cout << "Recieving for Echo Server" << "\n";
 		// call select() to check if the socket is reading, if the socket is ready call recvfrom()
+		
+		//utilize select() to know when to socket is ready for reading	
+		fd_set rset; // create socket set
+		FD_ZERO(&rset);//clear the socket set
+		FD_SET(clientSocket,&rset); //add the clientsocket to the set 
+		//set a timer utilize select to prevent hanging forever while waiting to recieved packeyt 
+		
+		struct timeval timeout;
+		timeout.tv_sec = 60;
+		timeout.tv_usec = 0;
+	
+
 		int active = select(clientSocket+1,&rset,NULL,NULL,&timeout);
 
 		//check for errors 
 		if (active == 0){
-			std::cerr << "Timeout Occured, clientSocket is not ready"<<"\n";
+			std::cerr << "Timeout Occured, Cannot detect server"<<"\n";
 			return -1;
 		} else if (active < 0){
 			std::cerr << "Select Error Occured" << "\n";
@@ -209,12 +213,11 @@ int main (int argc, char* argv[]) {
 					
 					//recover the data associated with the sequence number from the original file using seekg()
 					long offset = expectedSeqNum * 1468;
-					std::cout << "Offset: " << offset << "\n";
-					
+					//std::cout << "Offset: " << offset << "\n";
 					//check if osset is valid before reading
 					file.seekg(0,std::ios::end);
 					std::streampos fileSize = file.tellg();	
-					std::cout << "File Size: " << fileSize << "\n";
+					//std::cout << "File Size: " << fileSize << "\n";
 					if (offset > fileSize){
 						std::cerr << "Invalid offset: beyond file size. Closing.\n";
 						return 2;
