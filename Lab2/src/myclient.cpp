@@ -99,7 +99,8 @@ int main (int argc, char* argv[]) {
 	}
 
 	uint32_t sequence = 0;
-	//else process data in while loop
+	
+	//reading data & sending packets
 	while(file){
 		//std::cout << "Reading File" << "\n";
 		//std::cout << "Sequence:" << sequence << "\n";
@@ -133,6 +134,7 @@ int main (int argc, char* argv[]) {
 
 		}
 	}
+
 	//std::cout << "Finished Reading File" << "\n";
 	// file.close(); don't close the file until we are finished with everything as we still need it to retransmit lost data
 	//b.) Client should be able to detect packet losses
@@ -157,7 +159,10 @@ int main (int argc, char* argv[]) {
 	FD_ZERO(&rset);//clear the socket set
 	FD_SET(clientSocket,&rset); //add the clientsocket to the set 
 	//set a timer utilize select to prevent hanging forever while waiting to recieved packeyt 
-	struct timeval timeout = {10,0};
+	struct timeval timeout = {5,0};
+	
+	
+	//Recieving echoed packets
 	while(true){
 		// since the data stored in the buffer are raw bytes, we need to cast back into UDP Struct to interpret the data
 		//std::cout << "Recieving for Echo Server" << "\n";
@@ -170,44 +175,45 @@ int main (int argc, char* argv[]) {
 			return -1;
 		} else if (active < 0){
 			std::cerr << "Select Error Occured" << "\n";
-		}
-
-		//check if the clientSocket is ready, if this is true meaning the socket is ready to recievied data
-		if (FD_ISSET(clientSocket, &rset)){	
-			bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 
-			// we are recieving data
+		} else if (FD_ISSET(clientSocket, &rset)){ //clientSocket is ready, meaning we are ready to recieve data -> call recvfrom()	
+			
+			bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
+			
+			//if we are recieving data
 			if(bytes_recieved > 0){
 				//process the packet
 				UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
-				//exctract the sequence number
-				seqNum = ntohs(receivedPacket->sequenceNumber);
-       				recievedPackets[seqNum] = *receivedPacket;	
-				//instert the pair in the map
+				seqNum = ntohs(receivedPacket->sequenceNumber); //extract the sequence number
+       				recievedPackets[seqNum] = *receivedPacket;//instert the pair in the map
 		
-				//if the sequence number is in the map
-				if (recievedPackets.count(expectedSeqNum)){
+				//while the sequence number is found in the map
+				if(recievedPackets.count(expectedSeqNum)){
 					UDPPacket& pkt = recievedPackets[expectedSeqNum];
 					//std::cout << "Packet: " << expectedSeqNum << ": " << pkt.data << "\n";
 					outFile << pkt.data; //write into the oufile
 					recievedPackets.erase(expectedSeqNum); //erase from the recieved map
 					expectedSeqNum++; // increase the sequence nubmer
-				}
-				//if we detect packet loss, within 5 packets		
-				if(recievedPackets.size() > 5){
+				}else if (recievedPackets.size() > 5){//if the packet isn't detected within 5 packets detect packet loss & retransmitt		
+					
 					std::cerr << "Packet" << expectedSeqNum << "Loss Detected" << "\n";
 					UDPPacket lostPacket; //create the packet
 					lostPacket.sequenceNumber = htons(expectedSeqNum);//set the sequence number	
-					//once we detect a packet loss access the data associated wtih the sequence number from the original file using fseek()
+					//recover the data associated with the sequence number from the original file using seekg()
 					long offset = expectedSeqNum * 1468;
 					file.seekg(offset, std::ios::beg); //utilize seekg() to point the fd to the data and use SEEK_SET to go from the beginning of the file
 					file.read(lostPacket.data,1468); //utilize read to read into the data
+					
 					std::streamsize bytes_reRead = file.gcount();
-					if (bytes_reRead <= 0){
+					
+					if (bytes_reRead <= 0){ // if we read bytes form the file and it's less than 0{
 						if(file.eof()){
+							//we have reached the end of file
 							std::cerr << "EOF Reached, no more data." << "\n";
 						} else if(file.fail()){
+							//we failed to reach the file
 							std::cerr << "Read failed due to logical error" << "\n";
 						} else if(file.bad()){
+							//server issue
 							std::cerr << "Severe read error"<< "\n";
 						}else{
 							std::cerr <<"Failed to read missing data from file" << "\n";
@@ -217,7 +223,12 @@ int main (int argc, char* argv[]) {
 					sendto(clientSocket,&lostPacket, sizeof(uint32_t) + bytes_reRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
 					continue;
 				}
+
 					
+			}else if (bytes_recieved == 0){
+				//means we are no longer recieving data
+				std::cerr << "End of File Reached, no longer recieving data" << "\n";
+				return 2;
 			}
 		}
 	}
