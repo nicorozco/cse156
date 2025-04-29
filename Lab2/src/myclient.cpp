@@ -136,7 +136,7 @@ int main (int argc, char* argv[]) {
 	}
 
 	//std::cout << "Finished Reading File" << "\n";
-	// file.close(); don't close the file until we are finished with everything as we still need it to retransmit lost data
+	file.close(); //close the file until we are finished with everything as we still need it to retransmit lost data
 	//b.) Client should be able to detect packet losses
 	// utilize sequence numbers
 
@@ -151,6 +151,14 @@ int main (int argc, char* argv[]) {
 		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
 		return -1;
 	}
+
+	file.open(infilePath,std::ios::binary); //reopen the file for packet retransmission
+	// check for error when opening file
+	if(!file.is_open()){
+		std::cerr << "Error: " << std::strerror(errno) << "\n";
+		return -1;
+	}
+
 	
 	//std::cout << "Before recieiving packets" << "\n";
 	//hanging is going on here 	
@@ -202,6 +210,7 @@ int main (int argc, char* argv[]) {
 					//recover the data associated with the sequence number from the original file using seekg()
 					long offset = expectedSeqNum * 1468;
 					std::cout << "Offset: " << offset << "\n";
+					
 					//check if osset is valid before reading
 					file.seekg(0,std::ios::end);
 					std::streampos fileSize = file.tellg();	
