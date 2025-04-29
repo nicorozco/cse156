@@ -91,7 +91,7 @@ int main (int argc, char* argv[]) {
 	// utilize sendto() Note: each call to sendto() sends a single UDP Diagram
 	// open the file 
 	//infilePath = "file.txt"; 
-	std::ifstream file(infilePath);
+	std::ifstream file(infilePath,std::ios::binary);
 	// check for error when opening file
 	if(!file.is_open()){
 		std::cerr << "Error: " << std::strerror(errno) << "\n";
@@ -159,7 +159,7 @@ int main (int argc, char* argv[]) {
 	FD_ZERO(&rset);//clear the socket set
 	FD_SET(clientSocket,&rset); //add the clientsocket to the set 
 	//set a timer utilize select to prevent hanging forever while waiting to recieved packeyt 
-	struct timeval timeout = {5,0};
+	struct timeval timeout = {60,0};
 	
 	
 	//Recieving echoed packets
@@ -195,11 +195,22 @@ int main (int argc, char* argv[]) {
 					expectedSeqNum++; // increase the sequence nubmer
 				}else if (recievedPackets.size() > 5){//if the packet isn't detected within 5 packets detect packet loss & retransmitt		
 					
-					std::cerr << "Packet" << expectedSeqNum << "Loss Detected" << "\n";
+					std::cerr << "Packet " << expectedSeqNum << " Loss Detected" << "\n";
 					UDPPacket lostPacket; //create the packet
 					lostPacket.sequenceNumber = htons(expectedSeqNum);//set the sequence number	
+					
 					//recover the data associated with the sequence number from the original file using seekg()
 					long offset = expectedSeqNum * 1468;
+					std::cout << "Offset: " << offset << "\n";
+					//check if osset is valid before reading
+					file.seekg(0,std::ios::end);
+					std::streampos fileSize = file.tellg();	
+					std::cout << "File Size: " << fileSize << "\n";
+					if (offset > fileSize){
+						std::cerr << "Invalid offset: beyond file size. Closing.\n";
+						return 2;
+					}
+
 					file.seekg(offset, std::ios::beg); //utilize seekg() to point the fd to the data and use SEEK_SET to go from the beginning of the file
 					file.read(lostPacket.data,1468); //utilize read to read into the data
 					
@@ -209,14 +220,18 @@ int main (int argc, char* argv[]) {
 						if(file.eof()){
 							//we have reached the end of file
 							std::cerr << "EOF Reached, no more data." << "\n";
+							break;
 						} else if(file.fail()){
 							//we failed to reach the file
 							std::cerr << "Read failed due to logical error" << "\n";
+							break;
 						} else if(file.bad()){
 							//server issue
 							std::cerr << "Severe read error"<< "\n";
+							break;
 						}else{
 							std::cerr <<"Failed to read missing data from file" << "\n";
+							break;
 						}
 					}
 					//once the data is succesfuly read retransmit the packet and go back to the top of the while loop for recieving
@@ -236,6 +251,7 @@ int main (int argc, char* argv[]) {
 	
 	std::cout << "Closing Connection" << "\n";
 	outFile.close();
+	file.close();
 	close(clientSocket);
 	return 0;
 }
