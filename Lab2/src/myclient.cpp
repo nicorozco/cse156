@@ -192,11 +192,13 @@ int main (int argc, char* argv[]) {
 			return -1;
 		} else if (active > 0){ //the client socket is ready 
 			if(FD_ISSET(clientSocket, &rset)){ //clientSocket is ready, meaning we are ready to recieve data -> call recvfrom()	
-			
+				std::cout << "Client Socket is Ready" << "\n";
 				bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
 	
 				//if we are recieving data
 				if(bytes_recieved > 0){
+
+					std::cout << "recieving Data" <<"\n";
 					serverActive = true; // this means the server is active and we set the flag
 					//process the packet
 					UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
@@ -205,12 +207,13 @@ int main (int argc, char* argv[]) {
 		
 					//while the sequence number is found in the map
 					if(recievedPackets.count(expectedSeqNum)){
+						std::cout << "Packet Found" << "\n";
 						UDPPacket& pkt = recievedPackets[expectedSeqNum];
 						//std::cout << "Packet: " << expectedSeqNum << ": " << pkt.data << "\n";
 						outFile << pkt.data; //write into the oufile
 						recievedPackets.erase(expectedSeqNum); //erase from the recieved map
 						expectedSeqNum++; // increase the sequence nubmer
-					}else if (recievedPackets.size() > 5){//if the packet isn't detected within 5 packets detect packet loss & retransmitt		
+					}else if(recievedPackets.size() > 5){//if the packet isn't detected within 5 packets detect packet loss & retransmitt		
 					
 						std::cerr << "Packet " << expectedSeqNum << " Loss Detected" << "\n";
 						UDPPacket lostPacket; //create the packet
@@ -222,6 +225,7 @@ int main (int argc, char* argv[]) {
 						//check if osset is valid before reading
 						file.seekg(0,std::ios::end);
 						std::streampos fileSize = file.tellg();	
+						
 						//std::cout << "File Size: " << fileSize << "\n";
 						if (offset > fileSize){
 							std::cerr << "Invalid offset: beyond file size. Closing.\n";
@@ -252,6 +256,7 @@ int main (int argc, char* argv[]) {
 							}
 						}
 						//once the data is succesfuly read retransmit the packet and go back to the top of the while loop for recieving
+						std::cout << "Retransmitting Packet" << "\n";
 						sendto(clientSocket,&lostPacket, sizeof(uint32_t) + bytes_reRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
 						continue;
 					}		
