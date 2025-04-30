@@ -35,6 +35,7 @@ int main (int argc, char* argv[]) {
 	std::map<uint32_t,UDPPacket> recievedPackets;
 	uint32_t expectedSeqNum = 0;
 	uint32_t seqNum;
+	bool serverActive = false;
 
 	if (argc < 3){
 		std::cerr << "Error: not enough arguments.\n";
@@ -182,18 +183,28 @@ int main (int argc, char* argv[]) {
 
 		int active = select(clientSocket+1,&rset,NULL,NULL,&timeout);
 
-		//check for errors 
+		// if the port isn't active 
 		if (active == 0){
-			std::cerr << "Timeout Occured, Cannot detect server"<<"\n";
-			return -1;
-		} else if (active < 0){
+			//time out due to the server not being detected
+			if(!serverActive){
+				std::cerr << "Timeout Occured, Cannot detect server"<<"\n";
+				return -1;
+			} else {//we know the server is active but we haven't recieved a packet in the last 6 seconds trye again
+				std::cerr << "Timeout: no packet recieved in the last 60 seconds\n";
+				continue;
+			}
+		}else if (active < 0){
 			std::cerr << "Select Error Occured" << "\n";
-		} else if (FD_ISSET(clientSocket, &rset)){ //clientSocket is ready, meaning we are ready to recieve data -> call recvfrom()	
+			return -1;
+		}
+		
+		if(FD_ISSET(clientSocket, &rset)){ //clientSocket is ready, meaning we are ready to recieve data -> call recvfrom()	
 			
 			bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
 			
 			//if we are recieving data
 			if(bytes_recieved > 0){
+				serverActive = true; // this means the server is active and we set the flag
 				//process the packet
 				UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
 				seqNum = ntohs(receivedPacket->sequenceNumber); //extract the sequence number
@@ -260,6 +271,8 @@ int main (int argc, char* argv[]) {
 			}
 		}
 	}
+
+	//compare the file outputs
 		
 	
 	std::cout << "Closing Connection" << "\n";
