@@ -161,6 +161,14 @@ int main (int argc, char* argv[]) {
 		return -1;
 	}
 
+	//hanging is going on here 	
+	//Recieving echoed packets
+	while(true){
+		// since the data stored in the buffer are raw bytes, we need to cast back into UDP Struct to interpret the data
+		//std::cout << "Recieving for Echo Server" << "\n";
+		// call select() to check if the socket is reading, if the socket is ready call recvfrom()
+		
+
 		//utilize select() to know when to socket is ready for reading	
 		fd_set rset; // create socket set
 		FD_ZERO(&rset);//clear the socket set
@@ -170,14 +178,8 @@ int main (int argc, char* argv[]) {
 		struct timeval timeout;
 		timeout.tv_sec = 60;
 		timeout.tv_usec = 0;
+			
 		
-	//std::cout << "Before recieiving packets" << "\n";
-	//hanging is going on here 	
-	//Recieving echoed packets
-	while(true){
-		// since the data stored in the buffer are raw bytes, we need to cast back into UDP Struct to interpret the data
-		//std::cout << "Recieving for Echo Server" << "\n";
-		// call select() to check if the socket is reading, if the socket is ready call recvfrom()
 		int active = select(clientSocket+1,&rset,NULL,NULL,&timeout);
 
 		// if the port isn't active 
@@ -187,89 +189,89 @@ int main (int argc, char* argv[]) {
 				std::cerr << "Timeout Occured, Cannot detect server"<<"\n";
 				return -1;
 			}
+			break;
 		}else if (active < 0){
 			std::cerr << "Select Error Occured" << "\n";
 			return -1;
-		} else if (active > 0){ //the client socket is ready 
-			if(FD_ISSET(clientSocket, &rset)){ //clientSocket is ready, meaning we are ready to recieve data -> call recvfrom()	
-				std::cout << "Client Socket is Ready" << "\n";
-				bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
-	
+		}else if(FD_ISSET(clientSocket, &rset)){ //clientSocket is ready, meaning we are ready to recieve data -> call recvfrom()	
+			std::cout << "Client Socket is Ready" << "\n";
+			bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
+
 				//if we are recieving data
-				if(bytes_recieved > 0){
+			if(bytes_recieved > 0){
 
-					std::cout << "recieving Data" <<"\n";
-					serverActive = true; // this means the server is active and we set the flag
-					//process the packet
-					UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
-					seqNum = ntohs(receivedPacket->sequenceNumber); //extract the sequence number
-       					recievedPackets[seqNum] = *receivedPacket;//instert the pair in the map
+				std::cout << "recieving Data" <<"\n";
+				serverActive = true; // this means the server is active and we set the flag
+				//process the packet
+				UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
+				seqNum = ntohs(receivedPacket->sequenceNumber); //extract the sequence number
+				recievedPackets[seqNum] = *receivedPacket;//instert the pair in the map
 		
-					//while the sequence number is found in the map
-					if(recievedPackets.count(expectedSeqNum)){
-						std::cout << "Packet Found" << "\n";
-						UDPPacket& pkt = recievedPackets[expectedSeqNum];
-						//std::cout << "Packet: " << expectedSeqNum << ": " << pkt.data << "\n";
-						outFile << pkt.data; //write into the oufile
-						recievedPackets.erase(expectedSeqNum); //erase from the recieved map
-						expectedSeqNum++; // increase the sequence nubmer
-					}else if(recievedPackets.size() > 5){//if the packet isn't detected within 5 packets detect packet loss & retransmitt		
-					
-						std::cerr << "Packet " << expectedSeqNum << " Loss Detected" << "\n";
-						UDPPacket lostPacket; //create the packet
-						lostPacket.sequenceNumber = htons(expectedSeqNum);//set the sequence number	
-					
+				//while the sequence number is found in the map
+				if(recievedPackets.count(expectedSeqNum)){
+					std::cout << "Packet Found" << "\n";
+					UDPPacket& pkt = recievedPackets[expectedSeqNum];
+					std::cout << "Packet: " << expectedSeqNum << "\n";
+					outFile << pkt.data; //write into the oufile
+					recievedPackets.erase(expectedSeqNum); //erase from the recieved map
+					expectedSeqNum++; // increase the sequence nubmer
+					usleep(5000);
+				}else if(recievedPackets.size() >= 3){//if the packet isn't detected within 5 packets detect packet loss & retransmitt	
+					std::cerr << "Packet " << expectedSeqNum << " Loss Detected" << "\n";
+					UDPPacket lostPacket; //create the packet
+					lostPacket.sequenceNumber = htons(expectedSeqNum);//set the sequence number	
+				
 						//recover the data associated with the sequence number from the original file using seekg()
-						long offset = expectedSeqNum * 1468;
-						//std::cout << "Offset: " << offset << "\n";
-						//check if osset is valid before reading
-						file.seekg(0,std::ios::end);
-						std::streampos fileSize = file.tellg();	
-						
-						//std::cout << "File Size: " << fileSize << "\n";
-						if (offset > fileSize){
-							std::cerr << "Invalid offset: beyond file size. Closing.\n";
-							return 2;
-						}
+					long offset = expectedSeqNum * 1468;
+					//std::cout << "Offset: " << offset << "\n";
+					//check if osset is valid before reading
+					file.seekg(0,std::ios::end);
+					std::streampos fileSize = file.tellg();	
+					
+					//std::cout << "File Size: " << fileSize << "\n";
+					if (offset > fileSize){
+						std::cerr << "Invalid offset: beyond file size. Closing.\n";
+						return 2;
+					}
 
-						file.seekg(offset, std::ios::beg); //utilize seekg() to point the fd to the data and use SEEK_SET to go from the beginning of the file
-						file.read(lostPacket.data,1468); //utilize read to read into the data
+					file.seekg(offset, std::ios::beg); //utilize seekg() to point the fd to the data and use SEEK_SET to go from the beginning of the file
+					file.read(lostPacket.data,1468); //utilize read to read into the data
 					
-						std::streamsize bytes_reRead = file.gcount();
+					std::streamsize bytes_reRead = file.gcount();
 					
-						if (bytes_reRead <= 0){ // if we read bytes form the file and it's less than 0{
-							if(file.eof()){
-								//we have reached the end of file
-								std::cerr << "EOF Reached, no more data." << "\n";
-								break;
-							}else if(file.fail()){
-								//we failed to reach the file
-								std::cerr << "Read failed due to logical error" << "\n";
-								break;
-							} else if(file.bad()){
-								//server issue
-								std::cerr << "Severe read error"<< "\n";
-								break;
-							}else{
-								std::cerr <<"Failed to read missing data from file" << "\n";
-								break;
-							}
+					if (bytes_reRead <= 0){ // if we read bytes form the file and it's less than 0{
+						if(file.eof()){
+							//we have reached the end of file
+							std::cerr << "EOF Reached, no more data." << "\n";
+							break;
+						}else if(file.fail()){
+							//we failed to reach the file
+							std::cerr << "Read failed due to logical error" << "\n";
+							break;
+						} else if(file.bad()){
+							//server issue
+							std::cerr << "Severe read error"<< "\n";
+							break;
+						}else{
+							std::cerr <<"Failed to read missing data from file" << "\n";
+							break;
 						}
-						//once the data is succesfuly read retransmit the packet and go back to the top of the while loop for recieving
-						std::cout << "Retransmitting Packet" << "\n";
-						sendto(clientSocket,&lostPacket, sizeof(uint32_t) + bytes_reRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
-						continue;
-					}		
-			}else if (bytes_recieved == 0){
-					//means we are no longer recieving data
-					std::cerr << "End of File Reached, no longer recieving data" << "\n";
-					return 2;
-				}
+					}
+					//once the data is succesfuly read retransmit the packet and go back to the top of the while loop for recieving
+					std::cout << "Retransmitting Packet" << "\n";
+					sendto(clientSocket,&lostPacket, sizeof(uint32_t) + bytes_reRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
+					continue;
+				}		
+			} else if (bytes_recieved == 0){
+				//means we are no longer recieving data
+				std::cerr << "End of File Reached, no longer recieving data" << "\n";
+				return 2;
 			}
-		
-	}}
+		}
+	std::cout << "looping"<< "\n";
+	}
 	
-
+	
 	//compare the file outputs
 		
 	
