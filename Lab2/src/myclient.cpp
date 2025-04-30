@@ -178,8 +178,10 @@ int main (int argc, char* argv[]) {
 			
 		
 	int active = select(clientSocket+1,&rset,NULL,NULL,&timeout);
-
-	// if the port isn't active 
+	
+	// first check if the server is active 
+	
+	// if the port isn't active & we havent recived the first packet
 	if(active == 0){
 		//time out due to the server not being detected
 		if(!serverActive){
@@ -189,11 +191,9 @@ int main (int argc, char* argv[]) {
 	}else if (active < 0){
 		std::cerr << "Select Error Occured" << "\n";
 		return -1;
+	//recived the first packte
 	}else if(FD_ISSET(clientSocket, &rset)){ //clientSocket is ready, meaning we are ready to recieve data -> call recvfrom()	
 			std::cout << "Client Socket is Ready" << "\n";
-		
-		while(true){	
-			
 			bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
 
 					//if we are recieving data
@@ -205,7 +205,12 @@ int main (int argc, char* argv[]) {
 					UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
 					seqNum = ntohs(receivedPacket->sequenceNumber); //extract the sequence number
 					recievedPackets[seqNum] = *receivedPacket;//instert the pair in the map
-			
+				}
+
+
+
+
+
 					//while the sequence number is found in the map
 					if(recievedPackets.count(expectedSeqNum)){
 						std::cout << "Packet Found" << "\n";
