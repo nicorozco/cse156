@@ -4,11 +4,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
+#include "client.h"
 
 
 void echoLoop(int serverSocket){
-	char buffer[1024];
+	char buffer[1472];
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	struct sockaddr_in clientAddr;
 	socklen_t clientLen = sizeof(clientAddr);
@@ -18,10 +18,15 @@ void echoLoop(int serverSocket){
 		ssize_t bytesRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
 
 		if (bytesRecieved < 0){
-		perror("Error: Recieving");
-	}
-		std::cout << "Recieved: " << buffer << "from" << inet_ntoa(clientAddr.sin_addr) << ":"<< ntohs(clientAddr.sin_port) << "\n";	
+			perror("Error: Recieving from client");
+		}
+		
+		if(bytesRecieved > 0) {//if we are recieving data
+			//process the data create a strucutre of the buffer 		
+			UDPPacket* recievedPacket = reinterpret_cast<UDPPacket*>(buffer);
 
+			std::cout << "Data: " << recievedPacket->data << "from" << inet_ntoa(clientAddr.sin_addr) << ":"<< ntohs(clientAddr.sin_port) << "\n";	
+}
 	//echo it back to the client, meaning just send it back
 	sendto(serverSocket, buffer, bytesRecieved,0, (struct sockaddr*)&clientAddr, clientLen);
 	
