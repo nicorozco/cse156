@@ -132,6 +132,7 @@ int main (int argc, char* argv[]) {
 				return -1;
 			}
 
+			usleep(10000);
 		}
 	}
 
