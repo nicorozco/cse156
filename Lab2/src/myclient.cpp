@@ -259,17 +259,17 @@ int main (int argc, char* argv[]) {
 			//process the packet
 			UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
 			seqNum = ntohs(receivedPacket->sequenceNumber); //extract the sequence number
-			if(recievedPackets.size() < 5){
+			if(recievedPackets.size() < 5 && !recievedPackets.count(seqNum)){
 				recievedPackets[seqNum] = *receivedPacket;//instert the pair in the map
 			}
-			while(recievedPackets.count(expectedSeqNum)){ // if we find the sequence number in the map 
+			if(recievedPackets.count(expectedSeqNum)){ // if we find the sequence number in the map 
 				UDPPacket& pkt = recievedPackets[expectedSeqNum];
 				outFile << pkt.data; //write into the oufile
 				recievedPackets.erase(expectedSeqNum); //erase from the recieved map
 				expectedSeqNum++; // increase the sequence nubmer
 				retries = 0;
 			}
-			if (recievedPackets.size() <= 5 && !recievedPackets.count(expectedSeqNum)){//if we have 3 packets in the map and haven't found it packet loss detected
+			if (recievedPackets.size() >= 5 && !recievedPackets.count(expectedSeqNum)){//if we have 3 packets in the map and haven't found it packet loss detected
 				std::cerr << "Packet Loss Detected: Sequence Number" << expectedSeqNum << "\n";	
 				int retransmission = retransmit(expectedSeqNum,clientSocket, (struct sockaddr*)&serverAddress, file);
 				if(retransmission == -1){
