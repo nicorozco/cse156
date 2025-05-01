@@ -28,7 +28,7 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	file.clear();
 	UDPPacket lostPacket; //create the packet
 	lostPacket.sequenceNumber = htons(expectedSeqNum);//set the sequence number	
-	std::cout << "Resending Sequence Number = " << expectedSeqNum << "\n";
+	//std::cout << "Resending Sequence Number = " << expectedSeqNum << "\n";
 	//recover the data associated with the sequence number from the original file using seekg()
 	long offset = expectedSeqNum * 1468;
 	//std::cout << "Offset: " << offset << "\n";
@@ -45,7 +45,7 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	file.seekg(offset, std::ios::beg); //utilize seekg() to point the fd to the data and use SEEK_SET to go from the beginning of the file
 	file.read(lostPacket.data,1468); //utilize read to read into the data
 
-	std::cout << "Data:" << lostPacket.data << "\n";	
+	//std::cout << "Data:" << lostPacket.data << "\n";	
 	std::streamsize bytes_reRead = file.gcount();
 	
 	if (bytes_reRead <= 0){ // if we read bytes form the file and it's less than 0{
@@ -67,8 +67,17 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 		}
 	}
 	//once the data is succesfuly read retransmit the packet and go back to the top of the while loop for recieving
-	std::cout << "Retransmitting Packet" << "\n";
-	sendto(clientSocket,&lostPacket, sizeof(uint32_t) + bytes_reRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
+	//std::cout << "Bytes Re-read" << bytes_reRead << "\n";
+	auto* ipv4 = (struct sockaddr_in*)serverAddress;
+	std::cout << "Send to" << inet_ntoa(ipv4->sin_addr) << ":" << ntohs(ipv4->sin_port) << " | family=" << ipv4->sin_family << "\n";
+
+	ssize_t sent = sendto(clientSocket,&lostPacket, sizeof(uint32_t) + bytes_reRead, 0,(struct sockaddr*)&serverAddress,sizeof(struct sockaddr_in));
+	if(sent == -1){
+		perror("sendto failed");
+	}
+
+	std::cout << "Retransmitted Bytes" << sent << "\n";
+	usleep(5000);
 	return 0;
 }		
 
@@ -121,6 +130,7 @@ int main (int argc, char* argv[]) {
 	}	
 	// 2.) Specify the Server Address we utilize a structure for the address	
 	sockaddr_in serverAddress; 
+	memset(&serverAddress,0,sizeof(serverAddress));
 	serverAddress.sin_family = AF_INET;
 	
 	//checking if port is valid
@@ -209,6 +219,7 @@ int main (int argc, char* argv[]) {
 	}
 
 	while(true){ //2.)we know the server is active start recieving packets 
+		
 		fd_set rset; // create socket set
 		FD_ZERO(&rset);//clear the socket set
 		FD_SET(clientSocket,&rset); //add the clientsocket to the set 
@@ -217,7 +228,10 @@ int main (int argc, char* argv[]) {
 		timeout.tv_sec = 2;
 		timeout.tv_usec = 0;
 		int active = select(clientSocket+1,&rset,NULL,NULL,&timeout);
+		std::cout << "Active FD: " << active << "\n";
+	
 		if(active == 0){
+			retries++;
 			std::cout << "Retries" << retries << "\n";
 			if (retries >= MAX_RETRIES){
 				std::cerr << "Server Timeout: unable to recieve packets after attempts from server" << "\n";
@@ -231,8 +245,7 @@ int main (int argc, char* argv[]) {
 				std::cerr << "Error Retranmistting" << "\n";
 				return -1;
 			}
-			retries++;
-			usleep(5000);
+			
 			continue;
 
 		}else if (active < 0){
