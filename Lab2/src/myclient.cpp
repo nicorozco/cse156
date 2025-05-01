@@ -28,7 +28,7 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	file.clear();
 	UDPPacket lostPacket; //create the packet
 	lostPacket.sequenceNumber = htons(expectedSeqNum);//set the sequence number	
-	//std::cout << "Resending Sequence Number = " << expectedSeqNum << "\n";
+	std::cout << "Resending Sequence Number = " << expectedSeqNum << "\n";
 	//recover the data associated with the sequence number from the original file using seekg()
 	long offset = expectedSeqNum * 1468;
 	//std::cout << "Offset: " << offset << "\n";
@@ -69,14 +69,14 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	//once the data is succesfuly read retransmit the packet and go back to the top of the while loop for recieving
 	//std::cout << "Bytes Re-read" << bytes_reRead << "\n";
 	auto* ipv4 = (struct sockaddr_in*)serverAddress;
-	std::cout << "Send to" << inet_ntoa(ipv4->sin_addr) << ":" << ntohs(ipv4->sin_port) << " | family=" << ipv4->sin_family << "\n";
+	//std::cout << "Send to" << inet_ntoa(ipv4->sin_addr) << ":" << ntohs(ipv4->sin_port) << " | family=" << ipv4->sin_family << "\n";
 
 	ssize_t sent = sendto(clientSocket,&lostPacket, sizeof(uint32_t) + bytes_reRead, 0,(struct sockaddr*)ipv4,sizeof(struct sockaddr_in));
 	if(sent == -1){
 		perror("sendto failed");
 	}
 
-	std::cout << "Retransmitted Bytes" << sent << "\n";
+	//std::cout << "Retransmitted Bytes" << sent << "\n";
 	usleep(5000);
 	return 0;
 }		
@@ -228,11 +228,11 @@ int main (int argc, char* argv[]) {
 		timeout.tv_sec = 2;
 		timeout.tv_usec = 0;
 		int active = select(clientSocket+1,&rset,NULL,NULL,&timeout);
-		std::cout << "Active FD: " << active << "\n";
+		//std::cout << "Active FD: " << active << "\n";
 	
 		if(active == 0){
 			retries++;
-			std::cout << "Retries" << retries << "\n";
+			//std::cout << "Retries" << retries << "\n";
 			if (retries >= MAX_RETRIES){
 				std::cerr << "Server Timeout: unable to recieve packets after attempts from server" << "\n";
 				return 2;
@@ -240,7 +240,7 @@ int main (int argc, char* argv[]) {
 
 			//retransmit the the packet
 			int result = retransmit(expectedSeqNum,clientSocket, (struct sockaddr*)&serverAddress, file);
-			std::cout << "Retransmitting" << "\n";
+			//std::cout << "Retransmitting" << "\n";
 			if(result == -1){
 				std::cerr << "Error Retranmistting" << "\n";
 				return -1;
@@ -260,14 +260,18 @@ int main (int argc, char* argv[]) {
 			seqNum = ntohs(receivedPacket->sequenceNumber); //extract the sequence number
 			recievedPackets[seqNum] = *receivedPacket;//instert the pair in the map
 			
-			if(recievedPackets.count(expectedSeqNum)){ // if we find the sequence number in the map 
+		
+			while((recievedPackets.count(expectedSeqNum))){ // if we find the sequence number in the map 
 				UDPPacket& pkt = recievedPackets[expectedSeqNum];
 				outFile << pkt.data; //write into the oufile
 				recievedPackets.erase(expectedSeqNum); //erase from the recieved map
 				expectedSeqNum++; // increase the sequence nubmer
 				retries = 0;
 			}
-			if (recievedPackets.size() >= 3){//if we have 3 packets in the map and haven't found it packet loss detected
+
+			std::cout << "Buffer Size for Maps" << recievedPackets.size() << "\n";
+
+			if (recievedPackets.size() >= 3 && !recievedPackets.count(expectedSeqNum)){//if we have 3 packets in the map and haven't found it packet loss detected
 				std::cerr << "Packet Loss Detected" << "\n";	
 				int retransmission = retransmit(expectedSeqNum,clientSocket, (struct sockaddr*)&serverAddress, file);
 				if(retransmission == -1){
