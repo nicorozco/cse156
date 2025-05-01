@@ -27,9 +27,9 @@ void echoLoop(int serverSocket){
 
 			std::cout << "Data: " << recievedPacket->data << "from" << inet_ntoa(clientAddr.sin_addr) << ":"<< ntohs(clientAddr.sin_port) << "\n";	
 }
-	//echo it back to the client, meaning just send it back
-	sendto(serverSocket, buffer, bytesRecieved,0, (struct sockaddr*)&clientAddr, clientLen);
-	
+		//echo it back to the client, meaning just send it back
+		sendto(serverSocket, buffer, bytesRecieved,0, (struct sockaddr*)&clientAddr, clientLen);
+		usleep(5000);	
 	}
 }
 
