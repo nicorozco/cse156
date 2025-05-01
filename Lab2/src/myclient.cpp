@@ -71,7 +71,7 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	auto* ipv4 = (struct sockaddr_in*)serverAddress;
 	std::cout << "Send to" << inet_ntoa(ipv4->sin_addr) << ":" << ntohs(ipv4->sin_port) << " | family=" << ipv4->sin_family << "\n";
 
-	ssize_t sent = sendto(clientSocket,&lostPacket, sizeof(uint32_t) + bytes_reRead, 0,(struct sockaddr*)&serverAddress,sizeof(struct sockaddr_in));
+	ssize_t sent = sendto(clientSocket,&lostPacket, sizeof(uint32_t) + bytes_reRead, 0,(struct sockaddr*)ipv4,sizeof(struct sockaddr_in));
 	if(sent == -1){
 		perror("sendto failed");
 	}
