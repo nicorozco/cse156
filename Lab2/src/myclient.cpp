@@ -96,7 +96,7 @@ int main (int argc, char* argv[]) {
 	int retries = 0;
 	const int MAX_RETRIES = 5;
 	int bytes_recieved;
-	int sequence;
+	uint16_t sequence;
 	
 	if (argc < 3){
 		std::cerr << "Error: not enough arguments.\n";
@@ -254,28 +254,31 @@ int main (int argc, char* argv[]) {
 		}
 		
 		bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
+		
 		if(bytes_recieved > 0){ //if we are recieving data
 			std::cout << "Expected Sequence Number" << expectedSeqNum << "\n";
-			//process the packet
 			UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
 			seqNum = ntohs(receivedPacket->sequenceNumber); //extract the sequence number
-			if(recievedPackets.size() < 5 && !recievedPackets.count(seqNum)){
+			
+			//process the packet
+			if (recievedPackets.size() < 5){
 				recievedPackets[seqNum] = *receivedPacket;//instert the pair in the map
-			}
-			if(recievedPackets.count(expectedSeqNum)){ // if we find the sequence number in the map 
-				UDPPacket& pkt = recievedPackets[expectedSeqNum];
-				outFile << pkt.data; //write into the oufile
-				recievedPackets.erase(expectedSeqNum); //erase from the recieved map
-				expectedSeqNum++; // increase the sequence nubmer
-				retries = 0;
-			}
-			if (recievedPackets.size() >= 5 && !recievedPackets.count(expectedSeqNum)){//if we have 3 packets in the map and haven't found it packet loss detected
-				std::cerr << "Packet Loss Detected: Sequence Number" << expectedSeqNum << "\n";	
-				int retransmission = retransmit(expectedSeqNum,clientSocket, (struct sockaddr*)&serverAddress, file);
-				if(retransmission == -1){
-					std::cerr << "Error Retranmistting" << "\n";
+				
+				while(recievedPackets.count(expectedSeqNum)){	
+					UDPPacket& pkt = recievedPackets[expectedSeqNum];
+					outFile << pkt.data; //write into the oufile
+					recievedPackets.erase(expectedSeqNum); //erase from the recieved map
+					expectedSeqNum++; // increase the sequence nubmer
+					retries = 0;
 				}
-				continue;
+				std::cout << "Current Map Size: " << recievedPackets.size() << "\n";
+			}
+			if(recievedPackets.size() >= 5 && !recievedPackets.count(expectedSeqNum)){
+					std::cerr << "Packet Loss Detected: Sequence Number" << expectedSeqNum << "\n";	
+					int retransmission = retransmit(expectedSeqNum,clientSocket, (struct sockaddr*)&serverAddress, file);
+					if(retransmission == -1){
+						std::cerr << "Error Retranmistting" << "\n";
+					}
 			}
 
 		} else if (bytes_recieved == 0){
