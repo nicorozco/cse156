@@ -232,7 +232,7 @@ int main (int argc, char* argv[]) {
 	
 		if(active == 0){
 			retries++;
-			//std::cout << "Retries" << retries << "\n";
+			std::cout << "Retries" << retries << "\n";
 			if (retries >= MAX_RETRIES){
 				std::cerr << "Server Timeout: unable to recieve packets after attempts from server" << "\n";
 				return 2;
@@ -255,24 +255,22 @@ int main (int argc, char* argv[]) {
 		
 		bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
 		if(bytes_recieved > 0){ //if we are recieving data
+			std::cout << "Expected Sequence Number" << expectedSeqNum << "\n";
 			//process the packet
 			UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
 			seqNum = ntohs(receivedPacket->sequenceNumber); //extract the sequence number
-			recievedPackets[seqNum] = *receivedPacket;//instert the pair in the map
-			
-		
-			while((recievedPackets.count(expectedSeqNum))){ // if we find the sequence number in the map 
+			if(recievedPackets.size() < 5){
+				recievedPackets[seqNum] = *receivedPacket;//instert the pair in the map
+			}
+			while(recievedPackets.count(expectedSeqNum)){ // if we find the sequence number in the map 
 				UDPPacket& pkt = recievedPackets[expectedSeqNum];
 				outFile << pkt.data; //write into the oufile
 				recievedPackets.erase(expectedSeqNum); //erase from the recieved map
 				expectedSeqNum++; // increase the sequence nubmer
 				retries = 0;
 			}
-
-			std::cout << "Buffer Size for Maps" << recievedPackets.size() << "\n";
-
-			if (recievedPackets.size() >= 3 && !recievedPackets.count(expectedSeqNum)){//if we have 3 packets in the map and haven't found it packet loss detected
-				std::cerr << "Packet Loss Detected" << "\n";	
+			if (recievedPackets.size() <= 5 && !recievedPackets.count(expectedSeqNum)){//if we have 3 packets in the map and haven't found it packet loss detected
+				std::cerr << "Packet Loss Detected: Sequence Number" << expectedSeqNum << "\n";	
 				int retransmission = retransmit(expectedSeqNum,clientSocket, (struct sockaddr*)&serverAddress, file);
 				if(retransmission == -1){
 					std::cerr << "Error Retranmistting" << "\n";
