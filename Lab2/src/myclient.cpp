@@ -163,7 +163,7 @@ int main (int argc, char* argv[]) {
 	//reading data & sending packets
 	while(file){
 		UDPPacket packet;
-		packet.sequenceNumber = htons(sequence++);
+		packet.sequenceNumber = htonl(sequence++);
 		file.read(packet.data,sizeof(packet.data));
 		std::streamsize bytesRead = file.gcount();
 
@@ -219,7 +219,7 @@ int main (int argc, char* argv[]) {
 	}
 
 	while(true){ //2.)we know the server is active start recieving packets 
-		
+		std::cout << "Back at the Top of the Loop" << "\n";	
 		fd_set rset; // create socket set
 		FD_ZERO(&rset);//clear the socket set
 		FD_SET(clientSocket,&rset); //add the clientsocket to the set 
@@ -232,7 +232,7 @@ int main (int argc, char* argv[]) {
 	
 		if(active == 0){
 			retries++;
-			std::cout << "Retries" << retries << "\n";
+			std::cout << "ClientSocke is not ready" << retries << "\n";
 			if (retries >= MAX_RETRIES){
 				std::cerr << "Server Timeout: unable to recieve packets after attempts from server" << "\n";
 				return 2;
@@ -240,7 +240,7 @@ int main (int argc, char* argv[]) {
 
 			//retransmit the the packet
 			int result = retransmit(expectedSeqNum,clientSocket, (struct sockaddr*)&serverAddress, file);
-			//std::cout << "Retransmitting" << "\n";
+			std::cout << "Retransmitting Due to Inactivity" << "\n";
 			if(result == -1){
 				std::cerr << "Error Retranmistting" << "\n";
 				return -1;
@@ -257,12 +257,13 @@ int main (int argc, char* argv[]) {
 		
 		if(bytes_recieved > 0){ //if we are recieving data
 			std::cout << "Expected Sequence Number" << expectedSeqNum << "\n";
-			UDPPacket* receivedPacket = reinterpret_cast<UDPPacket*>(buffer);
-			seqNum = ntohs(receivedPacket->sequenceNumber); //extract the sequence number
-			
+			UDPPacket receivedPacket;
+			memcpy(&receivedPacket, buffer,sizeof(UDPPacket));
+			seqNum = ntohl(receivedPacket.sequenceNumber); //extract the sequence number
+			std::cout << "Sequence Number of Recieved Packet" << seqNum << "\n";
 			//process the packet
 			if (recievedPackets.size() < 5){
-				recievedPackets[seqNum] = *receivedPacket;//instert the pair in the map
+				recievedPackets[seqNum] = receivedPacket;//instert the pair in the map
 				
 				while(recievedPackets.count(expectedSeqNum)){	
 					UDPPacket& pkt = recievedPackets[expectedSeqNum];
