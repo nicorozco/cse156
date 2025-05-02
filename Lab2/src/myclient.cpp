@@ -272,10 +272,10 @@ int main (int argc, char* argv[]) {
 					retries = 0;
 				}
 				std::cout << "Current Map Size: " << recievedPackets.size() << "\n";
-			}
-			if(recievedPackets.size() >= 5 && !recievedPackets.count(expectedSeqNum)){
+			}else if(recievedPackets.size() >= 5 && !recievedPackets.count(expectedSeqNum)){
 					std::cerr << "Packet Loss Detected: Sequence Number" << expectedSeqNum << "\n";	
 					int retransmission = retransmit(expectedSeqNum,clientSocket, (struct sockaddr*)&serverAddress, file);
+					retries++;
 					if(retransmission == -1){
 						std::cerr << "Error Retranmistting" << "\n";
 					}
