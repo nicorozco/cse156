@@ -27,7 +27,7 @@ bool isValidIPv4Format(const std::string& ip){
 int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* serverAddress,std::ifstream& file){
 	file.clear();
 	UDPPacket lostPacket; //create the packet
-	lostPacket.sequenceNumber = htons(expectedSeqNum);//set the sequence number	
+	lostPacket.sequenceNumber = htonl(expectedSeqNum);//set the sequence number	
 	std::cout << "Resending Sequence Number = " << expectedSeqNum << "\n";
 	//recover the data associated with the sequence number from the original file using seekg()
 	long offset = expectedSeqNum * 1468;
@@ -57,7 +57,7 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 			//we failed to reach the file
 			std::cerr << "Read failed due to logical error" << "\n";
 			return -1;
-		} else if(file.bad()){
+		}else if(file.bad()){
 			//server issue
 			std::cerr << "Severe read error"<< "\n";
 			return -1;
@@ -219,7 +219,7 @@ int main (int argc, char* argv[]) {
 	}
 
 	while(true){ //2.)we know the server is active start recieving packets 
-		std::cout << "Back at the Top of the Loop" << "\n";	
+		//std::cout << "Back at the Top of the Loop" << "\n";	
 		fd_set rset; // create socket set
 		FD_ZERO(&rset);//clear the socket set
 		FD_SET(clientSocket,&rset); //add the clientsocket to the set 
@@ -232,13 +232,14 @@ int main (int argc, char* argv[]) {
 	
 		if(active == 0){
 			retries++;
-			std::cout << "ClientSocke is not ready" << retries << "\n";
+			std::cout << "ClientSocket is not ready" << retries << "\n";
 			if (retries >= MAX_RETRIES){
 				std::cerr << "Server Timeout: unable to recieve packets after attempts from server" << "\n";
 				return 2;
 			}
 
 			//retransmit the the packet
+			std::cout << "Sequence Number being retransmitted due to inactivity" << expectedSeqNum << "\n";
 			int result = retransmit(expectedSeqNum,clientSocket, (struct sockaddr*)&serverAddress, file);
 			std::cout << "Retransmitting Due to Inactivity" << "\n";
 			if(result == -1){
