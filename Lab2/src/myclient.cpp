@@ -225,7 +225,7 @@ int main (int argc, char* argv[]) {
 		FD_SET(clientSocket,&rset); //add the clientsocket to the set 
 		//set a timer utilize select to prevent hanging forever while waiting to recieved packeyt 
 		struct timeval timeout;
-		timeout.tv_sec = 2;
+		timeout.tv_sec = 10;
 		timeout.tv_usec = 0;
 		int active = select(clientSocket+1,&rset,NULL,NULL,&timeout);
 		//std::cout << "Active FD: " << active << "\n";
@@ -246,9 +246,6 @@ int main (int argc, char* argv[]) {
 				std::cerr << "Error Retranmistting" << "\n";
 				return -1;
 			}
-			
-			continue;
-
 		}else if (active < 0){
 			std::cerr << "Select Error Occured" << "\n";
 			return -1;
