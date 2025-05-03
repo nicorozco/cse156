@@ -93,6 +93,7 @@ int main (int argc, char* argv[]) {
 	std::map<uint32_t,UDPPacket> unackedPackets;
 	uint32_t nextSeqNum = 0;
 	uint32_t baseSeqNum = 0;
+	uint32_t seqNum = 0;
 	int retries = 0;
 	const int MAX_RETRIES = 5;
 	int bytes_recieved;
@@ -197,41 +198,51 @@ int main (int argc, char* argv[]) {
 			}
 		}
 
-	fd_set rset; // create socket set
-	FD_ZERO(&rset);//clear the socket set
-	FD_SET(clientSocket,&rset); //add the clientsocket to the set 
-	//set a timer utilize select to prevent hanging forever while waiting to recieved packeyt 
-	struct timeval timeout;
-	timeout.tv_sec = 2;
-	timeout.tv_usec = 0;
-	
-	int activity = select(clientSocket+1,&rset,NULL,NULL,&timeout);
-	
-	if(activity == 0){
-		retires++;
-		std::cerr << "Timeout waiting for echo. Retry #" << retires << "\n";
-		if(retries >= MAX_RETRIES){
-			std::cerr << "Max Retires Exceeded. Server unresponsive.\n";
-			return -1;
+		fd_set rset; // create socket set
+		FD_ZERO(&rset);//clear the socket set
+		FD_SET(clientSocket,&rset); //add the clientsocket to the set 
+		//set a timer utilize select to prevent hanging forever while waiting to recieved packeyt 
+		struct timeval timeout;
+		timeout.tv_sec = 2;
+		timeout.tv_usec = 0;
+		
+		int activity = select(clientSocket+1,&rset,NULL,NULL,&timeout);
+		
+		if(activity == 0){
+			retries++;
+			std::cerr << "Timeout waiting for echo. Retry #" << retries << "\n";
+			if(retries >= MAX_RETRIES){
+				std::cerr << "Max Retires Exceeded. Server unresponsive.\n";
+				return -1;
 
+			}
+			// if the fd is not ready retransmit, only retransmit the older unacknoldge sequence number 
+			auto it = unackedPackets.begin(); //grab the olders unack seq number
+			if(it!=unackedPackets.end()){ //if the map isnt empty
+				int retrans = retransmit(baseSeqNum,clientSocket,(struct sockaddr*)&serverAddress,file);
+				if (retrans == -1){
+					std::cerr << "error retransmitting" << "\n";
+				}
+			}
+		}else if (activity < 0){
+			std::cerr << "Select Error\n";
+			exit(-1);
 		}
-	}else if (activity < 0){
-		std::cerr << "Select Error\n";
-		exit(-1);
-	}
-	//processing echoed packets		
-	bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
-	if(bytes_reciveved > 0){
-		UDPPacket receivedPacket;
-		memcpy(&receivedPacket, buffer,sizeof(UDPPacket));
-		seqNum = ntohl(receivedPacket.sequenceNumber); //extract the sequence number
-		std::cout << "Sequence Number of Recieved Packet" << seqNum << "\n";
-	
-		// if the sequence number is in the unackedpacket, slides the window 
-		if(unackedPackets.count(seqNum)){
-			unackedPackets.erase(seqNum);
-			while(!unackedPacket.count(baseSeqNum) && baseSeqNum < nextSeqNum){
-					baseSeqNum++;
+		//processing echoed packets		
+		bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
+		if(bytes_recieved > 0){
+			UDPPacket receivedPacket;
+			memcpy(&receivedPacket, buffer,sizeof(UDPPacket));
+			seqNum = ntohl(receivedPacket.sequenceNumber); //extract the sequence number
+			std::cout << "Sequence Number of Recieved Packet" << seqNum << "\n";
+		
+			// if the sequence number is in the unackedpacket, slides the window 
+			if(unackedPackets.count(seqNum)){
+				unackedPackets.erase(seqNum);//if the is found remove it
+				while(!unackedPackets.count(baseSeqNum) && baseSeqNum < nextSeqNum){
+						baseSeqNum++;//slide the baseSeqNum to slide the window
+				}
+				retries = 0;
 			}
 		}
 	}
