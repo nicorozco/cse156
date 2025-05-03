@@ -19,6 +19,26 @@
 #include <sys/select.h> // for select()
 #include <sys/time.h> // for time		
 #define WINDOW_SIZE 5
+#include <fstream>
+
+bool compareFiles(const std::string& file1, const std::string& file2) {
+    std::ifstream f1(file1, std::ios::binary);
+    std::ifstream f2(file2, std::ios::binary);
+
+    if (!f1.is_open() || !f2.is_open()) {
+        std::cerr << "Error: Could not open one or both files.\n";
+        return false;
+    }
+
+    char c1, c2;
+    while (f1.get(c1) && f2.get(c2)) {
+        if (c1 != c2) return false;
+    }
+
+    // If both reached EOF, they're the same
+    return f1.eof() && f2.eof();
+}
+
 bool isValidIPv4Format(const std::string& ip){	
 	std::regex ipv4Pattern(R"(^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$)");
 	return std::regex_match(ip, ipv4Pattern);
@@ -260,10 +280,16 @@ int main (int argc, char* argv[]) {
 		}
 	}
 
-// if all packets are sent and acknolwedge break
 
 
-//Final Step: Compare the file outputs
+	//Final Step: Compare the file outputs
+	if (compareFiles(infilePath, outfilePath)) {
+	    	std::cout << "✅ Files are identical!\n";
+		return 2;
+	} else {
+    		std::cout << "❌ Files are different.\n";
+		return 1;
+	}
 		
 	
 	std::cout << "Closing Connection" << "\n";
