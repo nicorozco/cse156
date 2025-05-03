@@ -90,13 +90,12 @@ int main (int argc, char* argv[]) {
 	std::string outfilePath;
 	char buffer[1472];
 	std::string line;
-	std::map<uint32_t,UDPPacket> recievedPackets;
-	uint32_t expectedSeqNum = 0;
-	uint32_t seqNum;
+	std::map<uint32_t,UDPPacket> unackedPackets;
+	uint32_t nextSeqNum = 0;
+	uint32_t baseSeqNum = 0;
 	int retries = 0;
 	const int MAX_RETRIES = 5;
 	int bytes_recieved;
-	uint16_t sequence;
 	
 	if (argc < 3){
 		std::cerr << "Error: not enough arguments.\n";
@@ -166,27 +165,37 @@ int main (int argc, char* argv[]) {
 		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
 		return -1;
 	}
+
+
 	//reading data & sending packets
 	while(true){
-		// if there space in the buffer and there is still data to read from the file 
-		while(
-		//create a packet
-		UDPPacket packet;
-		packet.sequenceNumber = htonl(sequence++);
-		file.read(packet.data,sizeof(packet.data));
-		std::streamsize bytesRead = file.gcount();
+		//while we are within the window and there is data to read --> create packet and trasmit data
+		while(nextSeqNum < baseSeqNum + WINDOW_SIZE && file.good()){
+			UDPPacket packet;
+			memset(&packet,0,sizeof(packet));
+			packet.sequenceNumber = htonl(nextSeqNum);
+			file.read(packet.data,sizeof(packet.data));
+			std::streamsize bytesRead = file.gcount();
 
-		//if we have data have data send it 
-		if(bytesRead > 0){
-			//isend the data
-			ssize_t sentBytes = sendto(clientSocket,&packet, sizeof(uint32_t) + bytesRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));			// insert the packet into the sent packet	
-			if(sentBytes < 0){
-				perror("sendto failed");
-				close(clientSocket);
-				return -1;
+			//if we have data have data send it 
+			if(bytesRead > 0){
+				//send the data
+				ssize_t sentBytes = sendto(clientSocket,&packet, sizeof(uint32_t) + bytesRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));				
+				if(sentBytes < 0){
+					perror("sendto failed");
+					close(clientSocket);
+					return -1;
+				}else{
+					//insert the packet into the unackedPacket
+					unackedPackets[nextSeqNum] = packet;
+					nextSeqNum++;
+
+				}
+			} else if (bytesRead <=0){
+				std::cerr << "Error Reading Bytes" << "\n";
+				break;
 			}
 		}
-	}
 
 	fd_set rset; // create socket set
 	FD_ZERO(&rset);//clear the socket set
@@ -197,36 +206,39 @@ int main (int argc, char* argv[]) {
 	timeout.tv_usec = 0;
 	
 	int activity = select(clientSocket+1,&rset,NULL,NULL,&timeout);
+	
 	if(activity == 0){
-		std::cerr << "Cannot detect server\n";
-		exit(1);
+		retires++;
+		std::cerr << "Timeout waiting for echo. Retry #" << retires << "\n";
+		if(retries >= MAX_RETRIES){
+			std::cerr << "Max Retires Exceeded. Server unresponsive.\n";
+			return -1;
+
+		}
 	}else if (activity < 0){
 		std::cerr << "Select Error\n";
 		exit(-1);
 	}
-
-		if (retries >= MAX_RETRIES){
-			std::cerr << "Server Timeout: unable to recieve packets after attempts from server" << "\n";
-			return 2;
+	//processing echoed packets		
+	bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
+	if(bytes_reciveved > 0){
+		UDPPacket receivedPacket;
+		memcpy(&receivedPacket, buffer,sizeof(UDPPacket));
+		seqNum = ntohl(receivedPacket.sequenceNumber); //extract the sequence number
+		std::cout << "Sequence Number of Recieved Packet" << seqNum << "\n";
+	
+		// if the sequence number is in the unackedpacket, slides the window 
+		if(unackedPackets.count(seqNum)){
+			unackedPackets.erase(seqNum);
+			while(!unackedPacket.count(baseSeqNum) && baseSeqNum < nextSeqNum){
+					baseSeqNum++;
+			}
 		}
-
-			//retransmit all the unknockwledge packets
-			std::cout << "Sequence Number being retransmitted due to inactivity" << expectedSeqNum << "\n";
-			int result = retransmit(expectedSeqNum,clientSocket, (struct sockaddr*)&serverAddress, file);
-			std::cout << "Retransmitting Due to Inactivity" << "\n";
-		//recieved echoed packets		
-		bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
-		
-		if(bytes_recieved > 0){ //if we are recieving data
-			std::cout << "Expected Sequence Number" << expectedSeqNum << "\n";
-			UDPPacket receivedPacket;
-			memcpy(&receivedPacket, buffer,sizeof(UDPPacket));
-			seqNum = ntohl(receivedPacket.sequenceNumber); //extract the sequence number
-			std::cout << "Sequence Number of Recieved Packet" << seqNum << "\n";
-
+	}
 //once we acknoweldged the packet slide the window
 
 // if all packets are sent and acknolwedge break
+
 
 //Final Step: Compare the file outputs
 		
