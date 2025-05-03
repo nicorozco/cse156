@@ -198,7 +198,7 @@ int main (int argc, char* argv[]) {
 			file.read(packet.data,sizeof(packet.data));
 			std::streamsize bytesRead = file.gcount();
 			int totalSize = sizeof(uint32_t) + bytesRead;
-			std::cout << "Packet Size:" << totalSize << "\n";
+			//std::cout << "Packet Size:" << totalSize << "\n";
 			//if we have data have data send it 
 			if(bytesRead > 0){
 				//send the data
@@ -259,7 +259,7 @@ int main (int argc, char* argv[]) {
 			UDPPacket receivedPacket;
 			memcpy(&receivedPacket, buffer,sizeof(UDPPacket));
 			seqNum = ntohl(receivedPacket.sequenceNumber); //extract the sequence number
-			std::cout << "Sequence Number of Recieved Packet" << seqNum << "\n";
+			//std::cout << "Sequence Number of Recieved Packet" << seqNum << "\n";
 		
 			// if the sequence number is in the unackedpacket, slides the window 
 			if(unackedPackets.count(seqNum)){
