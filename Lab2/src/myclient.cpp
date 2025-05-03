@@ -177,11 +177,12 @@ int main (int argc, char* argv[]) {
 			packet.sequenceNumber = htonl(nextSeqNum);
 			file.read(packet.data,sizeof(packet.data));
 			std::streamsize bytesRead = file.gcount();
-
+			int totalSize = sizeof(uint32_t) + bytesRead;
+			std::cout << "Packet Size:" << totalSize << "\n";
 			//if we have data have data send it 
 			if(bytesRead > 0){
 				//send the data
-				ssize_t sentBytes = sendto(clientSocket,&packet, sizeof(uint32_t) + bytesRead, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));				
+				ssize_t sentBytes = sendto(clientSocket,&packet,totalSize, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));				
 				if(sentBytes < 0){
 					perror("sendto failed");
 					close(clientSocket);
@@ -192,10 +193,14 @@ int main (int argc, char* argv[]) {
 					nextSeqNum++;
 
 				}
-			} else if (bytesRead <=0){
-				std::cerr << "Error Reading Bytes" << "\n";
-				break;
+			} else {
+				if(file.eof()){
+					std::cerr << "Reached end of file" << "\n";
+				}else{ 
+					std::cerr << "File read error occured.\n";
+				}
 			}
+			break;
 		}
 
 		fd_set rset; // create socket set
