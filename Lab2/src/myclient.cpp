@@ -256,6 +256,7 @@ int main (int argc, char* argv[]) {
 		//processing echoed packets		
 		bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
 		if(bytes_recieved > 0){
+			ssize_t dataSize = bytes_recieved - sizeof(uint32_t);
 			UDPPacket receivedPacket;
 			memcpy(&receivedPacket, buffer,sizeof(UDPPacket));
 			seqNum = ntohl(receivedPacket.sequenceNumber); //extract the sequence number
@@ -264,7 +265,7 @@ int main (int argc, char* argv[]) {
 			// if the sequence number is in the unackedpacket, slides the window 
 			if(unackedPackets.count(seqNum)){
 				unackedPackets.erase(seqNum);//if the sequence number is found remove it
-				outFile << receivedPacket.data;//write it to the file
+				outFile.write(receivedPacket.data,dataSize);//write it to the file
 				while(!unackedPackets.count(baseSeqNum) && baseSeqNum < nextSeqNum) { //if we reach the ending of the unacked window
 						baseSeqNum++;//slide the baseSeqNum to slide the window
 				}
