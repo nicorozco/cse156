@@ -238,15 +238,22 @@ int main (int argc, char* argv[]) {
 		
 			// if the sequence number is in the unackedpacket, slides the window 
 			if(unackedPackets.count(seqNum)){
-				unackedPackets.erase(seqNum);//if the is found remove it
-				while(!unackedPackets.count(baseSeqNum) && baseSeqNum < nextSeqNum){
+				unackedPackets.erase(seqNum);//if the sequence number is found remove it
+				outFile << receivedPacket.data;//write it to the file
+				while(!unackedPackets.count(baseSeqNum) && baseSeqNum < nextSeqNum) { //if we reach the ending of the unacked window
 						baseSeqNum++;//slide the baseSeqNum to slide the window
 				}
 				retries = 0;
 			}
+		}else if (bytes_recieved < 0){
+			perror("recvfrom failed");
+			return -1;
+		}
+		if(file.eof() && unackedPackets.empty()){ //if we reach the end of file and there are no packets in the map break out
+			std::cout << "All Packet send and no more data to send" << "\n";
+			break;
 		}
 	}
-//once we acknoweldged the packet slide the window
 
 // if all packets are sent and acknolwedge break
 
