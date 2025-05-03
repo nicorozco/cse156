@@ -20,6 +20,33 @@
 #include <sys/time.h> // for time		
 #define WINDOW_SIZE 5
 #include <fstream>
+void printLastBytes(const std::string& filename, size_t numBytes = 20) {
+    std::ifstream file(filename, std::ios::binary);
+
+    if (!file.is_open()) {
+        std::cerr << "Could not open file: " << filename << "\n";
+        return;
+    }
+
+    // Go to end and get file size
+    file.seekg(0, std::ios::end);
+    std::streamoff fileSize = file.tellg();
+
+    if (fileSize < static_cast<std::streamoff>(numBytes)) {
+    numBytes = static_cast<size_t>(fileSize); // also cast here
+}
+
+    // Go to last `numBytes`
+    file.seekg(fileSize - numBytes, std::ios::beg);
+    std::vector<unsigned char> buffer(numBytes);
+    file.read(reinterpret_cast<char*>(buffer.data()), numBytes);
+
+    std::cout << "Last " << numBytes << " bytes of " << filename << ":\n";
+    for (size_t i = 0; i < buffer.size(); ++i) {
+        printf("%02X ", buffer[i]);
+    }
+    std::cout << "\n";
+}
 
 bool compareFiles(const std::string& file1, const std::string& file2) {
     std::ifstream f1(file1, std::ios::binary);
@@ -31,12 +58,23 @@ bool compareFiles(const std::string& file1, const std::string& file2) {
     }
 
     char c1, c2;
+    size_t pos = 0;
     while (f1.get(c1) && f2.get(c2)) {
-        if (c1 != c2) return false;
+        if (c1 != c2) {
+            std::cerr << "Difference at byte " << pos
+                      << ": " << std::hex << (int)(unsigned char)c1
+                      << " != " << (int)(unsigned char)c2 << "\n";
+            return false;
+        }
+        pos++;
     }
-
+  // Check if one file is longer than the other
+    if (f1.get(c1) || f2.get(c2)) {
+        std::cerr << "File length mismatch at byte " << pos << "\n";
+        return false;
+    }
     // If both reached EOF, they're the same
-    return f1.eof() && f2.eof();
+    return true;
 }
 
 bool isValidIPv4Format(const std::string& ip){	
@@ -191,36 +229,32 @@ int main (int argc, char* argv[]) {
 	//reading data & sending packets
 	while(true){
 		//while we are within the window and there is data to read --> create packet and trasmit data
-		while(nextSeqNum < baseSeqNum + WINDOW_SIZE && file.good()){
+		while(nextSeqNum < baseSeqNum + WINDOW_SIZE){
 			UDPPacket packet;
 			memset(&packet,0,sizeof(packet));
-			packet.sequenceNumber = htonl(nextSeqNum);
+
 			file.read(packet.data,sizeof(packet.data));
 			std::streamsize bytesRead = file.gcount();
+			
+			if(bytesRead <= 0)break;
+			packet.sequenceNumber = htonl(nextSeqNum);
 			int totalSize = sizeof(uint32_t) + bytesRead;
 			//std::cout << "Packet Size:" << totalSize << "\n";
 			//if we have data have data send it 
-			if(bytesRead > 0){
 				//send the data
-				ssize_t sentBytes = sendto(clientSocket,&packet,totalSize, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));				
-				if(sentBytes < 0){
-					perror("sendto failed");
-					close(clientSocket);
-					return -1;
-				}else{
-					//insert the packet into the unackedPacket
-					unackedPackets[nextSeqNum] = packet;
-					nextSeqNum++;
-
-				}
-			} else {
-				if(file.eof()){
-					std::cerr << "Reached end of file" << "\n";
-				}else{ 
-					std::cerr << "File read error occured.\n";
-				}
+			ssize_t sentBytes = sendto(clientSocket,&packet,totalSize, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));				
+			if(sentBytes < 0){
+				perror("sendto failed");
+				close(clientSocket);
+				return -1;
 			}
-			break;
+				
+			if(bytesRead < static_cast<std::streamsize>(sizeof(packet.data))){
+				std::cout << "Sent Final Partial packet of" << bytesRead << " bytes (Seq: " << nextSeqNum << ")\n";
+			}	
+				
+			unackedPackets[nextSeqNum] = packet;
+			nextSeqNum++;
 		}
 
 		fd_set rset; // create socket set
@@ -258,7 +292,8 @@ int main (int argc, char* argv[]) {
 		if(bytes_recieved > 0){
 			ssize_t dataSize = bytes_recieved - sizeof(uint32_t);
 			UDPPacket receivedPacket;
-			memcpy(&receivedPacket, buffer,sizeof(UDPPacket));
+			memset(&receivedPacket, 0, sizeof(receivedPacket));  // clear all
+			memcpy(&receivedPacket, buffer,bytes_recieved);
 			seqNum = ntohl(receivedPacket.sequenceNumber); //extract the sequence number
 			//std::cout << "Sequence Number of Recieved Packet" << seqNum << "\n";
 		
@@ -282,12 +317,13 @@ int main (int argc, char* argv[]) {
 	}
 
 
-
+	printLastBytes(infilePath);
+	printLastBytes(outfilePath);
 	//Final Step: Compare the file outputs
 	if (compareFiles(infilePath, outfilePath)) {
 	    	std::cout << "✅ Files are identical!\n";
 		return 2;
-	} else {
+	} else{
     		std::cout << "❌ Files are different.\n";
 		return 1;
 	}
