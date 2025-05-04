@@ -152,7 +152,7 @@ int main (int argc, char* argv[]) {
 	if (serverPort < 1 || serverPort > 65535){
 		std::cerr << "Error: Invalid port number\n";
 		close(clientSocket);
-		return 6;
+		return -1;
 	}
 	serverAddress.sin_port = htons(serverPort); 
 	
@@ -172,13 +172,21 @@ int main (int argc, char* argv[]) {
 	// check for error when opening file
 	if(!file.is_open()){
 		std::cerr << "Error: " << std::strerror(errno) << "\n";
+		close(clientSocket);
 		return -1;
 	}
+	file.seekg(0, std::ios::end); // go to end
+	if (file.tellg() == 0) {
+	    std::cerr << "File is empty.\n";
+	    return 0; // or any code you want to indicate "empty file"
+	}
+	file.seekg(0, std::ios::beg); // rewind to beginning if not empty
 
 	socklen_t addrlen = sizeof(serverAddress);
 	std::ofstream outFile(outfilePath,std::ios::binary);//open file path for writing
 	if(!outFile.is_open()){
 		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
+		close(clientSocket);
 		return -1;
 	}
 
@@ -198,6 +206,9 @@ int main (int argc, char* argv[]) {
 			
 			if(bytesRead <= 0){
 				break;
+			}else if (bytesRead <= 32){
+				std::cerr << "Required Minimum MSS is X+1\n";
+					return 1;
 			}
 			packet.sequenceNumber = htonl(nextSeqNum);
 			int totalSize = sizeof(uint32_t) + bytesRead;

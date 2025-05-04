@@ -9,7 +9,6 @@
 #include <ctime>
 
 void echoLoop(int serverSocket){	
-	double dropRate = 0.2;
 	char buffer[1472];
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	struct sockaddr_in clientAddr;
@@ -25,11 +24,6 @@ void echoLoop(int serverSocket){
 		}
 		
 		if(bytesRecieved > 0) {//if we are recieving data
-			double r = (double)rand() / RAND_MAX;
-    			if (r < dropRate) {
-        			std::cout << "Simulating packet loss. Dropped packet.\n";
-        			continue;  // drop the packet, do not send a response
-    			}
 			//process the data create a strucutre of the buffer 		
 			UDPPacket* recievedPacket = reinterpret_cast<UDPPacket*>(buffer);
 
