@@ -3,39 +3,44 @@ Usage:
 		-./myclient <server_ip> <server_port> <infile path> <outfile path>
 	Server Usage:
 		-./myserver <port-number>
-Functions:
-- isValidIPv4Format():
-	- uses regex pattern to ensure the IPv4 format for the server is given correctly
-- retransmit();
-	- handles the functionility of constructing the packet with the lost sequence number, and 
-	filling in the missing data using seekg() from the file and sending to the server 
-
-Internal Design:
-	Packet Splitting Mechanism:
-		- To split the packets, I created a UDPpacket structure to hold the sequence number (for retransmission & packet loss) and the actual data. Since the MSS is 1500 bytes,
-		the sequence number is set to a uint_32 (4 Bytes), leaving 1468 bytes for the actual char data. When reading from the file we only read 1468 bytes and insert it into the data section of the structure
-
-
-	Packet Ordering Mechanism:	
-		- In order to ensure the packets where written to the file in the correct order, when recieved I inserted the sequence number into a map. 
-		The map automatically reorders the packets, therefore the last step is the sequence number is found to remove it from the map and write it to the file. This ensure correct order
-
-Retransmittion Algorithm:
-	Transmitition Window Design:
-		- The sending & recieving of packets is done in segments of 5, the client sends the first 5 packets and inserts them into a unackedPacket map, this acts as a "window" similar 
-		to the TCP Window, this ensure we recieve packet within the window. Once we sent the packet, we go into to recieving. When recieving the packet we extract the sequence number
-		and check if it's within the unacknowledge packets, if the sequence number is found we remove the packet from the map and write it to the file. Once we remove the packet from the window,
-		we then check the conditions to move the window forward, if the lowest unacked sequence number is not in the map (since removed) and it's less then the greatest unacked packet, we slide the window over by one.
-	Retransmittion:
-		- If within this window or within the 2 second timer set by utilizing select() we detect packet loss and retransmit. If we haven't recieved a packet in either 6 seconds or within
-		the max limits of retries (5) this means we lost connection with the server and exit
-	 
-Test Cases:
-	- Normal Sending Packet
-	- 2 Client sending packet
-	- Implementing packet dropping on the server side every 20% of random packets
-	- utilizing a file path that doesn't exit 
-	- 2 client sending packets, and server crashing
-
-Shortcomings:
-- Due to time constrait, was unable to implement my cruzid at the front of each packet sent, due to the constraint of the UDPpacket header, reciving and processing based on the byte size of the header
+Client Design:
+	Functions:
+	- isValidIPv4Format():
+		- uses regex pattern to ensure the IPv4 format for the server is given correctly
+	- retransmit();
+		- handles the functionility of constructing the packet with the lost sequence number, and 
+		filling in the missing data using seekg() from the file and sending to the server 
+	
+	Internal Design:
+		Packet Splitting Mechanism:
+			- To split the packets, I created a UDPpacket structure to hold the sequence number (for retransmission & packet loss) and the actual data. Since the MSS is 1500 bytes,
+			the sequence number is set to a uint_32 (4 Bytes), leaving 1468 bytes for the actual char data. When reading from the file we only read 1468 bytes and insert it into the data section of the structure
+	
+	
+		Packet Ordering Mechanism:	
+			- In order to ensure the packets where written to the file in the correct order, when recieved I inserted the sequence number into a map. 
+			The map automatically reorders the packets, therefore the last step is the sequence number is found to remove it from the map and write it to the file. This ensure correct order
+	
+	Retransmittion Algorithm:
+		Transmitition Window Design:
+			- The sending & recieving of packets is done in segments of 5, the client sends the first 5 packets and inserts them into a unackedPacket map, this acts as a "window" similar 
+			to the TCP Window, this ensure we recieve packet within the window. Once we sent the packet, we go into to recieving. When recieving the packet we extract the sequence number
+			and check if it's within the unacknowledge packets, if the sequence number is found we remove the packet from the map and write it to the file. Once we remove the packet from the window,
+			we then check the conditions to move the window forward, if the lowest unacked sequence number is not in the map (since removed) and it's less then the greatest unacked packet, we slide the window over by one.
+		Retransmittion:
+			- If within this window or within the 2 second timer set by utilizing select() we detect packet loss and retransmit. If we haven't recieved a packet in either 6 seconds or within
+			the max limits of retries (5) this means we lost connection with the server and exit
+		 
+	Test Cases:
+		- Normal Sending Packet
+		- 2 Client sending packet
+		- Implementing packet dropping on the server side every 20% of random packets
+		- utilizing a file path that doesn't exit 
+		- 2 client sending packets, and server crashing
+Server Design:
+	- Server is fairly simple due to UDP being connectionless & allowing concurency for the server only binding the server to any of it's interfaces and internaly handling the
+	sending of packets to the appropriate client.
+	- Server recieves packets from it's UDP Socket & echoes (sends) out of it's socket
+	
+	Shortcomings:
+	- Due to time constrait, was unable to implement my cruzid at the front of each packet sent, due to the constraint of the UDPpacket header, reciving and processing based on the byte size of the header
