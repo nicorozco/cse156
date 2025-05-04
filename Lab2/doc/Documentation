@@ -44,8 +44,8 @@ Server Design:
 	
 Shortcomings:
 	- Due to time constrait, was unable to implement my cruzid at the front of each packet sent, due to the constraint of the UDPpacket header, reciving and processing based on the byte size of the header
-Return Codes:
 
+Return Codes:
 	- Return 0:
 		- Success, file succesfully constructed in order
 	- Return -1:
