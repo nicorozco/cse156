@@ -5,31 +5,42 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "client.h"
+#include <cstdlib>
+#include <ctime>
 
-
-void echoLoop(int serverSocket){
+void echoLoop(int serverSocket){	
+	double dropRate = 0.2;
 	char buffer[1472];
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	struct sockaddr_in clientAddr;
 	socklen_t clientLen = sizeof(clientAddr);
-	
+	ssize_t dataSize;	
 	while(true){
 
 		ssize_t bytesRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
 
 		if (bytesRecieved < 0){
 			perror("Error: Recieving from client");
+			continue;
 		}
 		
 		if(bytesRecieved > 0) {//if we are recieving data
+			double r = (double)rand() / RAND_MAX;
+    			if (r < dropRate) {
+        			std::cout << "Simulating packet loss. Dropped packet.\n";
+        			continue;  // drop the packet, do not send a response
+    			}
 			//process the data create a strucutre of the buffer 		
 			UDPPacket* recievedPacket = reinterpret_cast<UDPPacket*>(buffer);
 
-			std::cout << "Data: " << recievedPacket->data << "from" << inet_ntoa(clientAddr.sin_addr) << ":"<< ntohs(clientAddr.sin_port) << "\n";	
-}
+			dataSize = bytesRecieved - sizeof(uint32_t);
+			uint32_t seq = ntohl(recievedPacket->sequenceNumber);
+			std::cout << seq << "\n";
+		}
+		if(dataSize > 0){
 		//echo it back to the client, meaning just send it back
-		sendto(serverSocket, buffer, bytesRecieved,0, (struct sockaddr*)&clientAddr, clientLen);
-		usleep(5000);	
+			sendto(serverSocket, buffer, bytesRecieved,0, (struct sockaddr*)&clientAddr, clientLen);
+		}	
 	}
 }
 
@@ -40,7 +51,7 @@ bool isPortValid(int port){
 	return true;
 }	
 int main(int argc, char* argv[]){
-
+	srand(time(0));
 	std::string portStr;
 	int port;
 	

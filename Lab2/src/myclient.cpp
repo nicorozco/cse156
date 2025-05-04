@@ -143,6 +143,17 @@ int main (int argc, char* argv[]) {
 	} else {
 		std::cerr << "Error: Invalid Arguments" << "\n";
 	}
+	std::filesystem::path outPath(outfilePath);
+   	 std::filesystem::path parentDir = outPath.parent_path();
+
+    if (!parentDir.empty() && !std::filesystem::exists(parentDir)) {
+        try {
+            std::filesystem::create_directories(parentDir);
+        } catch (const std::filesystem::filesystem_error& e) {
+            std::cerr << "Failed to create directory: " << e.what() << "\n";
+            return 1;
+        }
+    }
 
 	int serverPort = std::stoi(Port);
 
