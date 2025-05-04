@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 #include <filesystem>
 #include <iterator>
 #include <cstdlib>  // for std::system
@@ -22,10 +23,37 @@
 #include <sys/select.h> // for select()
 #include <sys/time.h> // for time		
 #define WINDOW_SIZE 5
+#define TIMEOUT_SEC 60
 #include <fstream>
 bool isValidIPv4Format(const std::string& ip){	
 	std::regex ipv4Pattern(R"(^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$)");
 	return std::regex_match(ip, ipv4Pattern);
+}
+
+int check_server_response(int sockfd) {
+    fd_set readfds;
+    struct timeval timeout;
+
+    FD_ZERO(&readfds);
+    FD_SET(sockfd, &readfds);
+
+    timeout.tv_sec = TIMEOUT_SEC;
+    timeout.tv_usec = 0;
+
+    int activity = select(sockfd + 1, &readfds, NULL, NULL, &timeout);
+
+    if (activity == -1) {
+        perror("select error");
+        return -1;  // socket error
+    } else if (activity == 0) {
+        fprintf(stderr, "Cannot detect server\n");
+        exit(2); // timed out after 60 seconds
+    } else if (FD_ISSET(sockfd, &readfds)) {
+        // Ready to read
+        return 1;
+    }
+
+    return 0;
 }
 
 int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* serverAddress,std::ifstream& file){
@@ -172,6 +200,8 @@ int main (int argc, char* argv[]) {
 
 
 	//reading data & sending packets
+	auto startTime = std::chrono::steady_clock::now();
+	bool recievedFirstPacket = false;
 	while(true){
 		//while we are within the window and there is data to read --> create packet and trasmit data
 		while(nextSeqNum < baseSeqNum + WINDOW_SIZE){
@@ -216,6 +246,16 @@ int main (int argc, char* argv[]) {
 		int activity = select(clientSocket+1,&rset,NULL,NULL,&timeout);
 		
 		if(activity == 0){
+			auto currentTime = std::chrono::steady_clock::now();
+			auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
+
+
+			if (!recievedFirstPacket && elapsed >= 60) {
+    				std::cerr << "Cannot detect server\n";
+    				close(clientSocket);
+    				return 2;
+			}
+			
 			retries++;
 			std::cerr << "Timeout waiting for echo. Retry #" << retries << "\n";
 			if(retries >= MAX_RETRIES){
@@ -244,7 +284,8 @@ int main (int argc, char* argv[]) {
 			seqNum = ntohl(net_seq); //extract the sequence number
 
 			//std::cout << "Sequence Number of Recieved Packet" << seqNum << "\n";
-		
+			recievedFirstPacket = true;
+			startTime = std::chrono::steady_clock::now();
 			// if the sequence number is in the unackedpacket, slides the window 
 			if(unackedPackets.count(seqNum)){
 				unackedPackets.erase(seqNum);//if the sequence number is found remove it
