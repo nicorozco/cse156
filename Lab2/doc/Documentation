@@ -48,7 +48,6 @@ Return Codes:
 
 	- Return 0:
 		- Success, file succesfully constructed in order
-		
 	- Return -1:
 		- Network or System-Level Error
 	- Return 1:
