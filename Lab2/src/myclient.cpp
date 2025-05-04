@@ -117,7 +117,7 @@ int main (int argc, char* argv[]) {
 		std::cerr << "Error: Invalid Arguments" << "\n";
 	}
 	std::filesystem::path outPath(outfilePath);
-   	 std::filesystem::path parentDir = outPath.parent_path();
+   	std::filesystem::path parentDir = outPath.parent_path();
 
     if (!parentDir.empty() && !std::filesystem::exists(parentDir)) {
         try {
@@ -161,7 +161,7 @@ int main (int argc, char* argv[]) {
 		// check for errors: 1 means address was set succesfuly, anything less than 1 means error
 		std::cerr << "Invalid Address" << "\n";
 		close(clientSocket);
-		return 7;
+		return -1;
 	}
 	
 	//3.) Client reads a file from disk & Sends it over UDP Socket
@@ -241,7 +241,7 @@ int main (int argc, char* argv[]) {
 			std::cerr << "Timeout waiting for echo. Retry #" << retries << "\n";
 			if(retries >= MAX_RETRIES){
 				std::cerr << "Cannot detect server\n";
-				return -1;
+				return 2;
 
 			}
 			// if the fd is not ready retransmit, only retransmit the older unacknoldge sequence number 
