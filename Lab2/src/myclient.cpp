@@ -270,6 +270,7 @@ int main (int argc, char* argv[]) {
 				if (retrans == -1){
 					std::cerr << "error retransmitting" << "\n";
 				}
+				continue;
 			}
 		}else if (activity < 0){
 			std::cerr << "Select Error\n";
