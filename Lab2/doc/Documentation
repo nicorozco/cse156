@@ -42,5 +42,5 @@ Server Design:
 	sending of packets to the appropriate client.
 	- Server recieves packets from it's UDP Socket & echoes (sends) out of it's socket
 	
-	Shortcomings:
+Shortcomings:
 	- Due to time constrait, was unable to implement my cruzid at the front of each packet sent, due to the constraint of the UDPpacket header, reciving and processing based on the byte size of the header
