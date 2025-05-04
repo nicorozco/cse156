@@ -1,4 +1,7 @@
 #include <iostream>
+#include <filesystem>
+#include <iterator>
+#include <cstdlib>  // for std::system
 #include <regex>
 #include <sstream> // for stream 
 #include <cctype> // to test character classification
@@ -20,63 +23,6 @@
 #include <sys/time.h> // for time		
 #define WINDOW_SIZE 5
 #include <fstream>
-void printLastBytes(const std::string& filename, size_t numBytes = 20) {
-    std::ifstream file(filename, std::ios::binary);
-
-    if (!file.is_open()) {
-        std::cerr << "Could not open file: " << filename << "\n";
-        return;
-    }
-
-    // Go to end and get file size
-    file.seekg(0, std::ios::end);
-    std::streamoff fileSize = file.tellg();
-
-    if (fileSize < static_cast<std::streamoff>(numBytes)) {
-    numBytes = static_cast<size_t>(fileSize); // also cast here
-}
-
-    // Go to last `numBytes`
-    file.seekg(fileSize - numBytes, std::ios::beg);
-    std::vector<unsigned char> buffer(numBytes);
-    file.read(reinterpret_cast<char*>(buffer.data()), numBytes);
-
-    std::cout << "Last " << numBytes << " bytes of " << filename << ":\n";
-    for (size_t i = 0; i < buffer.size(); ++i) {
-        printf("%02X ", buffer[i]);
-    }
-    std::cout << "\n";
-}
-
-bool compareFiles(const std::string& file1, const std::string& file2) {
-    std::ifstream f1(file1, std::ios::binary);
-    std::ifstream f2(file2, std::ios::binary);
-
-    if (!f1.is_open() || !f2.is_open()) {
-        std::cerr << "Error: Could not open one or both files.\n";
-        return false;
-    }
-
-    char c1, c2;
-    size_t pos = 0;
-    while (f1.get(c1) && f2.get(c2)) {
-        if (c1 != c2) {
-            std::cerr << "Difference at byte " << pos
-                      << ": " << std::hex << (int)(unsigned char)c1
-                      << " != " << (int)(unsigned char)c2 << "\n";
-            return false;
-        }
-        pos++;
-    }
-  // Check if one file is longer than the other
-    if (f1.get(c1) || f2.get(c2)) {
-        std::cerr << "File length mismatch at byte " << pos << "\n";
-        return false;
-    }
-    // If both reached EOF, they're the same
-    return true;
-}
-
 bool isValidIPv4Format(const std::string& ip){	
 	std::regex ipv4Pattern(R"(^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$)");
 	return std::regex_match(ip, ipv4Pattern);
@@ -135,7 +81,6 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	}
 
 	//std::cout << "Retransmitted Bytes" << sent << "\n";
-	usleep(5000);
 	return 0;
 }		
 
@@ -219,7 +164,7 @@ int main (int argc, char* argv[]) {
 	}
 
 	socklen_t addrlen = sizeof(serverAddress);
-	std::ofstream outFile(outfilePath);//open file path for writing
+	std::ofstream outFile(outfilePath,std::ios::binary);//open file path for writing
 	if(!outFile.is_open()){
 		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
 		return -1;
@@ -236,7 +181,10 @@ int main (int argc, char* argv[]) {
 			file.read(packet.data,sizeof(packet.data));
 			std::streamsize bytesRead = file.gcount();
 			
-			if(bytesRead <= 0)break;
+			if(bytesRead <= 0){
+				break;
+			}
+			std::cout << "Bytes Read" << bytesRead << "\n";
 			packet.sequenceNumber = htonl(nextSeqNum);
 			int totalSize = sizeof(uint32_t) + bytesRead;
 			//std::cout << "Packet Size:" << totalSize << "\n";
@@ -291,16 +239,16 @@ int main (int argc, char* argv[]) {
 		bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
 		if(bytes_recieved > 0){
 			ssize_t dataSize = bytes_recieved - sizeof(uint32_t);
-			UDPPacket receivedPacket;
-			memset(&receivedPacket, 0, sizeof(receivedPacket));  // clear all
-			memcpy(&receivedPacket, buffer,bytes_recieved);
-			seqNum = ntohl(receivedPacket.sequenceNumber); //extract the sequence number
+			uint32_t net_seq;
+			memcpy(&net_seq,buffer,sizeof(uint32_t));
+			seqNum = ntohl(net_seq); //extract the sequence number
+
 			//std::cout << "Sequence Number of Recieved Packet" << seqNum << "\n";
 		
 			// if the sequence number is in the unackedpacket, slides the window 
 			if(unackedPackets.count(seqNum)){
 				unackedPackets.erase(seqNum);//if the sequence number is found remove it
-				outFile.write(receivedPacket.data,dataSize);//write it to the file
+				outFile.write(buffer+sizeof(uint32_t),dataSize);//write it to the file
 				while(!unackedPackets.count(baseSeqNum) && baseSeqNum < nextSeqNum) { //if we reach the ending of the unacked window
 						baseSeqNum++;//slide the baseSeqNum to slide the window
 				}
@@ -315,19 +263,6 @@ int main (int argc, char* argv[]) {
 			break;
 		}
 	}
-
-
-	printLastBytes(infilePath);
-	printLastBytes(outfilePath);
-	//Final Step: Compare the file outputs
-	if (compareFiles(infilePath, outfilePath)) {
-	    	std::cout << "✅ Files are identical!\n";
-		return 2;
-	} else{
-    		std::cout << "❌ Files are different.\n";
-		return 1;
-	}
-		
 	
 	std::cout << "Closing Connection" << "\n";
 	outFile.close();
