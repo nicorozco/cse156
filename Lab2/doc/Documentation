@@ -51,6 +51,7 @@ Return Codes:
 		
 	- Return -1:
 		- Network or System-Level Error
-	
+	- Return 1:
+		- If the given size of the payload is less than the overhead sequencing protocal implemented
 	- Return 2:
 		- Server unresponsive for 5 retransmission or > 60s
