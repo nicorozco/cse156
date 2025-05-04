@@ -4,17 +4,19 @@ Echo Application utilizing UDP
 Nicolas Orozco (norozco6)
 
 Purpose:
-Ddevelop a UDP client and server, for the server to echo the exact file sent by client and store it 
+Developed a UDP Realiable client and server, for the purpose for the server to echo the exact file sent by client and store it 
 Files:
 	-src:
-		-main.cpp
+		-myclient.cpp
+		-myserver.cpp
+		-client.h
 
 	-doc:
 		-README
 		- Documentation
 	
 	-bin: 
-		-main (executable) main file to be ran 
-	
+		- myserver(executable) to be ran first 
+		-myclient 
 	-Makefile:
 		- to generate executable in bin
