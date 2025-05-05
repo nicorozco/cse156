@@ -9,6 +9,7 @@
 #include <ctime>
 
 void echoLoop(int serverSocket,int lossRate){	
+	std::map<uint32_t,UDPPacket> packetsRecieved;
 	char buffer[1472];
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	struct sockaddr_in clientAddr;
@@ -30,12 +31,18 @@ void echoLoop(int serverSocket,int lossRate){
 			double random = (double)rand() / RAND_MAX; // generates a random number between 0.0 & 1.0
 			if (random < lossRate){ //if we random value generate falls within the loss rate it is lost
 				std::cout << "Packet Loss\n";
+				std::cout << "Loss Rate: " << lossRate << "%\n";
 				continue; // by continuing we skip over sending the packet 
 			}
+
+			//process the packet
 			UDPPacket* recievedPacket = reinterpret_cast<UDPPacket*>(buffer);
 			dataSize = bytesRecieved - sizeof(uint32_t);
 			uint32_t seq = ntohl(recievedPacket->sequenceNumber);
 			std::cout << seq << "\n";
+						//insert into map 
+
+			//reorder the packet
 		
 		}
 
