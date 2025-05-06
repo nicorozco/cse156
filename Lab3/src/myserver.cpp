@@ -14,10 +14,15 @@ void echoLoop(int serverSocket,int lossRate){
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	struct sockaddr_in clientAddr;
 	socklen_t clientLen = sizeof(clientAddr);
-	ssize_t dataSize;	
+	ssize_t dataSize;
+	uint32_t seq;
+	uint32_t nextSeq;
+	double random;	
+	ssize_t bytesRecieved;
+	
 	while(true){
 
-		ssize_t bytesRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
+		bytesRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
 
 		if (bytesRecieved < 0){
 			perror("Error: Recieving from client");
@@ -25,30 +30,30 @@ void echoLoop(int serverSocket,int lossRate){
 		}
 		
 		if(bytesRecieved > 0) {//if we are recieving data
-			//process the data create a strucutre of the buffer 		
-
-			//simulate packet loss 
-			double random = (double)rand() / RAND_MAX; // generates a random number between 0.0 & 1.0
-			if (random < lossRate){ //if we random value generate falls within the loss rate it is lost
-				std::cout << "Packet Loss\n";
-				std::cout << "Loss Rate: " << lossRate << "%\n";
-				continue; // by continuing we skip over sending the packet 
-			}
-
 			//process the packet
 			UDPPacket* recievedPacket = reinterpret_cast<UDPPacket*>(buffer);
-			dataSize = bytesRecieved - sizeof(uint32_t);
-			uint32_t seq = ntohl(recievedPacket->sequenceNumber);
-			std::cout << seq << "\n";
-						//insert into map 
-
-			//reorder the packet
-		
+			dataSize = bytesRecieved - sizeof(uint32_t);//size of the data recieved, by removing the sequence number 
+			seq = ntohl(recievedPacket->sequenceNumber);
+			nextSeq = seq++;// we expected the next packet to be the sequence + 1
+			//simulate packet loss 
+			random = (double)rand() / RAND_MAX; // generates a random number between 0.0 & 1.0
+			if (random < lossRate){ //if we random value generate falls within the loss rate it is lost
+				std::cout << "Packet Loss\n";
+				std::cout << "Dropping Packet : " << seq << "%\n";
+				continue; // by continuing we skip over sending the packet 
+			}
+			packetsRecieved[seq] = recievedPacket;//if not dropping the packet insert into the map	
+			//check if the sequence number is in the map if it is write it to the file and remove it from the map
+			
+			if (packetsRecieved.count(nextSeq)){
+				packetsRecieved.erase(nextSeq);
+				outFile.write(buffer+sizeof(uint32_t),dataSize);
+			}
 		}
 
 
 		if(dataSize > 0){
-		//echo it back to the client, meaning just send it back
+		//send message ACK message to client if written to the file
 			sendto(serverSocket, buffer, bytesRecieved,0, (struct sockaddr*)&clientAddr, clientLen);
 		}	
 	}
