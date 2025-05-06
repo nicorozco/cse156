@@ -183,14 +183,6 @@ int main (int argc, char* argv[]) {
 	file.seekg(0, std::ios::beg); // rewind to beginning if not empty
 
 	socklen_t addrlen = sizeof(serverAddress);
-	std::ofstream outFile(outfilePath,std::ios::binary);//open file path for writing
-	if(!outFile.is_open()){
-		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
-		close(clientSocket);
-		return -1;
-	}
-
-
 	//reading data & sending packets
 	auto startTime = std::chrono::steady_clock::now();
 	bool recievedFirstPacket = false;
@@ -221,8 +213,6 @@ int main (int argc, char* argv[]) {
 				close(clientSocket);
 				return -1;
 			}
-				
-				
 			unackedPackets[nextSeqNum] = packet;
 			nextSeqNum++;
 		}
@@ -240,14 +230,11 @@ int main (int argc, char* argv[]) {
 		if(activity == 0){
 			auto currentTime = std::chrono::steady_clock::now();
 			auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
-
-
-			if (!recievedFirstPacket && elapsed >= 60) {
+			if (!recievedFirstPacket && elapsed >= 30) {
     				std::cerr << "Cannot detect server\n";
     				close(clientSocket);
     				return 2;
 			}
-			
 			retries++;
 			std::cerr << "Timeout waiting for echo. Retry #" << retries << "\n";
 			if(retries >= MAX_RETRIES){
@@ -268,10 +255,9 @@ int main (int argc, char* argv[]) {
 			std::cerr << "Select Error\n";
 			exit(-1);
 		}
-		//processing echoed packets		
+		//processing ACKED Packets		
 		bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
 		if(bytes_recieved > 0){
-			ssize_t dataSize = bytes_recieved - sizeof(uint32_t);
 			uint32_t net_seq;
 			memcpy(&net_seq,buffer,sizeof(uint32_t));
 			seqNum = ntohl(net_seq); //extract the sequence number
@@ -282,7 +268,6 @@ int main (int argc, char* argv[]) {
 			// if the sequence number is in the unackedpacket, slides the window 
 			if(unackedPackets.count(seqNum)){
 				unackedPackets.erase(seqNum);//if the sequence number is found remove it
-				outFile.write(buffer+sizeof(uint32_t),dataSize);//write it to the file
 				while(!unackedPackets.count(baseSeqNum) && baseSeqNum < nextSeqNum) { //if we reach the ending of the unacked window
 						baseSeqNum++;//slide the baseSeqNum to slide the window
 				}
@@ -299,7 +284,6 @@ int main (int argc, char* argv[]) {
 	}
 	
 	std::cout << "Closing Connection" << "\n";
-	outFile.close();
 	file.close();
 	close(clientSocket);
 	return 0;

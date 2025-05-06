@@ -7,19 +7,26 @@
 #include "client.h"
 #include <cstdlib>
 #include <ctime>
+#include <map>
+#include <fstream>
 
-void echoLoop(int serverSocket,int lossRate){	
+void echoLoop(int serverSocket,int lossRate,std::string outfilePath){	
 	std::map<uint32_t,UDPPacket> packetsRecieved;
 	char buffer[1472];
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	struct sockaddr_in clientAddr;
 	socklen_t clientLen = sizeof(clientAddr);
 	ssize_t dataSize;
-	uint32_t seq;
-	uint32_t nextSeq;
+	uint32_t seqNum = 0;
 	double random;	
 	ssize_t bytesRecieved;
 	
+	//open file to reach 
+	std::ofstream outfile(outfilePath,std::ios::binary);
+	if(!outfile.is_open()){
+		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
+	}	
+
 	while(true){
 
 		bytesRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
@@ -29,34 +36,36 @@ void echoLoop(int serverSocket,int lossRate){
 			continue;
 		}
 		
-		if(bytesRecieved > 0) {//if we are recieving data
+		if(bytesRecieved > 0){//if we are recieving data
 			//process the packet
 			UDPPacket* recievedPacket = reinterpret_cast<UDPPacket*>(buffer);
 			dataSize = bytesRecieved - sizeof(uint32_t);//size of the data recieved, by removing the sequence number 
-			seq = ntohl(recievedPacket->sequenceNumber);
-			nextSeq = seq++;// we expected the next packet to be the sequence + 1
+			seqNum = ntohl(recievedPacket->sequenceNumber); // the sequence numbers sets the acknolwedgement we should be recieving 
 			//simulate packet loss 
 			random = (double)rand() / RAND_MAX; // generates a random number between 0.0 & 1.0
 			if (random < lossRate){ //if we random value generate falls within the loss rate it is lost
 				std::cout << "Packet Loss\n";
-				std::cout << "Dropping Packet : " << seq << "%\n";
+				std::cout << "Dropping Packet : " << seqNum << "%\n";
 				continue; // by continuing we skip over sending the packet 
 			}
-			packetsRecieved[seq] = recievedPacket;//if not dropping the packet insert into the map	
+			packetsRecieved[seqNum] = *recievedPacket;//if not dropping the packet insert into the map	
 			//check if the sequence number is in the map if it is write it to the file and remove it from the map
 			
-			if (packetsRecieved.count(nextSeq)){
-				packetsRecieved.erase(nextSeq);
-				outFile.write(buffer+sizeof(uint32_t),dataSize);
+			if (packetsRecieved.count(seqNum)){
+				UDPPacket ackPacket;
+				memset(&ackPacket,0,sizeof(ackPacket));
+				ackPacket.sequenceNumber = htonl(seqNum);
+				int size = sizeof(uint32_t);
+				ssize_t sentBytes = sendto(serverSocket,&ackPacket,size,0,(struct sockaddr*)&clientAddr,clientLen);//if the packet was recieved correctly send an "ACK" message to the client which is just sending the sequence number
+				if(sentBytes < 0){
+					std::cerr << "Error Sending ACK Packet\n";
+				}
+				packetsRecieved.erase(seqNum);
+				outfile.write(buffer+sizeof(uint32_t),dataSize);			       
+				std::cout << "Packet: " << seqNum << "Acknowledged" << "\n";
 			}
 		}
-
-
-		if(dataSize > 0){
-		//send message ACK message to client if written to the file
-			sendto(serverSocket, buffer, bytesRecieved,0, (struct sockaddr*)&clientAddr, clientLen);
-		}	
-	}
+	}	
 }
 
 bool isPortValid(int port){
@@ -123,7 +132,8 @@ int main(int argc, char* argv[]){
 		return 1;
 	}
 
-	echoLoop(serverSocket,lossRate);
+	std::string outfile = "text.txt";
+	echoLoop(serverSocket,lossRate,outfile);
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	//d.) recieved a packet
 	close(serverSocket);
