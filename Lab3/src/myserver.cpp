@@ -1,4 +1,7 @@
 #include <iostream>
+#include <chrono>
+#include <ctime>
+#include <iomanip>
 #include <cstring>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -12,9 +15,21 @@
 struct ACKPacket {
 	uint32_t sequenceNumber;
 };
+
+std::string currentTimestamp(){
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+    std::tm utc_tm = *std::gmtime(&now_c);
+
+    std::ostringstream oss;
+    oss << std::put_time(&utc_tm, "%Y-%m-%dT%H:%M:%SZ");
+    return oss.str();
+}
+
 void initRandom(){
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
 }
+
 bool dropPacket(int lossRate){
 	double percLossRate = lossRate / 100.0;
 	std::cout << percLossRate;
@@ -23,6 +38,7 @@ bool dropPacket(int lossRate){
 }
 
 void echoLoop(int serverSocket,int lossRate,std::string outfilePath){	
+	uint32_t expectedSeqNum = 0;
 	std::map<uint32_t,UDPPacket> packetsRecieved;
 	char buffer[1472];
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
@@ -31,6 +47,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 	ssize_t dataSize;
 	uint32_t seqNum = 0;
 	ssize_t bytesRecieved;
+	std::map<int, UDPPacket> packetBuffer;
 	
 	//open file to reach 
 	std::ofstream outfile(outfilePath,std::ios::binary);
@@ -39,16 +56,12 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 	}	
 
 	while(true){
-
 		bytesRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
-
 		if (bytesRecieved < 0){
 			perror("Error: Recieving from client");
 			continue;
 		}
-		
-		if(bytesRecieved > 0){//if we are recieving data
-			
+		if(bytesRecieved > 0){//if we are recieving data	
 			//process the packet
 			UDPPacket* recievedPacket = reinterpret_cast<UDPPacket*>(buffer);
 			dataSize = bytesRecieved - sizeof(uint32_t);//size of the data recieved, by removing the sequence number 
@@ -57,34 +70,35 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			//simulate packet loss 
 			if (dropPacket(lossRate)){ //if we random value generate falls within the loss rate it is lost
 				std::cout << "Packet Loss\n";
-				std::cout << "Dropping SEQ#:" << seqNum << "\n";
+				std::cout << currentTimestamp()<< ", DROP DATA, " << seqNum << "\n";
 				continue; // by continuing we skip over sending the packet 
+			}else{
+				std::cout << currentTimestamp() << ", DATA," << seqNum << "\n";
 			}
-			packetsRecieved[seqNum] = *recievedPacket;//if not dropping the packet insert into the map	
-			
-			
-			//check if the sequence number is in the map if it is write it to the file and remove it from the map	
-			if (packetsRecieved.count(seqNum)){
-				ACKPacket ackPacket;
-				memset(&ackPacket,0,sizeof(ackPacket));
-				ackPacket.sequenceNumber = htonl(seqNum); //set the sequence number
-				int size = sizeof(uint32_t); //how muhc data to send 
-				
+			//we utilize the expectedSeqNum to ensure we are recieving the correct packet 	
+			if (seqNum == expectedSeqNum){
 				if(dropPacket(lossRate)){
-					std::cout << "Dropping ACK# " << seqNum << "\n";
+					std::cout << currentTimestamp() <<" ,DROP ACK, " << seqNum << "\n";
 					continue; //drop packet if true
+				}else{
+					//send an ack packet
+					ACKPacket ackPacket;
+					memset(&ackPacket,0,sizeof(ackPacket));
+					ackPacket.sequenceNumber = htonl(seqNum); //set the sequence number
+					int size = sizeof(uint32_t); //how muhc data to send 
+					ssize_t sentBytes = sendto(serverSocket,&ackPacket,size,0,(struct sockaddr*)&clientAddr,clientLen);//send an "ACK" message to the client which is just sending the sequence number
+					if(sentBytes < 0){
+						std::cerr << "Error Sending ACK Packet\n";
+						continue;
+					}
+					std::cout << currentTimestamp() << " , ACK, " << seqNum << "\n";
+					packetsRecieved.erase(seqNum);
+					outfile.write(buffer+sizeof(uint32_t),dataSize);			       
+					std::cout << "Packet: " << seqNum << " Acknowledged" << "\n";
 				}
-
-				ssize_t sentBytes = sendto(serverSocket,&ackPacket,size,0,(struct sockaddr*)&clientAddr,clientLen);//send an "ACK" message to the client which is just sending the sequence number
-				if(sentBytes < 0){
-					std::cerr << "Error Sending ACK Packet\n";
-				}
-				packetsRecieved.erase(seqNum);
-				outfile.write(buffer+sizeof(uint32_t),dataSize);			       
-				std::cout << "Packet: " << seqNum << " Acknowledged" << "\n";
 			}
-		}
-	}	
+		}	
+	}
 }
 
 bool isPortValid(int port){
