@@ -9,7 +9,9 @@
 #include <ctime>
 #include <map>
 #include <fstream>
-
+struct ACKPacket {
+	uint32_t sequenceNumber;
+}
 void echoLoop(int serverSocket,int lossRate,std::string outfilePath){	
 	std::map<uint32_t,UDPPacket> packetsRecieved;
 	char buffer[1472];
@@ -52,17 +54,17 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			//check if the sequence number is in the map if it is write it to the file and remove it from the map
 			
 			if (packetsRecieved.count(seqNum)){
-				UDPPacket ackPacket;
+				ACKPacket ackPacket;
 				memset(&ackPacket,0,sizeof(ackPacket));
-				ackPacket.sequenceNumber = htonl(seqNum);
-				int size = sizeof(uint32_t);
-				ssize_t sentBytes = sendto(serverSocket,&ackPacket,size,0,(struct sockaddr*)&clientAddr,clientLen);//if the packet was recieved correctly send an "ACK" message to the client which is just sending the sequence number
+				ackPacket.sequenceNumber = htonl(seqNum); //set the sequence number
+				int size = sizeof(uint32_t); //how muhc data to send 
+				ssize_t sentBytes = sendto(serverSocket,&ackPacket,size,0,(struct sockaddr*)&clientAddr,clientLen);//send an "ACK" message to the client which is just sending the sequence number
 				if(sentBytes < 0){
 					std::cerr << "Error Sending ACK Packet\n";
 				}
 				packetsRecieved.erase(seqNum);
 				outfile.write(buffer+sizeof(uint32_t),dataSize);			       
-				std::cout << "Packet: " << seqNum << "Acknowledged" << "\n";
+				std::cout << "Packet: " << seqNum << " Acknowledged" << "\n";
 			}
 		}
 	}	
@@ -132,7 +134,7 @@ int main(int argc, char* argv[]){
 		return 1;
 	}
 
-	std::string outfile = "text.txt";
+	std::string outfile = output.txt;
 	echoLoop(serverSocket,lossRate,outfile);
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	//d.) recieved a packet
