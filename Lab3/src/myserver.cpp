@@ -12,6 +12,14 @@
 struct ACKPacket {
 	uint32_t sequenceNumber;
 };
+void initRandom(){
+	std::srand(static_cast<unsigned int>(std::time(nullptr)));
+}
+bool dropPacket(int lossRate){
+	double randVal = static_cast<double>(std::rand() / RAND_MAX);
+	return randVal < lossRate;
+}
+
 void echoLoop(int serverSocket,int lossRate,std::string outfilePath){	
 	std::map<uint32_t,UDPPacket> packetsRecieved;
 	char buffer[1472];
@@ -20,7 +28,6 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 	socklen_t clientLen = sizeof(clientAddr);
 	ssize_t dataSize;
 	uint32_t seqNum = 0;
-	double random;	
 	ssize_t bytesRecieved;
 	
 	//open file to reach 
@@ -44,23 +51,26 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			dataSize = bytesRecieved - sizeof(uint32_t);//size of the data recieved, by removing the sequence number 
 			seqNum = ntohl(recievedPacket->sequenceNumber); // the sequence numbers sets the acknolwedgement we should be recieving 
 			//simulate packet loss 
-			random = (double)rand() / RAND_MAX; // generates a random number between 0.0 & 1.0
-			if (random < lossRate){ //if we random value generate falls within the loss rate it is lost
+			if (dropPacket(lossRate)){ //if we random value generate falls within the loss rate it is lost
 				std::cout << "Packet Loss\n";
-				std::cout << "Dropping Packet : " << seqNum << "%\n";
+				std::cout << "Dropping SEQ#:" << seqNum << "\n";
 				continue; // by continuing we skip over sending the packet 
 			}
 			packetsRecieved[seqNum] = *recievedPacket;//if not dropping the packet insert into the map	
-			//check if the sequence number is in the map if it is write it to the file and remove it from the map
-			
+			//check if the sequence number is in the map if it is write it to the file and remove it from the map	
+		
 			if (packetsRecieved.count(seqNum)){
 				ACKPacket ackPacket;
 				memset(&ackPacket,0,sizeof(ackPacket));
 				ackPacket.sequenceNumber = htonl(seqNum); //set the sequence number
 				int size = sizeof(uint32_t); //how muhc data to send 
-				ssize_t sentBytes = sendto(serverSocket,&ackPacket,size,0,(struct sockaddr*)&clientAddr,clientLen);//send an "ACK" message to the client which is just sending the sequence number
-				if(sentBytes < 0){
-					std::cerr << "Error Sending ACK Packet\n";
+				
+				if(dropPacket(lossRate)){
+					ssize_t sentBytes = sendto(serverSocket,&ackPacket,size,0,(struct sockaddr*)&clientAddr,clientLen);//send an "ACK" message to the client which is just sending the sequence number
+					if(sentBytes < 0){
+						std::cerr << "Error Sending ACK Packet\n";
+					}
+					continue; //drop packet if true
 				}
 				packetsRecieved.erase(seqNum);
 				outfile.write(buffer+sizeof(uint32_t),dataSize);			       
@@ -88,9 +98,9 @@ int main(int argc, char* argv[]){
 	srand(time(0));
 	std::string portStr;
 	std::string lossRateStr;
-	int port;
 	int lossRate;
-	
+	int port;
+	initRandom(); //seed random generator 
 	if (argc < 3){
 
 		std::cerr << "Please provide a port number and packet loss rate for the server";

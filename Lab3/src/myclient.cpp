@@ -263,6 +263,7 @@ int main (int argc, char* argv[]) {
 			startTime = std::chrono::steady_clock::now();
 			// if the sequence number is in the unackedpacket, slides the window 
 			if(unackedPackets.count(seqNum)){
+				std::cout << "ACK: "<< seqNum << "\n"; 
 				unackedPackets.erase(seqNum);//if the sequence number is found remove it
 				while(!unackedPackets.count(baseSeqNum) && baseSeqNum < nextSeqNum) { //if we reach the ending of the unacked window
 						baseSeqNum++;//slide the baseSeqNum to slide the window
