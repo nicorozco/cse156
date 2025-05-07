@@ -22,9 +22,10 @@
 #include <map>
 #include <sys/select.h> // for select()
 #include <sys/time.h> // for time		
+#include <fstream>
+#include <unordered_set>
 #define WINDOW_SIZE 5
 #define TIMEOUT_SEC 60
-#include <fstream>
 bool isValidIPv4Format(const std::string& ip){	
 	std::regex ipv4Pattern(R"(^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$)");
 	return std::regex_match(ip, ipv4Pattern);
@@ -92,9 +93,9 @@ int main (int argc, char* argv[]) {
 	std::string Port;
 	std::string infilePath;
 	std::string outfilePath;
+	std::unordered_set<int> unackedPackets;	
 	char buffer[1472];
 	std::string line;
-	std::map<uint32_t,UDPPacket> unackedPackets;
 	uint32_t nextSeqNum = 0;
 	uint32_t baseSeqNum = 0;
 	uint32_t seqNum = 0;
@@ -192,10 +193,8 @@ int main (int argc, char* argv[]) {
 		while(nextSeqNum < baseSeqNum + WINDOW_SIZE){
 			UDPPacket packet;
 			memset(&packet,0,sizeof(packet));
-
 			file.read(packet.data,sizeof(packet.data));
 			std::streamsize bytesRead = file.gcount();
-			
 			if(bytesRead <= 0){
 				break;
 			}else if (bytesRead <= 32){
@@ -204,16 +203,13 @@ int main (int argc, char* argv[]) {
 			}
 			packet.sequenceNumber = htonl(nextSeqNum);
 			int totalSize = sizeof(uint32_t) + bytesRead;
-			//std::cout << "Packet Size:" << totalSize << "\n";
-			//if we have data have data send it 
-				//send the data
 			ssize_t sentBytes = sendto(clientSocket,&packet,totalSize, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));				
 			if(sentBytes < 0){
 				perror("sendto failed");
 				close(clientSocket);
 				return -1;
 			}
-			unackedPackets[nextSeqNum] = packet;
+			unackedPackets.insert(nextSeqNum);
 			nextSeqNum++;
 		}
 

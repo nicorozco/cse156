@@ -11,7 +11,7 @@
 #include <fstream>
 struct ACKPacket {
 	uint32_t sequenceNumber;
-}
+};
 void echoLoop(int serverSocket,int lossRate,std::string outfilePath){	
 	std::map<uint32_t,UDPPacket> packetsRecieved;
 	char buffer[1472];
@@ -134,7 +134,7 @@ int main(int argc, char* argv[]){
 		return 1;
 	}
 
-	std::string outfile = output.txt;
+	std::string outfile = "output.txt";
 	echoLoop(serverSocket,lossRate,outfile);
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	//d.) recieved a packet
