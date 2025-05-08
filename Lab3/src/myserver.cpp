@@ -99,7 +99,29 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				}
 				std::cout << currentTimestamp() << " , ACK, " << seqNum << "\n";
 				packetsRecieved.erase(seqNum);
-				outfile.write(buffer+sizeof(uint32_t),dataSize);//only write to the file if we have sent the ACK message 			
+				outfile.write(buffer+sizeof(uint32_t),dataSize);//only write to the file if we have sent the ACK message 
+				expectedSeqNum++;
+				while(packetsRecieved.count(expectedSeqNum) && !packetsRecieved.empty()){
+					//possibility of dropping as well
+					
+					if(dropPacket(lossRate)){
+						std::cout << currentTimestamp() <<" ,DROP ACK, " << seqNum << "\n";
+						continue; //drop packet if true
+					}
+
+					//send ack packet
+					 ssize_t sentBuff = sendAck(serverSocket,expectedSeqNum,&clientAddr,clientLen);
+					 if(sentBuff < 0){
+						 std::cerr << "Error Sending ACK Packet\n";
+						 continue;
+					 }
+					 
+					packetsRecieved.erase(expectedSeqNum);//erase the seq num from the map
+					expectedSeqNum++;//increase seqnum
+					outfile.write(buffer+sizeof(uint32_t),dataSize);//only write to the file if we have sent the ACK message 	
+
+				}
+
 			}else{//buffer the packet that have arrived but not in correct order 
 				//insert into map 
 				packetsRecieved[seqNum] = *recievedPacket;
