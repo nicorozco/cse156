@@ -197,7 +197,6 @@ int main (int argc, char* argv[]) {
 	//reading data & sending packets
 	auto startTime = std::chrono::steady_clock::now();
 	bool recievedFirstPacket = false;
-	baseWindow = baseSeqNum + WINDOW_SIZE;
 	
 	while(true){
 		//while we are within the window and there is data to read --> create packet and trasmit data
@@ -275,6 +274,7 @@ int main (int argc, char* argv[]) {
 
 			// if the sequence number is in the unackedpacket, slides the window 
 			if(unackedPackets.count(seqNum)){
+				baseWindow = baseSeqNum + WINDOW_SIZE;
 				std::cout << currentTimestamp() <<", ACK, "<< seqNum <<"," << baseSeqNum << "," << nextSeqNum <<"," << baseWindow << "\n"; 
 				
 				unackedPackets.erase(seqNum);//if the sequence number is found remove it
