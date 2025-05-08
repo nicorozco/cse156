@@ -5,6 +5,13 @@ struct UDPPacket {
 	char data[1468];
 };
 
+struct filePathPacket{
+	char filepath[256];
+};
+
+struct ACKPacket{
+	uint32_t sequenceNumber;
+};
 
 bool isValidIPv4Format(const std::string& ip);
 

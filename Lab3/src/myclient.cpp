@@ -197,7 +197,23 @@ int main (int argc, char* argv[]) {
 	//reading data & sending packets
 	auto startTime = std::chrono::steady_clock::now();
 	bool recievedFirstPacket = false;
+
+
+	//before we transmit anything lets send the file where the file will be printed to the file 
 	
+	//utilize a simple packet 
+	filePathPacket pathPacket;
+	memset(&pathPacket,0,sizeof(pathPacket));
+	strncpy(pathPacket.filepath, outPath.c_str(),sizeof(pathPacket.filepath)-1);
+	pathPacket.filepath[sizeof(pathPacket.filepath)-1] = '\0';
+	//send to server
+
+	ssize_t pathSent = sendto(clientSocket,&pathPacket, sizeof(pathPacket),0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
+
+	if(pathSent < 0){
+		perror("Error Sending Path to Client");
+	}
+
 	while(true){
 		//while we are within the window and there is data to read --> create packet and trasmit data
 		while(nextSeqNum < baseSeqNum + WINDOW_SIZE){

@@ -12,12 +12,7 @@
 #include <ctime>
 #include <map>
 #include <fstream>
-struct ACKPacket {
-	uint32_t sequenceNumber;
-};
-
 ssize_t sendAck(int serverSocket,uint32_t seqNum,struct sockaddr_in* clientAddr,socklen_t clientLen){
-
 	ACKPacket ackPacket;
 	memset(&ackPacket,0,sizeof(ackPacket));
 	ackPacket.sequenceNumber = htonl(seqNum); //set the sequence number
@@ -57,8 +52,21 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 	ssize_t bytesRecieved;
 	std::map<int, UDPPacket> packetBuffer;
 	
-	//open file to reach 
-	std::ofstream outfile(outfilePath,std::ios::binary);
+	//recieved intial packet
+	filePathPacket pathPacket;
+	sockaddr_in clientAddr;
+	socklen_t clientLen = sizeof(clientAddr);
+
+	ssize_t	pathRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
+
+	if (pathRecieved < 0){
+		perror("Error receiving filepath");
+	}else {
+		std::string filePath(pathPacket.filepath);
+		std::cout << "File path recieved: "<< filePath << "\n";
+	}
+	//open file path 
+	std::ofstream outfile(filePath,std::ios::binary);
 	if(!outfile.is_open()){
 		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
 	}	
