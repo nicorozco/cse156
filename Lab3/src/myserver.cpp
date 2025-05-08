@@ -16,6 +16,15 @@ struct ACKPacket {
 	uint32_t sequenceNumber;
 };
 
+ssize_t sendAck(int serverSocket,uint32_t seqNum,struct sockaddr_in* clientAddr,socklen_t clientLen){
+
+	ACKPacket ackPacket;
+	memset(&ackPacket,0,sizeof(ackPacket));
+	ackPacket.sequenceNumber = htonl(seqNum); //set the sequence number
+	int size = sizeof(uint32_t); //how muhc data to send 
+	ssize_t sentBytes = sendto(serverSocket,&ackPacket,size,0,(struct sockaddr*)&clientAddr,clientLen);//send an "ACK" message to the client which is just sending the sequence number
+	return sentBytes;
+}
 std::string currentTimestamp(){
     auto now = std::chrono::system_clock::now();
     std::time_t now_c = std::chrono::system_clock::to_time_t(now);
@@ -83,11 +92,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				}
 
 				//send an ack packet
-				ACKPacket ackPacket;
-				memset(&ackPacket,0,sizeof(ackPacket));
-				ackPacket.sequenceNumber = htonl(seqNum); //set the sequence number
-				int size = sizeof(uint32_t); //how muhc data to send 
-				ssize_t sentBytes = sendto(serverSocket,&ackPacket,size,0,(struct sockaddr*)&clientAddr,clientLen);//send an "ACK" message to the client which is just sending the sequence number
+				ssize_t sentBytes = sendAck(serverSocket,seqNum,&clientAddr,clientLen);
 				if(sentBytes < 0){
 					std::cerr << "Error Sending ACK Packet\n";
 					continue;
@@ -95,13 +100,12 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				std::cout << currentTimestamp() << " , ACK, " << seqNum << "\n";
 				packetsRecieved.erase(seqNum);
 				outfile.write(buffer+sizeof(uint32_t),dataSize);//only write to the file if we have sent the ACK message 			
-			} else {//buffer the packet that have arrived but not in correct order 
+			}else{//buffer the packet that have arrived but not in correct order 
 				//insert into map 
-				packetsRecieved[seqNum] = ackPacket;
+				packetsRecieved[seqNum] = *recievedPacket;
 			}
 		}
 	}	
-	}
 }
 
 bool isPortValid(int port){
