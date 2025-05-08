@@ -62,42 +62,45 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			continue;
 		}
 		if(bytesRecieved > 0){//if we are recieving data	
-			//process the packet
 			UDPPacket* recievedPacket = reinterpret_cast<UDPPacket*>(buffer);
 			dataSize = bytesRecieved - sizeof(uint32_t);//size of the data recieved, by removing the sequence number 
 			seqNum = ntohl(recievedPacket->sequenceNumber); // the sequence numbers sets the acknolwedgement we should be recieving 
-			
 			//simulate packet loss 
 			if (dropPacket(lossRate)){ //if we random value generate falls within the loss rate it is lost
 				std::cout << "Packet Loss\n";
 				std::cout << currentTimestamp()<< ", DROP DATA, " << seqNum << "\n";
 				continue; // by continuing we skip over sending the packet 
-			}else{
-				std::cout << currentTimestamp() << ", DATA," << seqNum << "\n";
 			}
+			std::cout << currentTimestamp() << ", DATA," << seqNum << "\n";
+			
+			//-------------work on this part-------------
+			
 			//we utilize the expectedSeqNum to ensure we are recieving the correct packet 	
 			if (seqNum == expectedSeqNum){
 				if(dropPacket(lossRate)){
 					std::cout << currentTimestamp() <<" ,DROP ACK, " << seqNum << "\n";
 					continue; //drop packet if true
-				}else{
-					//send an ack packet
-					ACKPacket ackPacket;
-					memset(&ackPacket,0,sizeof(ackPacket));
-					ackPacket.sequenceNumber = htonl(seqNum); //set the sequence number
-					int size = sizeof(uint32_t); //how muhc data to send 
-					ssize_t sentBytes = sendto(serverSocket,&ackPacket,size,0,(struct sockaddr*)&clientAddr,clientLen);//send an "ACK" message to the client which is just sending the sequence number
-					if(sentBytes < 0){
-						std::cerr << "Error Sending ACK Packet\n";
-						continue;
-					}
-					std::cout << currentTimestamp() << " , ACK, " << seqNum << "\n";
-					packetsRecieved.erase(seqNum);
-					outfile.write(buffer+sizeof(uint32_t),dataSize);			       
-					std::cout << "Packet: " << seqNum << " Acknowledged" << "\n";
 				}
+
+				//send an ack packet
+				ACKPacket ackPacket;
+				memset(&ackPacket,0,sizeof(ackPacket));
+				ackPacket.sequenceNumber = htonl(seqNum); //set the sequence number
+				int size = sizeof(uint32_t); //how muhc data to send 
+				ssize_t sentBytes = sendto(serverSocket,&ackPacket,size,0,(struct sockaddr*)&clientAddr,clientLen);//send an "ACK" message to the client which is just sending the sequence number
+				if(sentBytes < 0){
+					std::cerr << "Error Sending ACK Packet\n";
+					continue;
+				}
+				std::cout << currentTimestamp() << " , ACK, " << seqNum << "\n";
+				packetsRecieved.erase(seqNum);
+				outfile.write(buffer+sizeof(uint32_t),dataSize);//only write to the file if we have sent the ACK message 			
+			} else {//buffer the packet that have arrived but not in correct order 
+				//insert into map 
+				packetsRecieved[seqNum] = ackPacket;
 			}
-		}	
+		}
+	}	
 	}
 }
 
