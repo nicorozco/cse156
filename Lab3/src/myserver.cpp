@@ -51,16 +51,18 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 	uint32_t seqNum = 0;
 	ssize_t bytesRecieved;
 	std::map<int, UDPPacket> packetBuffer;
-	
-	//recieved intial packet
-	filePathPacket pathPacket;
 
+	//implement logic to ensure we dont hang here from recfrom()	
+	//recieved intial packet
 	ssize_t	pathRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
+
+	filePathPacket* pathPacket = reinterpret_cast<filePathPacket*>(buffer);
+	std::string filePath(pathPacket->filepath);
 
 	if (pathRecieved < 0){
 		perror("Error receiving filepath");
 	}else {
-		std::string filePath(pathPacket.filepath);
+		std::string filePath(pathPacket->filepath);
 		std::cout << "File path recieved: "<< filePath << "\n";
 	}
 	//open file path 
