@@ -26,6 +26,15 @@
 #include <unordered_set>
 #define WINDOW_SIZE 5
 #define TIMEOUT_SEC 60
+std::string currentTimestamp(){
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+    std::tm utc_tm = *std::gmtime(&now_c);
+
+    std::ostringstream oss;
+    oss << std::put_time(&utc_tm, "%Y-%m-%dT%H:%M:%SZ");
+    return oss.str();
+}
 bool isValidIPv4Format(const std::string& ip){	
 	std::regex ipv4Pattern(R"(^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$)");
 	return std::regex_match(ip, ipv4Pattern);
@@ -99,6 +108,7 @@ int main (int argc, char* argv[]) {
 	uint32_t nextSeqNum = 0;
 	uint32_t baseSeqNum = 0;
 	uint32_t seqNum = 0;
+	uint32_t baseWindow = 0;
 	int retries = 0;
 	const int MAX_RETRIES = 5;
 	int bytes_recieved;
@@ -187,6 +197,7 @@ int main (int argc, char* argv[]) {
 	//reading data & sending packets
 	auto startTime = std::chrono::steady_clock::now();
 	bool recievedFirstPacket = false;
+	baseWindow = baseSeqNum + WINDOW_SIZE;
 	
 	while(true){
 		//while we are within the window and there is data to read --> create packet and trasmit data
@@ -261,9 +272,11 @@ int main (int argc, char* argv[]) {
 			//std::cout << "Sequence Number of Recieved Packet" << seqNum << "\n";
 			recievedFirstPacket = true;
 			startTime = std::chrono::steady_clock::now();
+
 			// if the sequence number is in the unackedpacket, slides the window 
 			if(unackedPackets.count(seqNum)){
-				std::cout << "ACK: "<< seqNum << "\n"; 
+				std::cout << currentTimestamp() <<", ACK, "<< seqNum <<"," << baseSeqNum << "," << nextSeqNum <<"," << baseWindow << "\n"; 
+				
 				unackedPackets.erase(seqNum);//if the sequence number is found remove it
 				while(!unackedPackets.count(baseSeqNum) && baseSeqNum < nextSeqNum) { //if we reach the ending of the unacked window
 						baseSeqNum++;//slide the baseSeqNum to slide the window
