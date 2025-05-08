@@ -22,7 +22,7 @@ ssize_t sendAck(int serverSocket,uint32_t seqNum,struct sockaddr_in* clientAddr,
 	memset(&ackPacket,0,sizeof(ackPacket));
 	ackPacket.sequenceNumber = htonl(seqNum); //set the sequence number
 	int size = sizeof(uint32_t); //how muhc data to send 
-	ssize_t sentBytes = sendto(serverSocket,&ackPacket,size,0,(struct sockaddr*)&clientAddr,clientLen);//send an "ACK" message to the client which is just sending the sequence number
+	ssize_t sentBytes = sendto(serverSocket,&ackPacket,size,0,(struct sockaddr*)clientAddr,clientLen);//send an "ACK" message to the client which is just sending the sequence number
 	return sentBytes;
 }
 std::string currentTimestamp(){
@@ -41,7 +41,6 @@ void initRandom(){
 
 bool dropPacket(int lossRate){
 	double percLossRate = lossRate / 100.0;
-	std::cout << percLossRate;
 	double randVal = static_cast<double>(std::rand()) / static_cast<double>(RAND_MAX);
 	return randVal < percLossRate;
 }
@@ -79,7 +78,6 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			
 			//simulate packet loss 
 			if (dropPacket(lossRate)){ //if we random value generate falls within the loss rate it is lost
-				std::cout << "Packet Loss\n";
 				std::cout << currentTimestamp()<< ", DROP DATA, " << seqNum << "\n";
 				continue; // by continuing we skip over sending the packet 
 			}
@@ -91,25 +89,25 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			//we utilize the expectedSeqNum to ensure we are recieving the correct packet 	
 			if (seqNum == expectedSeqNum){
 				if(dropPacket(lossRate)){
-					std::cout << currentTimestamp() <<" ,DROP ACK, " << seqNum << "\n";
+					std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
 					continue; //drop packet if true
 				}
 
 				//send an ack packet
 				ssize_t sentBytes = sendAck(serverSocket,seqNum,&clientAddr,clientLen);
 				if(sentBytes < 0){
-					std::cerr << "Error Sending ACK Packet\n";
-					continue;
+					perror("Error sending ACK Packet");
 				}
-				std::cout << currentTimestamp() << " , ACK, " << seqNum << "\n";
+				std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
 				packetsRecieved.erase(seqNum);
 				outfile.write(buffer+sizeof(uint32_t),dataSize);//only write to the file if we have sent the ACK message 
 				expectedSeqNum++;
+				
 				while(packetsRecieved.count(expectedSeqNum) && !packetsRecieved.empty()){
 					//possibility of dropping as well
 					
 					if(dropPacket(lossRate)){
-						std::cout << currentTimestamp() <<" ,DROP ACK, " << seqNum << "\n";
+						std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
 						continue; //drop packet if true
 					}
 
@@ -197,7 +195,6 @@ int main(int argc, char* argv[]){
 		close(serverSocket);
 		return 1;
 	}
-
 	std::string outfile = "output.txt";
 	echoLoop(serverSocket,lossRate,outfile);
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
