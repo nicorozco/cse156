@@ -46,16 +46,14 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 	char buffer[1472];
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	struct sockaddr_in clientAddr;
-	socklen_t clientLen = sizeof(clientAddr);
 	ssize_t dataSize;
+	socklen_t clientLen = sizeof(clientAddr);
 	uint32_t seqNum = 0;
 	ssize_t bytesRecieved;
 	std::map<int, UDPPacket> packetBuffer;
 	
 	//recieved intial packet
 	filePathPacket pathPacket;
-	sockaddr_in clientAddr;
-	socklen_t clientLen = sizeof(clientAddr);
 
 	ssize_t	pathRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
 
@@ -66,7 +64,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 		std::cout << "File path recieved: "<< filePath << "\n";
 	}
 	//open file path 
-	std::ofstream outfile(filePath,std::ios::binary);
+	std::ofstream outfile(outfilePath,std::ios::binary);
 	if(!outfile.is_open()){
 		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
 	}	
