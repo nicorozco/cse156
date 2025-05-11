@@ -41,11 +41,13 @@ bool isValidIPv4Format(const std::string& ip){
 }
 int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* serverAddress,std::ifstream& file){
 	file.clear();
+
 	UDPPacket lostPacket; //create the packet
 	lostPacket.sequenceNumber = htonl(expectedSeqNum);//set the sequence number	
+	
 	std::cout << "Resending Sequence Number = " << expectedSeqNum << "\n";
 	//recover the data associated with the sequence number from the original file using seekg()
-	long offset = expectedSeqNum * 1468;
+	long offset = expectedSeqNum * 1466;
 	//std::cout << "Offset: " << offset << "\n";
 	//check if osset is valid before reading
 	file.seekg(0,std::ios::end);
@@ -62,7 +64,7 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 
 	//std::cout << "Data:" << lostPacket.data << "\n";	
 	std::streamsize bytes_reRead = file.gcount();
-	
+	lostPacket.payloadSize = htons(static_cast<uint16_t>(bytes_reRead));	
 	if (bytes_reRead <= 0){ // if we read bytes form the file and it's less than 0{
 		if(file.eof()){
 			//we have reached the end of file
@@ -86,12 +88,12 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	auto* ipv4 = (struct sockaddr_in*)serverAddress;
 	//std::cout << "Send to" << inet_ntoa(ipv4->sin_addr) << ":" << ntohs(ipv4->sin_port) << " | family=" << ipv4->sin_family << "\n";
 
-	ssize_t sent = sendto(clientSocket,&lostPacket, sizeof(uint32_t) + bytes_reRead, 0,(struct sockaddr*)ipv4,sizeof(struct sockaddr_in));
+	ssize_t sent = sendto(clientSocket,&lostPacket, sizeof(uint32_t)+ sizeof(uint16_t) + bytes_reRead, 0,(struct sockaddr*)ipv4,sizeof(struct sockaddr_in));
 	if(sent == -1){
 		perror("sendto failed");
 	}
 
-	//std::cout << "Retransmitted Bytes" << sent << "\n";
+	std::cout << "Retransmitted Bytes" << sent << "\n";
 	return 0;
 }		
 
