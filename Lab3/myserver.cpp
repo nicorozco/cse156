@@ -12,12 +12,7 @@
 #include <ctime>
 #include <map>
 #include <fstream>
-struct ACKPacket {
-	uint32_t sequenceNumber;
-};
-
 ssize_t sendAck(int serverSocket,uint32_t seqNum,struct sockaddr_in* clientAddr,socklen_t clientLen){
-
 	ACKPacket ackPacket;
 	memset(&ackPacket,0,sizeof(ackPacket));
 	ackPacket.sequenceNumber = htonl(seqNum); //set the sequence number
@@ -51,13 +46,26 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 	char buffer[1472];
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	struct sockaddr_in clientAddr;
-	socklen_t clientLen = sizeof(clientAddr);
 	ssize_t dataSize;
+	socklen_t clientLen = sizeof(clientAddr);
 	uint32_t seqNum = 0;
 	ssize_t bytesRecieved;
 	std::map<int, UDPPacket> packetBuffer;
-	
-	//open file to reach 
+
+	//implement logic to ensure we dont hang here from recfrom()	
+	//recieved intial packet
+	ssize_t	pathRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
+
+	filePathPacket* pathPacket = reinterpret_cast<filePathPacket*>(buffer);
+	std::string filePath(pathPacket->filepath);
+	std::cout << "File Path recieved:" << filePath << "\n";
+	if (pathRecieved < 0){
+		perror("Error receiving filepath");
+	}else {
+		std::string filePath(pathPacket->filepath);
+		std::cout << "File path recieved: "<< filePath << "\n";
+	}
+	//open file path 
 	std::ofstream outfile(outfilePath,std::ios::binary);
 	if(!outfile.is_open()){
 		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
@@ -73,7 +81,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			
 			
 			UDPPacket* recievedPacket = reinterpret_cast<UDPPacket*>(buffer);
-			dataSize = bytesRecieved - sizeof(uint32_t);//size of the data recieved, by removing the sequence number 
+			uint16_t actualSize = ntohs(recievedPacket->payloadSize);//size of the data recieved, by removing the sequence number 
 			seqNum = ntohl(recievedPacket->sequenceNumber); // the sequence numbers sets the acknolwedgement we should be recieving 
 			
 			//simulate packet loss 
@@ -87,6 +95,11 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			//-------------work on this part-------------
 			
 			//we utilize the expectedSeqNum to ensure we are recieving the correct packet 	
+			if(seqNum == EOF_SEQ){
+				std::cout << currentTimestamp() << ", EOF RECEIVED\n";
+    				break;
+			}
+			
 			if (seqNum == expectedSeqNum){
 				if(dropPacket(lossRate)){
 					std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
@@ -100,12 +113,13 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				}
 				std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
 				packetsRecieved.erase(seqNum);
-				outfile.write(buffer+sizeof(uint32_t),dataSize);//only write to the file if we have sent the ACK message 
+				std::cout << "Writing" << actualSize << "Bytes" << "\n";
+				outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
 				expectedSeqNum++;
 				
-				while(packetsRecieved.count(expectedSeqNum) && !packetsRecieved.empty()){
+				while(packetsRecieved.count(expectedSeqNum)){
 					//possibility of dropping as well
-					
+					std::cout << "Writing Buffered Packets" << "\n";	
 					if(dropPacket(lossRate)){
 						std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
 						continue; //drop packet if true
@@ -118,15 +132,20 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 						 continue;
 					 }
 					 
+					UDPPacket& pkt = packetsRecieved[expectedSeqNum];
+					//this is wrong, size 
+					uint16_t actualSize = ntohs(pkt.payloadSize);
+					outfile.write(pkt.data,actualSize);//only write to the file if we have sent the ACK message 
+					std::cout << "Writing" << actualSize << "Bytes" << "\n";
 					packetsRecieved.erase(expectedSeqNum);//erase the seq num from the map
 					expectedSeqNum++;//increase seqnum
-					outfile.write(buffer+sizeof(uint32_t),dataSize);//only write to the file if we have sent the ACK message 	
-
 				}
 
-			}else{//buffer the packet that have arrived but not in correct order 
-				//insert into map 
-				packetsRecieved[seqNum] = *recievedPacket;
+			}else {
+				if (!packetsRecieved.count(expectedSeqNum)){//buffer the packet that have arrived but not in correct order 
+					//insert into map 
+					packetsRecieved[seqNum] = *recievedPacket;
+				}
 			}
 		}
 	}	
@@ -197,6 +216,7 @@ int main(int argc, char* argv[]){
 	}
 	std::string outfile = "output.txt";
 	echoLoop(serverSocket,lossRate,outfile);
+	std::cout << "Finishing Recieving" << "\n";
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	//d.) recieved a packet
 	close(serverSocket);

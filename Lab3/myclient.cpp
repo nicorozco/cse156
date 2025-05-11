@@ -58,7 +58,7 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	}
 
 	file.seekg(offset, std::ios::beg); //utilize seekg() to point the fd to the data and use SEEK_SET to go from the beginning of the file
-	file.read(lostPacket.data,1468); //utilize read to read into the data
+	file.read(lostPacket.data,1466); //utilize read to read into the data
 
 	//std::cout << "Data:" << lostPacket.data << "\n";	
 	std::streamsize bytes_reRead = file.gcount();
@@ -197,7 +197,23 @@ int main (int argc, char* argv[]) {
 	//reading data & sending packets
 	auto startTime = std::chrono::steady_clock::now();
 	bool recievedFirstPacket = false;
+
+
+	//before we transmit anything lets send the file where the file will be printed to the file 
 	
+	//utilize a simple packet 
+	filePathPacket pathPacket;
+	memset(&pathPacket,0,sizeof(pathPacket));
+	strncpy(pathPacket.filepath, outPath.c_str(),sizeof(pathPacket.filepath)-1);
+	pathPacket.filepath[sizeof(pathPacket.filepath)-1] = '\0';
+	//send to server
+
+	ssize_t pathSent = sendto(clientSocket,&pathPacket, sizeof(pathPacket),0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
+
+	if(pathSent < 0){
+		perror("Error Sending Path to Client");
+	}
+
 	while(true){
 		//while we are within the window and there is data to read --> create packet and trasmit data
 		while(nextSeqNum < baseSeqNum + WINDOW_SIZE){
@@ -207,12 +223,13 @@ int main (int argc, char* argv[]) {
 			std::streamsize bytesRead = file.gcount();
 			if(bytesRead <= 0){
 				break;
-			}else if (bytesRead <= 32){
+			}else if (bytesRead == 0){
 				std::cerr << "Required Minimum MSS is X+1\n";
-					return 1;
+				break;
 			}
+			packet.payloadSize = htons(bytesRead);
 			packet.sequenceNumber = htonl(nextSeqNum);
-			int totalSize = sizeof(uint32_t) + bytesRead;
+			int totalSize = sizeof(uint32_t) + sizeof(uint16_t) + bytesRead;
 			ssize_t sentBytes = sendto(clientSocket,&packet,totalSize, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));				
 			if(sentBytes < 0){
 				perror("sendto failed");
@@ -271,7 +288,6 @@ int main (int argc, char* argv[]) {
 			//std::cout << "Sequence Number of Recieved Packet" << seqNum << "\n";
 			recievedFirstPacket = true;
 			startTime = std::chrono::steady_clock::now();
-
 			// if the sequence number is in the unackedpacket, slides the window 
 			if(unackedPackets.count(seqNum)){
 				baseWindow = baseSeqNum + WINDOW_SIZE;
@@ -288,6 +304,12 @@ int main (int argc, char* argv[]) {
 			return -1;
 		}
 		if(file.eof() && unackedPackets.empty()){ //if we reach the end of file and there are no packets in the map break out
+			//send EOF Packet
+			UDPPacket eofPacket;
+			memset(&eofPacket,0,sizeof(eofPacket));
+			eofPacket.sequenceNumber = htonl(EOF_SEQ);
+			sendto(clientSocket, &eofPacket, sizeof(uint32_t), 0,
+       (struct sockaddr*)&serverAddress, sizeof(serverAddress));
 			std::cout << "All Packet send and no more data to send" << "\n";
 			break;
 		}
