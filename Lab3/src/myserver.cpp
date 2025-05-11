@@ -86,11 +86,11 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			
 			//simulate packet loss 
 			if (dropPacket(lossRate)){ //if we random value generate falls within the loss rate it is lost
-				//std::cout << currentTimestamp()<< ", DROP DATA, " << seqNum << "\n";
+				std::cout << currentTimestamp()<< ", DROP DATA, " << seqNum << "\n";
 				continue; // by continuing we skip over sending the packet 
 			}
 			
-			//std::cout << currentTimestamp() << ", DATA," << seqNum << "\n";
+			std::cout << currentTimestamp() << ", DATA," << seqNum << "\n";
 			
 			//-------------work on this part-------------
 			
@@ -102,7 +102,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			
 			if (seqNum == expectedSeqNum){
 				if(dropPacket(lossRate)){
-					//std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
+					std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
 					continue; //drop packet if true
 				}
 
@@ -111,7 +111,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				if(sentBytes < 0){
 					perror("Error sending ACK Packet");
 				}
-				//std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
+				std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
 				
 				if(packetsRecieved.count(seqNum)){
 					UDPPacket& pkt = packetsRecieved[seqNum];
@@ -122,9 +122,9 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 					std::cout << "Writing" << bufferedSize << "Bytes" << "\n";
 				}else{
 					//std::cout << recievedPacket->data << "\n";
-					std::cout << actualSize << "\n";
+					//std::cout << actualSize << "\n";
 					if (actualSize > 1468){
-						std::cout << actualSize << "\n";
+						//std::cout << actualSize << "\n";
 						std::cerr << "Inclaid Payload Size:" << "on seqNum" << seqNum << "\n";
 					}
 					outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
