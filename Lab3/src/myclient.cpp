@@ -304,6 +304,12 @@ int main (int argc, char* argv[]) {
 			return -1;
 		}
 		if(file.eof() && unackedPackets.empty()){ //if we reach the end of file and there are no packets in the map break out
+			//send EOF Packet
+			UDPPacket eofPacket;
+			memset(&eofPacket,0,sizeof(eofPacket));
+			eofPacket.sequenceNumber = htonl(EOF_SEQ);
+			sendto(clientSocket, &eofPacket, sizeof(uint32_t), 0,
+       (struct sockaddr*)&serverAddress, sizeof(serverAddress));
 			std::cout << "All Packet send and no more data to send" << "\n";
 			break;
 		}

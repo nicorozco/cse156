@@ -95,6 +95,11 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			//-------------work on this part-------------
 			
 			//we utilize the expectedSeqNum to ensure we are recieving the correct packet 	
+			if(seqNum == EOF_SEQ){
+				std::cout << currentTimestamp() << ", EOF RECEIVED\n";
+    				break;
+			}
+			
 			if (seqNum == expectedSeqNum){
 				if(dropPacket(lossRate)){
 					std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
@@ -108,12 +113,13 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				}
 				std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
 				packetsRecieved.erase(seqNum);
+				std::cout << "Writing" << dataSize << "Bytes" << "\n";
 				outfile.write(buffer+sizeof(uint32_t),dataSize);//only write to the file if we have sent the ACK message 
 				expectedSeqNum++;
 				
-				while(packetsRecieved.count(expectedSeqNum) && !packetsRecieved.empty()){
+				while(packetsRecieved.count(expectedSeqNum)){
 					//possibility of dropping as well
-					
+					std::cout << "Writing Buffered Packets" << "\n";	
 					if(dropPacket(lossRate)){
 						std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
 						continue; //drop packet if true
@@ -126,10 +132,11 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 						 continue;
 					 }
 					 
+					UDPPacket& pkt = packetsRecieved[expectedSeqNum];
+					outfile.write(pkt.data,dataSize);//only write to the file if we have sent the ACK message 
+					std::cout << "Writing" << sizeof(pkt.data) << "Bytes" << "\n";
 					packetsRecieved.erase(expectedSeqNum);//erase the seq num from the map
 					expectedSeqNum++;//increase seqnum
-					outfile.write(buffer+sizeof(uint32_t),dataSize);//only write to the file if we have sent the ACK message 	
-
 				}
 
 			}else{//buffer the packet that have arrived but not in correct order 
@@ -205,6 +212,7 @@ int main(int argc, char* argv[]){
 	}
 	std::string outfile = "output.txt";
 	echoLoop(serverSocket,lossRate,outfile);
+	std::cout << "Finishing Recieving" << "\n";
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	//d.) recieved a packet
 	close(serverSocket);

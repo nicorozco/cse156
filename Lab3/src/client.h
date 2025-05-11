@@ -1,4 +1,6 @@
 // H file for the client side
+#include <cstdint>
+const uint32_t EOF_SEQ = UINT32_MAX;
 //structure for UDP packet
 struct UDPPacket {
 	uint32_t sequenceNumber;
