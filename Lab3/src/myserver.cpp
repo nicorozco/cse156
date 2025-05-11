@@ -58,7 +58,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 
 	filePathPacket* pathPacket = reinterpret_cast<filePathPacket*>(buffer);
 	std::string filePath(pathPacket->filepath);
-
+	std::cout << "File Path recieved:" << filePath << "\n";
 	if (pathRecieved < 0){
 		perror("Error receiving filepath");
 	}else {
@@ -81,7 +81,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			
 			
 			UDPPacket* recievedPacket = reinterpret_cast<UDPPacket*>(buffer);
-			dataSize = bytesRecieved - sizeof(uint32_t);//size of the data recieved, by removing the sequence number 
+			uint16_t actualSize = ntohs(recievedPacket->payloadSize);//size of the data recieved, by removing the sequence number 
 			seqNum = ntohl(recievedPacket->sequenceNumber); // the sequence numbers sets the acknolwedgement we should be recieving 
 			
 			//simulate packet loss 
@@ -112,10 +112,17 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 					perror("Error sending ACK Packet");
 				}
 				std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
-				packetsRecieved.erase(seqNum);
-				std::cout << "Writing" << dataSize << "Bytes" << "\n";
-				outfile.write(buffer+sizeof(uint32_t),dataSize);//only write to the file if we have sent the ACK message 
-				expectedSeqNum++;
+				
+				if(packetsRecieved.count(seqNum)){
+					UDPPacket& pkt = packetsRecieved[seqNum];
+					uint16_t bufferedSize = ntohs(pkt.payloadSize);
+					outfile.write(pkt.data, bufferedSize);
+					packetsRecieved.erase(seqNum);
+					std::cout << "Writing" << bufferedSize << "Bytes" << "\n";
+				}else{
+					outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
+				}
+					expectedSeqNum++;
 				
 				while(packetsRecieved.count(expectedSeqNum)){
 					//possibility of dropping as well
@@ -141,9 +148,11 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 					expectedSeqNum++;//increase seqnum
 				}
 
-			}else{//buffer the packet that have arrived but not in correct order 
-				//insert into map 
-				packetsRecieved[seqNum] = *recievedPacket;
+			}else {
+				if (!packetsRecieved.count(seqNum)){//buffer the packet that have arrived but not in correct order 
+					//insert into map 
+					packetsRecieved[seqNum] = *recievedPacket;
+				}
 			}
 		}
 	}	

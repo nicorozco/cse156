@@ -58,7 +58,7 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	}
 
 	file.seekg(offset, std::ios::beg); //utilize seekg() to point the fd to the data and use SEEK_SET to go from the beginning of the file
-	file.read(lostPacket.data,1468); //utilize read to read into the data
+	file.read(lostPacket.data,1466); //utilize read to read into the data
 
 	//std::cout << "Data:" << lostPacket.data << "\n";	
 	std::streamsize bytes_reRead = file.gcount();
@@ -223,13 +223,13 @@ int main (int argc, char* argv[]) {
 			std::streamsize bytesRead = file.gcount();
 			if(bytesRead <= 0){
 				break;
-			}else if (bytesRead <= 32){
+			}else if (bytesRead == 0){
 				std::cerr << "Required Minimum MSS is X+1\n";
-					return 1;
+				break;
 			}
 			packet.payloadSize = htons(bytesRead);
 			packet.sequenceNumber = htonl(nextSeqNum);
-			int totalSize = sizeof(uint32_t) + bytesRead;
+			int totalSize = sizeof(uint32_t) + sizeof(uint16_t) + bytesRead;
 			ssize_t sentBytes = sendto(clientSocket,&packet,totalSize, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));				
 			if(sentBytes < 0){
 				perror("sendto failed");
@@ -288,7 +288,6 @@ int main (int argc, char* argv[]) {
 			//std::cout << "Sequence Number of Recieved Packet" << seqNum << "\n";
 			recievedFirstPacket = true;
 			startTime = std::chrono::steady_clock::now();
-
 			// if the sequence number is in the unackedpacket, slides the window 
 			if(unackedPackets.count(seqNum)){
 				baseWindow = baseSeqNum + WINDOW_SIZE;
