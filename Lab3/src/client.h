@@ -4,7 +4,8 @@ const uint32_t EOF_SEQ = UINT32_MAX;
 //structure for UDP packet
 struct UDPPacket {
 	uint32_t sequenceNumber;
-	char data[1468];
+	uint16_t payloadSize;
+	char data[1466];
 };
 
 struct filePathPacket{

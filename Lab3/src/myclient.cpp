@@ -227,6 +227,7 @@ int main (int argc, char* argv[]) {
 				std::cerr << "Required Minimum MSS is X+1\n";
 					return 1;
 			}
+			packet.payloadSize = htons(bytesRead);
 			packet.sequenceNumber = htonl(nextSeqNum);
 			int totalSize = sizeof(uint32_t) + bytesRead;
 			ssize_t sentBytes = sendto(clientSocket,&packet,totalSize, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));				
