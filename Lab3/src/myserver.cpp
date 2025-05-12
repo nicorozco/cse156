@@ -130,8 +130,6 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 					
 					std::cout << "Expected Sequence Number Recieved, Writing to File" << "\n"; 
 					outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
-					expectedSeqNum++;
-					
 					bool ackDropped = dropPacket(lossRate);
 					if(ackDropped){
 						std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
@@ -143,7 +141,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 						}else{
 							std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";	
 						}
-				
+						expectedSeqNum++;	
 						while(packetsRecieved.count(expectedSeqNum)){
 							//possibility of dropping as well
 							bool ackDroppedBuffered = dropPacket(lossRate);
