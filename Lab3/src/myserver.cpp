@@ -136,7 +136,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 						UDPPacket& pkt = packetsRecieved[expectedSeqNum]; 
 						uint16_t pktSize = ntohs(pkt.payloadSize);
 						//std::cout << "Size of Buffered Packet" << pktSize << "\n";
-						outfile.write(pkt.data,actualSize);//only write to the file if we have sent the ACK message 
+						outfile.write(pkt.data,pktSize);//only write to the file if we have sent the ACK message 
 						packetsRecieved.erase(expectedSeqNum);//erase the seq num from the map
 						expectedSeqNum++;//increase seqnum
 					}
