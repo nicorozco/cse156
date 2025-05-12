@@ -111,53 +111,41 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				if(sentBytes < 0){
 					perror("Error sending ACK Packet");
 				}
-				std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
-				
-				if(packetsRecieved.count(seqNum)){
-					UDPPacket& pkt = packetsRecieved[seqNum];
-					uint16_t bufferedSize = ntohs(pkt.payloadSize);
-					outfile.write(pkt.data, bufferedSize);
-					//std::cout << pkt.data << "\n";
-					packetsRecieved.erase(seqNum);
-					std::cout << "Writing" << bufferedSize << "Bytes" << "\n";
-				}else{
-					//std::cout << recievedPacket->data << "\n";
-					//std::cout << actualSize << "\n";
-					if (actualSize > 1468){
+				std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";	
+				if (actualSize > 1468){
 						//std::cout << actualSize << "\n";
 						std::cerr << "Inclaid Payload Size:" << "on seqNum" << seqNum << "\n";
-					}
-					outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
 				}
-				expectedSeqNum++;
 				
+				std::cout << "Expected Sequence Number Recieved, Writing to File" << "\n"; 
+				outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
+				expectedSeqNum++;
+			
 				while(packetsRecieved.count(expectedSeqNum)){
 					//possibility of dropping as well
 					if(dropPacket(lossRate)){
 						std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
-						continue; //drop packet if true
-					}
+					}else{
 
-					//send ack packet
-					 ssize_t sentBuff = sendAck(serverSocket,expectedSeqNum,&clientAddr,clientLen);
-					 
-					 if(sentBuff < 0){
-						 std::cerr << "Error Sending ACK Packet\n";
-						 continue;
-					} 
-					
-					 std::cout << "Writing Buffered Packet" << expectedSeqNum << "\n";	
-					UDPPacket& pkt = packetsRecieved[expectedSeqNum]; 
-					uint16_t pktSize = ntohs(pkt.payloadSize);
-					std::cout << "Size of Buffered Packet" << pktSize << "\n";
-					outfile.write(pkt.data,actualSize);//only write to the file if we have sent the ACK message 
-					packetsRecieved.erase(expectedSeqNum);//erase the seq num from the map
-					expectedSeqNum++;//increase seqnum
+						//send ack packet
+						ssize_t sentBuff = sendAck(serverSocket,expectedSeqNum,&clientAddr,clientLen);
+					 	if(sentBuff < 0){
+							 std::cerr << "Error Sending ACK Packet\n";
+						} 
+										std::cout << "Writing Buffered Packet" << expectedSeqNum << "\n";	
+						UDPPacket& pkt = packetsRecieved[expectedSeqNum]; 
+						uint16_t pktSize = ntohs(pkt.payloadSize);
+						//std::cout << "Size of Buffered Packet" << pktSize << "\n";
+						outfile.write(pkt.data,actualSize);//only write to the file if we have sent the ACK message 
+						packetsRecieved.erase(expectedSeqNum);//erase the seq num from the map
+						expectedSeqNum++;//increase seqnum
+					}
 				}
 
-			}else {
+			}else{
 				if (!packetsRecieved.count(seqNum)){//buffer the packet that have arrived but not in correct order 
 					//insert into map 
+					std::cout << "Inserting" << seqNum << "into buffer" << "\n";
 					packetsRecieved[seqNum] = *recievedPacket;
 				}
 			}

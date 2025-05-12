@@ -233,11 +233,13 @@ int main (int argc, char* argv[]) {
 			packet.sequenceNumber = htonl(nextSeqNum);
 			int totalSize = sizeof(uint32_t) + sizeof(uint16_t) + bytesRead;
 			ssize_t sentBytes = sendto(clientSocket,&packet,totalSize, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));				
+			baseWindow = baseSeqNum + WINDOW_SIZE;
 			if(sentBytes < 0){
 				perror("sendto failed");
 				close(clientSocket);
 				return -1;
 			}
+			std::cout << currentTimestamp() <<", DATA, "<< seqNum <<"," << baseSeqNum << "," << nextSeqNum <<"," << baseWindow << "\n"; 
 			unackedPackets.insert(nextSeqNum);
 			nextSeqNum++;
 		}
