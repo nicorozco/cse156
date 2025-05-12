@@ -100,7 +100,26 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 					std::cout << currentTimestamp() << ", EOF RECEIVED\n";
 					break;
 				}
-				
+			
+				if (seqNum < expectedSeqNum) {
+				    // Already received and written this packet; re-ACK if needed, but don't write again.
+				    std::cout << currentTimestamp() << ", DUPLICATE, " << seqNum << "\n";
+
+				    if (!dropPacket(lossRate)) {
+					ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);
+					if (sentBytes < 0) {
+					    perror("Error sending ACK Packet");
+					} else {
+					    std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
+					}
+				    } else {
+					std::cout << currentTimestamp() << ", DROP ACK, " << seqNum << "\n";
+				    }
+
+				    continue; 
+				}
+
+
 				if (seqNum == expectedSeqNum){
 					bool ackDropped = dropPacket(lossRate);
 					if(ackDropped){
