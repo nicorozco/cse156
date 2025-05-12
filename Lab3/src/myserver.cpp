@@ -98,7 +98,16 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				//we utilize the expectedSeqNum to ensure we are recieving the correct packet 	
 				if(seqNum == EOF_SEQ){
 					std::cout << currentTimestamp() << ", EOF RECEIVED\n";
-					break;
+					
+				    while (packetsRecieved.count(expectedSeqNum)) {
+					UDPPacket& pkt = packetsRecieved[expectedSeqNum];
+					uint16_t pktSize = ntohs(pkt.payloadSize);
+					outfile.write(pkt.data, pktSize);
+					packetsRecieved.erase(expectedSeqNum);
+					expectedSeqNum++;
+				    }
+
+				    break;
 				}
 			
 				if (seqNum < expectedSeqNum) {
