@@ -121,11 +121,21 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 
 
 				if (seqNum == expectedSeqNum){
+					
+					if (actualSize > 1468){
+						//std::cout << actualSize << "\n";
+						std::cerr << "Inclaid Payload Size:" << "on seqNum" << seqNum << "\n";
+						continue;
+					}
+					
+					std::cout << "Expected Sequence Number Recieved, Writing to File" << "\n"; 
+					outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
+					expectedSeqNum++;
+					
 					bool ackDropped = dropPacket(lossRate);
 					if(ackDropped){
 						std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
 					} else {
-
 						//send an ack packet
 						ssize_t sentBytes = sendAck(serverSocket,seqNum,&clientAddr,clientLen);
 						if(sentBytes < 0){
@@ -133,15 +143,6 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 						}else{
 							std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";	
 						}
-						if (actualSize > 1468){
-							//std::cout << actualSize << "\n";
-							std::cerr << "Inclaid Payload Size:" << "on seqNum" << seqNum << "\n";
-							continue;
-						}
-					
-						std::cout << "Expected Sequence Number Recieved, Writing to File" << "\n"; 
-						outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
-						expectedSeqNum++;
 				
 						while(packetsRecieved.count(expectedSeqNum)){
 							//possibility of dropping as well
