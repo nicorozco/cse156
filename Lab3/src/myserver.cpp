@@ -147,6 +147,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 							
 							if(ackDroppedBuffered){
 								std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
+								break;
 							}else{
 								//send ack packet
 								ssize_t sentBuff = sendAck(serverSocket,expectedSeqNum,&clientAddr,clientLen);
