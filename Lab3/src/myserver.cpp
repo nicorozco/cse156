@@ -122,7 +122,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 						}
 					}
 				}else if(seqNum == expectedSeqNum){	
-					if (actualSize > 1468){
+					if (actualSize > MSS){
 						//std::cout << actualSize << "\n";
 						std::cerr << "Invalid Payload Size:" << "on seqNum" << seqNum << "\n";
 						continue;
@@ -139,6 +139,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 						}else{
 							std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";	
 							std::cout << "Expected Sequence Number Recieved, Writing to File" << seqNum << "\n"; 
+							std::cout << "Writing" << actualSize << "\n";
 							outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
 							expectedSeqNum++;	
 						}
@@ -160,6 +161,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 									UDPPacket& pkt = packetsRecieved[expectedSeqNum]; 
 									uint16_t pktSize = ntohs(pkt.payloadSize);
 									std::cout << "Writing Buffered Packet";	
+									std::cout << pktSize << "Bytes Written" << "\n";
 									outfile.write(pkt.data,pktSize);//only write to the file if we have sent the ACK message 
 									packetsRecieved.erase(expectedSeqNum);//erase the seq num from the map
 									expectedSeqNum++;//increase seqnum

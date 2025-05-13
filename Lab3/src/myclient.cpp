@@ -26,7 +26,6 @@
 #include <unordered_set>
 #define WINDOW_SIZE 5
 #define TIMEOUT_SEC 60
-constexpr size_t MSS = sizeof(UPDPacket{}.data);
 
 std::string currentTimestamp(){
     auto now = std::chrono::system_clock::now();
@@ -244,7 +243,7 @@ int main (int argc, char* argv[]) {
 				std::cerr << "Required Minimum MSS is X+1\n";
 				break;
 			}
-			packet.payloadSize = htons(static_cast<uint16_6>(bytesRead);
+			packet.payloadSize = htons(static_cast<uint16_t>(bytesRead));
 			packet.sequenceNumber = htonl(nextSeqNum);
 			
 			int totalSize = sizeof(packet.sequenceNumber) + sizeof(packet.payloadSize) + bytesRead;
