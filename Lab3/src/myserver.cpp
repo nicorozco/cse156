@@ -46,7 +46,6 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 	char buffer[1472];
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	struct sockaddr_in clientAddr;
-	ssize_t dataSize;
 	socklen_t clientLen = sizeof(clientAddr);
 	uint32_t seqNum = 0;
 	ssize_t bytesRecieved;
@@ -86,6 +85,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			
 			//simulate packet loss i
 			bool dataDropped = dropPacket(lossRate);
+			
 			if (dataDropped){ //if we random value generate falls within the loss rate it is lost
 				std::cout << currentTimestamp()<< ", DROP DATA, " << seqNum << "\n";
 				// by continuing we skip over sending the packet 
@@ -115,24 +115,23 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				    std::cout << currentTimestamp() << ", DUPLICATE, " << seqNum << "\n";
 
 				    if (!dropPacket(lossRate)) {
-					ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);//ack the duplicate
-					if (sentBytes < 0) {
-					    perror("Error sending ACK Packet");
-					} else {
-					    std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
-					}
+						ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);//ack the duplicate
+						if (sentBytes < 0) {
+					    	perror("Error sending ACK Packet");
+						} else {
+					    	std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
+						}
 				    } else {
-					std::cout << currentTimestamp() << ", DROP ACK, " << seqNum << "\n";
+						std::cout << currentTimestamp() << ", DROP ACK, " << seqNum << "\n";
 				    }
-
-				    continue; 
+					continue; 
 				}
 
 
 				if (seqNum == expectedSeqNum){	
 					if (actualSize > 1468){
 						//std::cout << actualSize << "\n";
-						std::cerr << "Inclaid Payload Size:" << "on seqNum" << seqNum << "\n";
+						std::cerr << "Invalid Payload Size:" << "on seqNum" << seqNum << "\n";
 						continue;
 					}
 					
