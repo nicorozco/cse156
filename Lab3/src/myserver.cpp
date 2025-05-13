@@ -43,6 +43,7 @@ bool dropPacket(int lossRate){
 void echoLoop(int serverSocket,int lossRate,std::string outfilePath){	
 	uint32_t expectedSeqNum = 0;
 	std::map<uint32_t,UDPPacket> packetsRecieved;
+	
 	char buffer[1472];
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	struct sockaddr_in clientAddr;
@@ -57,12 +58,10 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 
 	filePathPacket* pathPacket = reinterpret_cast<filePathPacket*>(buffer);
 	std::string filePath(pathPacket->filepath);
-	std::cout << "File Path recieved:" << filePath << "\n";
 	if (pathRecieved < 0){
 		perror("Error receiving filepath");
 	}else {
 		std::string filePath(pathPacket->filepath);
-		std::cout << "File path recieved: "<< filePath << "\n";
 	}
 	//open file path 
 	std::ofstream outfile(outfilePath,std::ios::binary);
@@ -127,6 +126,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 						continue;
 					}
 					bool ackDropped = dropPacket(lossRate);
+					
 					outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
 					expectedSeqNum++;	
 					
