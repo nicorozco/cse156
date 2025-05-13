@@ -26,6 +26,8 @@
 #include <unordered_set>
 #define WINDOW_SIZE 5
 #define TIMEOUT_SEC 60
+constexpr size_t MSS = sizeof(UPDPacket{}.data);
+
 std::string currentTimestamp(){
     auto now = std::chrono::system_clock::now();
     std::time_t now_c = std::chrono::system_clock::to_time_t(now);
@@ -70,7 +72,9 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 
 	//std::cout << "Data:" << lostPacket.data << "\n";	
 	std::streamsize bytes_reRead = file.gcount();
+	
 	lostPacket.payloadSize = htons(static_cast<uint16_t>(bytes_reRead));	
+	
 	if (bytes_reRead <= 0){ // if we read bytes form the file and it's less than 0{
 		if(file.eof()){
 			//we have reached the end of file
@@ -89,12 +93,16 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 			return -1;
 		}
 	}
+	lostPacket.payloadSize = htons(static_cast<uint16_t>(bytes_reRead));
+
+	int totalSize = sizeof(lostPacket.sequenceNumber) + sizeof(lostPacket.payloadSize) + bytes_reRead;
+
 	//once the data is succesfuly read retransmit the packet and go back to the top of the while loop for recieving
 	//std::cout << "Bytes Re-read" << bytes_reRead << "\n";
 	auto* ipv4 = (struct sockaddr_in*)serverAddress;
 	//std::cout << "Send to" << inet_ntoa(ipv4->sin_addr) << ":" << ntohs(ipv4->sin_port) << " | family=" << ipv4->sin_family << "\n";
 
-	ssize_t sent = sendto(clientSocket,&lostPacket, sizeof(uint32_t)+ sizeof(uint16_t) + bytes_reRead, 0,(struct sockaddr*)ipv4,sizeof(struct sockaddr_in));
+	ssize_t sent = sendto(clientSocket,&lostPacket,totalSize, 0,(struct sockaddr*)ipv4,sizeof(struct sockaddr_in));
 	if(sent == -1){
 		perror("sendto failed");
 	}
@@ -227,7 +235,8 @@ int main (int argc, char* argv[]) {
 		while(nextSeqNum < baseSeqNum + WINDOW_SIZE){
 			UDPPacket packet;
 			memset(&packet,0,sizeof(packet));
-			file.read(packet.data,sizeof(packet.data));
+			file.read(packet.data,MSS);
+			
 			std::streamsize bytesRead = file.gcount();
 			if(bytesRead <= 0){
 				break;
@@ -235,17 +244,17 @@ int main (int argc, char* argv[]) {
 				std::cerr << "Required Minimum MSS is X+1\n";
 				break;
 			}
-			packet.payloadSize = htons(bytesRead);
+			packet.payloadSize = htons(static_cast<uint16_6>(bytesRead);
 			packet.sequenceNumber = htonl(nextSeqNum);
-			int totalSize = sizeof(uint32_t) + sizeof(uint16_t) + bytesRead;
+			
+			int totalSize = sizeof(packet.sequenceNumber) + sizeof(packet.payloadSize) + bytesRead;
 			ssize_t sentBytes = sendto(clientSocket,&packet,totalSize, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));				
-			baseWindow = baseSeqNum + WINDOW_SIZE;
 			if(sentBytes < 0){
 				perror("sendto failed");
 				close(clientSocket);
 				return -1;
 			}
-			std::cout << currentTimestamp() <<", DATA, "<< seqNum <<"," << baseSeqNum << "," << nextSeqNum <<"," << baseWindow << "\n"; 
+			std::cout << currentTimestamp() <<", DATA, "<< seqNum <<"," << baseSeqNum << "," << nextSeqNum <<"," << baseSeqNum + WINDOW_SIZE << "\n"; 
 			unackedPackets.insert(nextSeqNum);
 			nextSeqNum++;
 		}
