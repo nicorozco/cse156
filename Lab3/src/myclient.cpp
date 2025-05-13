@@ -40,6 +40,9 @@ bool isValidIPv4Format(const std::string& ip){
 	return std::regex_match(ip, ipv4Pattern);
 }
 int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* serverAddress,std::ifstream& file){
+	
+	constexpr std::size_t MSS = sizeof(UDPPacket{}.data);
+	
 	file.clear();
 
 	UDPPacket lostPacket; //create the packet
@@ -47,9 +50,12 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	
 	std::cout << "Resending Sequence Number = " << expectedSeqNum << "\n";
 	//recover the data associated with the sequence number from the original file using seekg()
-	long offset = expectedSeqNum * 1466;
+	
+	long offset = static_cast<long>(expectedSeqNum) * MSS;
+	
 	//std::cout << "Offset: " << offset << "\n";
 	//check if osset is valid before reading
+	
 	file.seekg(0,std::ios::end);
 	std::streampos fileSize = file.tellg();	
 	
@@ -60,7 +66,7 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	}
 
 	file.seekg(offset, std::ios::beg); //utilize seekg() to point the fd to the data and use SEEK_SET to go from the beginning of the file
-	file.read(lostPacket.data,1466); //utilize read to read into the data
+	file.read(lostPacket.data,MSS); //utilize read to read into the data
 
 	//std::cout << "Data:" << lostPacket.data << "\n";	
 	std::streamsize bytes_reRead = file.gcount();

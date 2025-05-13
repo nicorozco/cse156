@@ -111,6 +111,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				    
 					if(dropDuplicate) {
 						std::cout << currentTimestamp() << ", DROP ACK, " << seqNum << "\n";
+						continue;
 					}else{ 
 						ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);//ack the duplicate
 						if (sentBytes < 0) {
@@ -158,7 +159,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 									std::cout << currentTimestamp() << ", ACK, " << expectedSeqNum << "\n";
 									UDPPacket& pkt = packetsRecieved[expectedSeqNum]; 
 									uint16_t pktSize = ntohs(pkt.payloadSize);
-									
+									std::cout << "Writing Buffered Packet";	
 									outfile.write(pkt.data,pktSize);//only write to the file if we have sent the ACK message 
 									packetsRecieved.erase(expectedSeqNum);//erase the seq num from the map
 									expectedSeqNum++;//increase seqnum
