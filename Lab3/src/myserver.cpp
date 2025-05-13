@@ -104,21 +104,22 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 
 				    break;
 				}
-				if (seqNum < expectedSeqNum) {
+				if (seqNum < expectedSeqNum){
 				    // Already received and written this packet; re-ACK if needed, but don't write again.
 				    std::cout << currentTimestamp() << ", DUPLICATE, " << seqNum << "\n";
-
-				    if (!dropPacket(lossRate)) {
+					bool dropDuplicate = dropPacket(lossRate);
+				    
+					if(dropDuplicate) {
+						std::cout << currentTimestamp() << ", DROP ACK, " << seqNum << "\n";
+					}else{ 
 						ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);//ack the duplicate
 						if (sentBytes < 0) {
 					    	perror("Error sending ACK Packet");
 						} else {
 					    	std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
+							continue; 	
 						}
-				    } else {
-						std::cout << currentTimestamp() << ", DROP ACK, " << seqNum << "\n";
-				    }
-					continue; 
+					}
 				}else if(seqNum == expectedSeqNum){	
 					if (actualSize > 1468){
 						//std::cout << actualSize << "\n";
@@ -143,6 +144,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 						while(packetsRecieved.count(expectedSeqNum)){
 							//possibility of dropping as well
 							bool ackDroppedBuffered = dropPacket(lossRate);
+							
 							if(ackDroppedBuffered){
 								std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
 							}else{
@@ -155,6 +157,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 									std::cout << currentTimestamp() << ", ACK, " << expectedSeqNum << "\n";
 									UDPPacket& pkt = packetsRecieved[expectedSeqNum]; 
 									uint16_t pktSize = ntohs(pkt.payloadSize);
+									
 									outfile.write(pkt.data,pktSize);//only write to the file if we have sent the ACK message 
 									packetsRecieved.erase(expectedSeqNum);//erase the seq num from the map
 									expectedSeqNum++;//increase seqnum
@@ -162,7 +165,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 							}
 						}
 					}
-				}else{
+				}else if (seqNum > expectedSeqNum){
 					if (!packetsRecieved.count(seqNum)){//buffer the packet that have arrived but not in correct order 
 						//insert into map 
 						std::cout << "Inserting" << seqNum << "into buffer" << "\n";
