@@ -72,8 +72,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 	while(true){
 		bytesRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
 		if (bytesRecieved < 0){
-			perror("Error: Recieving from client");
-			continue;
+
 		}
 		if(bytesRecieved > 0){//if we are recieving data		
 			UDPPacket* recievedPacket = reinterpret_cast<UDPPacket*>(buffer);
@@ -91,16 +90,24 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				//we utilize the expectedSeqNum to ensure we are recieving the correct packet 	
 				if(seqNum == EOF_SEQ){
 					std::cout << currentTimestamp() << ", EOF RECEIVED\n";
-				    while (packetsRecieved.count(expectedSeqNum)) {
-						std::cout << "Writing Final Packets " << "\n";
-						UDPPacket& pkt = packetsRecieved[expectedSeqNum];
-						uint16_t pktSize = ntohs(pkt.payloadSize);
-						outfile.write(pkt.data, pktSize);
-						packetsRecieved.erase(expectedSeqNum);
-						expectedSeqNum++;
-				    }
+				     uint32_t maxSeqNum = packetsRecieved.rbegin()->first;
 
-				    break;
+					while (expectedSeqNum <= maxSeqNum) {
+						if (packetsRecieved.count(expectedSeqNum)) {
+							UDPPacket& pkt = packetsRecieved[expectedSeqNum];
+							uint16_t pktSize = ntohs(pkt.payloadSize);
+
+							std::cout << "[EOF WRITE] Seq=" << expectedSeqNum << ", Size=" << pktSize << "\n";
+							outfile.write(pkt.data, pktSize);
+							packetsRecieved.erase(expectedSeqNum);
+						} else {
+							std::cerr << "[EOF WARNING] Missing packet with Seq=" << expectedSeqNum << ". Skipping to next.\n";
+						}
+						expectedSeqNum++;
+					}
+
+					outfile.flush();
+					break;
 				}
 				if (seqNum < expectedSeqNum){
 				    // Already received and written this packet; re-ACK if needed, but don't write again.
@@ -168,7 +175,9 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 					if (!packetsRecieved.count(seqNum)){//buffer the packet that have arrived but not in correct order 
 						//insert into map 
 						std::cout << "Inserting" << seqNum << "into buffer" << "\n";
-						packetsRecieved[seqNum] = *recievedPacket;
+						UDPPacket pktCopy;
+						memcpy(&pktCopy, recievedPacket, sizeof(UDPPacket));
+						packetsRecieved[seqNum] = pktCopy;
 					}
 				}
 			}	
