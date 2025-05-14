@@ -43,24 +43,19 @@ bool isValidIPv4Format(const std::string& ip){
 int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* serverAddress,std::ifstream& file){
 	
 	constexpr std::size_t MSS = sizeof(UDPPacket{}.data);
-	
+	std::cout << "MSS: " << MSS << "\n";	
 	file.clear();
 
 	UDPPacket lostPacket; //create the packet
-	lostPacket.sequenceNumber = htonl(expectedSeqNum);//set the sequence number	
-	
+	lostPacket.sequenceNumber = htonl(expectedSeqNum);//set the sequence number
 	std::cout << "Resending Sequence Number = " << expectedSeqNum << "\n";
-	//recover the data associated with the sequence number from the original file using seekg()
 	
 	long offset = static_cast<long>(expectedSeqNum) * MSS;
-	
-	//std::cout << "Offset: " << offset << "\n";
-	//check if osset is valid before reading
+	std::cout << "Offset" << offset << "\n";	
 	
 	file.seekg(0,std::ios::end);
 	std::streampos fileSize = file.tellg();	
 	
-	//std::cout << "File Size: " << fileSize << "\n";
 	if (offset > fileSize){
 		std::cerr << "Invalid offset: beyond file size. Closing.\n";
 		return 2;
@@ -69,10 +64,8 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	file.seekg(offset, std::ios::beg); //utilize seekg() to point the fd to the data and use SEEK_SET to go from the beginning of the file
 	file.read(lostPacket.data,MSS); //utilize read to read into the data
 
-	//std::cout << "Data:" << lostPacket.data << "\n";	
 	std::streamsize bytes_reRead = file.gcount();
-	std::cout << "Data Retransmitted" << lostPacket.data << "\n";	
-	lostPacket.payloadSize = htons(static_cast<uint16_t>(bytes_reRead));	
+	std::cout << "Data ReRead" << bytes_reRead << "\n";	
 	
 	if (bytes_reRead <= 0){ // if we read bytes form the file and it's less than 0{
 		if(file.eof()){
@@ -93,20 +86,12 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 		}
 	}
 	lostPacket.payloadSize = htons(static_cast<uint16_t>(bytes_reRead));
-
 	int totalSize = sizeof(lostPacket.sequenceNumber) + sizeof(lostPacket.payloadSize) + bytes_reRead;
-
-	//once the data is succesfuly read retransmit the packet and go back to the top of the while loop for recieving
-	//std::cout << "Bytes Re-read" << bytes_reRead << "\n";
 	auto* ipv4 = (struct sockaddr_in*)serverAddress;
-	//std::cout << "Send to" << inet_ntoa(ipv4->sin_addr) << ":" << ntohs(ipv4->sin_port) << " | family=" << ipv4->sin_family << "\n";
-
 	ssize_t sent = sendto(clientSocket,&lostPacket,totalSize, 0,(struct sockaddr*)ipv4,sizeof(struct sockaddr_in));
 	if(sent == -1){
 		perror("sendto failed");
 	}
-
-	std::cout << "Retransmitted Bytes" << sent << "\n";
 	return 0;
 }		
 
@@ -236,6 +221,7 @@ int main (int argc, char* argv[]) {
 			memset(&packet,0,sizeof(packet));
 			file.read(packet.data,MSS);
 			std::streamsize bytesRead = file.gcount();
+			std::cout << "Bytes Sent" << "\n";
 			if(bytesRead <= 0){
 				break;
 			}else if (bytesRead == 0){
@@ -252,7 +238,7 @@ int main (int argc, char* argv[]) {
 				close(clientSocket);
 				return -1;
 			}
-			std::cout << "Data Sent: " << nextSeqNum << packet.data << "\n";	
+			std::cout << "Data Sent: " << ntohl(packet.sequenceNumber) << " " << bytesRead << "\n";	
 			//std::cout << currentTimestamp() <<", DATA, "<< seqNum <<"," << baseSeqNum << "," << nextSeqNum <<"," << baseSeqNum + WINDOW_SIZE << "\n"; 
 			unackedPackets.insert(nextSeqNum);
 			nextSeqNum++;
