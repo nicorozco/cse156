@@ -79,7 +79,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			UDPPacket* recievedPacket = reinterpret_cast<UDPPacket*>(buffer);
 			uint16_t actualSize = ntohs(recievedPacket->payloadSize);//size of the data recieved, by removing the sequence number 
 			seqNum = ntohl(recievedPacket->sequenceNumber); // the sequence numbers sets the acknolwedgement we should be recieving 
-			
+			//std::cout << "Data Recieved" << seqNum << " " << recievedPacket->data << "\n";	
 			//simulate packet loss i
 			bool dataDropped = dropPacket(lossRate);
 			
@@ -126,10 +126,6 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 						continue;
 					}
 					bool ackDropped = dropPacket(lossRate);
-					
-					outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
-					expectedSeqNum++;	
-					
 					if(ackDropped){
 						std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
 					}else{
@@ -139,6 +135,9 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 							perror("Error sending ACK Packet");
 						}else{
 							std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";	
+							outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
+							std::cout << "Expected Data: Writing to File" << recievedPacket->data << "\n";
+							expectedSeqNum++;	
 						}
 						while(packetsRecieved.count(expectedSeqNum)){
 							//possibility of dropping as well
@@ -157,7 +156,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 									std::cout << currentTimestamp() << ", ACK, " << expectedSeqNum << "\n";
 									UDPPacket& pkt = packetsRecieved[expectedSeqNum]; 
 									uint16_t pktSize = ntohs(pkt.payloadSize);
-									std::cout << "Packet Size" << pktSize << "\n";
+									std::cout << "Writing Buffered Data: "<< expectedSeqNum << pkt.data << "\n";
 									outfile.write(pkt.data,pktSize);//only write to the file if we have sent the ACK message 
 									packetsRecieved.erase(expectedSeqNum);//erase the seq num from the map
 									expectedSeqNum++;//increase seqnum

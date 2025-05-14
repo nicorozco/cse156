@@ -71,7 +71,7 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 
 	//std::cout << "Data:" << lostPacket.data << "\n";	
 	std::streamsize bytes_reRead = file.gcount();
-	
+	std::cout << "Data Retransmitted" << lostPacket.data << "\n";	
 	lostPacket.payloadSize = htons(static_cast<uint16_t>(bytes_reRead));	
 	
 	if (bytes_reRead <= 0){ // if we read bytes form the file and it's less than 0{
@@ -235,7 +235,6 @@ int main (int argc, char* argv[]) {
 			UDPPacket packet;
 			memset(&packet,0,sizeof(packet));
 			file.read(packet.data,MSS);
-			
 			std::streamsize bytesRead = file.gcount();
 			if(bytesRead <= 0){
 				break;
@@ -253,7 +252,8 @@ int main (int argc, char* argv[]) {
 				close(clientSocket);
 				return -1;
 			}
-			std::cout << currentTimestamp() <<", DATA, "<< seqNum <<"," << baseSeqNum << "," << nextSeqNum <<"," << baseSeqNum + WINDOW_SIZE << "\n"; 
+			std::cout << "Data Sent: " << nextSeqNum << packet.data << "\n";	
+			//std::cout << currentTimestamp() <<", DATA, "<< seqNum <<"," << baseSeqNum << "," << nextSeqNum <<"," << baseSeqNum + WINDOW_SIZE << "\n"; 
 			unackedPackets.insert(nextSeqNum);
 			nextSeqNum++;
 		}
