@@ -177,7 +177,6 @@ int main (int argc, char* argv[]) {
 	
 	//3.) Client reads a file from disk & Sends it over UDP Socket
 	//a.) Sending Data over a UDP Socket 
-	// utilize sendto() Note: each call to sendto() sends a single UDP Diagram
 	
 	std::ifstream file(infilePath,std::ios::binary);
 	// check for error when opening file
@@ -198,9 +197,6 @@ int main (int argc, char* argv[]) {
 	auto startTime = std::chrono::steady_clock::now();
 	bool recievedFirstPacket = false;
 
-
-	//before we transmit anything lets send the file where the file will be printed to the file 
-	
 	//utilize a simple packet 
 	filePathPacket pathPacket;
 	memset(&pathPacket,0,sizeof(pathPacket));
@@ -238,7 +234,7 @@ int main (int argc, char* argv[]) {
 				close(clientSocket);
 				return -1;
 			}
-			std::cout << "Data Sent: " << ntohl(packet.sequenceNumber) << " " << bytesRead << "\n";	
+			//std::cout << "Data Sent: " << ntohl(packet.sequenceNumber) << " " << bytesRead << "\n";	
 			//std::cout << currentTimestamp() <<", DATA, "<< seqNum <<"," << baseSeqNum << "," << nextSeqNum <<"," << baseSeqNum + WINDOW_SIZE << "\n"; 
 			unackedPackets.insert(nextSeqNum);
 			nextSeqNum++;
