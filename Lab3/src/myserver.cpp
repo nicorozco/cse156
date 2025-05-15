@@ -91,7 +91,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				if(seqNum == EOF_SEQ){
 					std::cout << currentTimestamp() << ", EOF RECEIVED\n";
 					//process the buffer at the end 
-					while (packetsRecieved.count(expectedSeqNum)) {
+					while (packetsRecieved.count(expectedSeqNum) && !packetsRecieved.empty()) {
 							UDPPacket& pkt = packetsRecieved[expectedSeqNum];
 							uint16_t pktSize = ntohs(pkt.payloadSize);
 							std::cout << "[EOF WRITE] Seq=" << expectedSeqNum << ", Size=" << pktSize << "\n";
@@ -99,7 +99,9 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 							packetsRecieved.erase(expectedSeqNum);
 							expectedSeqNum++;
 					}
+					std::cout << "Buffer is empty" << "\n";
 					outfile.flush();
+					break;
 				}
 				//Case 2: Recieved a packet already acked
 				if (seqNum < expectedSeqNum){

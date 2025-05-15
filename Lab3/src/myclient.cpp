@@ -138,9 +138,7 @@ int main (int argc, char* argv[]) {
             return 1;
         }
     }
-
-	int serverPort = std::stoi(Port);
-
+	int serverPort = std::stoi(argv[2]);
 	//after we have extracted the ip address we check if it's valid
 	if (isValidIPv4Format(serverIP) == false){
 		std::cout << serverIP << " is not a valid IPv4 format" << "\n";
@@ -174,10 +172,6 @@ int main (int argc, char* argv[]) {
 		close(clientSocket);
 		return -1;
 	}
-	
-	//3.) Client reads a file from disk & Sends it over UDP Socket
-	//a.) Sending Data over a UDP Socket 
-	
 	std::ifstream file(infilePath,std::ios::binary);
 	// check for error when opening file
 	if(!file.is_open()){
@@ -217,7 +211,6 @@ int main (int argc, char* argv[]) {
 			memset(&packet,0,sizeof(packet));
 			file.read(packet.data,MSS);
 			std::streamsize bytesRead = file.gcount();
-			std::cout << "Bytes Sent" << "\n";
 			if(bytesRead <= 0){
 				break;
 			}else if (bytesRead == 0){
@@ -225,8 +218,7 @@ int main (int argc, char* argv[]) {
 				break;
 			}
 			packet.payloadSize = htons(static_cast<uint16_t>(bytesRead));
-			packet.sequenceNumber = htonl(nextSeqNum);
-			
+			packet.sequenceNumber = htonl(nextSeqNum);	
 			int totalSize = sizeof(packet.sequenceNumber) + sizeof(packet.payloadSize) + bytesRead;
 			ssize_t sentBytes = sendto(clientSocket,&packet,totalSize, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));				
 			if(sentBytes < 0){
@@ -234,8 +226,7 @@ int main (int argc, char* argv[]) {
 				close(clientSocket);
 				return -1;
 			}
-			//std::cout << "Data Sent: " << ntohl(packet.sequenceNumber) << " " << bytesRead << "\n";	
-			//std::cout << currentTimestamp() <<", DATA, "<< seqNum <<"," << baseSeqNum << "," << nextSeqNum <<"," << baseSeqNum + WINDOW_SIZE << "\n"; 
+			std::cout << "Seq # "<< nextSeqNum << "Payload Sent" << bytesRead << "\n";
 			unackedPackets.insert(nextSeqNum);
 			nextSeqNum++;
 		}
@@ -263,17 +254,19 @@ int main (int argc, char* argv[]) {
 			if(retries >= MAX_RETRIES){
 				std::cerr << "Cannot detect server\n";
 				return 2;
-
 			}
 			// if the fd is not ready retransmit, only retransmit the older unacknoldge sequence number 
-			auto it = unackedPackets.begin(); //grab the olders unack seq number
-			if(it!=unackedPackets.end()){ //if the map isnt empty
-				int retrans = retransmit(baseSeqNum,clientSocket,(struct sockaddr*)&serverAddress,file);
-				if (retrans == -1){
-					std::cerr << "error retransmitting" << "\n";
+			for(uint32_t seq = baseSeqNum; seq < nextSeqNum; seq++){ //if the map isnt empty
+				if(unackedPackets.count(seq)){
+					int retrans = retransmit(baseSeqNum,clientSocket,(struct sockaddr*)&serverAddress,file);
+					if (retrans == -1){
+						std::cerr << "error retransmitting" << "\n";
+					}else{
+						std::cout << "Timeout waiting for echo. Retry#" << retries << "\n";
+					}
+					break;
 				}
-				continue;
-			}
+		}
 		}else if (activity < 0){
 			std::cerr << "Select Error\n";
 			exit(-1);
