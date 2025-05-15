@@ -166,12 +166,15 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 					}
 				// Case 4: Buffer out of order packets 
 				}else if (seqNum > expectedSeqNum){
-					if (!packetsRecieved.count(seqNum)){//if it's not already in the buffer, insert  
-						std::cout << "Inserting" << seqNum << "into buffer" << "\n";
-						UDPPacket pktCopy;
-						memcpy(&pktCopy, recievedPacket, sizeof(UDPPacket));
-						packetsRecieved[seqNum] = pktCopy;
+					
+					if(packetsRecieved.count(seqNum)){
+				        std::cout << currentTimestamp() << ", DUPLICATE BUFFERED, " << seqNum << "\n";
+						continue;
 					}
+					std::cout << "Inserting" << seqNum << "into buffer" << "\n";
+					UDPPacket pktCopy;
+					memcpy(&pktCopy, recievedPacket, sizeof(UDPPacket));
+					packetsRecieved[seqNum] = pktCopy;
 				}
 			}	
 		}
