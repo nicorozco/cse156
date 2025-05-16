@@ -117,6 +117,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 					    	std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
 						}
 					}
+					continue;
 				}
 //___________________________________________________________________________________________________________________________________________________________
 				// Case 2: Buffer out of order packets 
@@ -162,21 +163,21 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 						}else{
 							std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";	
 						}
-						//Process the buffer 
-						while(state.packetsRecieved.count(state.expectedSeqNum)){
-								//send ack packet
-								ssize_t sentBuff = sendAck(serverSocket,state.expectedSeqNum,&clientAddr,clientLen);
-								if(sentBuff < 0){
-									 std::cerr << "Error Sending ACK Packet\n";
-								} else {
-									std::cout << "Writing Buffered Data" << "\n";
-									std::cout << currentTimestamp() << ", ACK, " << state.expectedSeqNum << "\n";
-									UDPPacket& pkt = state.packetsRecieved[state.expectedSeqNum]; 
-									uint16_t pktSize = ntohs(pkt.payloadSize);
-									outfile.write(pkt.data,pktSize);//only write to the file if we have sent the ACK message 
-									state.packetsRecieved.erase(state.expectedSeqNum);//erase the seq num from the map
-									state.expectedSeqNum++;//increase seqnum
-								}
+					}
+					//Process the buffer 
+					while(state.packetsRecieved.count(state.expectedSeqNum)){
+							//send ack packet
+							ssize_t sentBuff = sendAck(serverSocket,state.expectedSeqNum,&clientAddr,clientLen);
+							if(sentBuff < 0){
+								 std::cerr << "Error Sending ACK Packet\n";
+							} else {
+								std::cout << "Writing Buffered Data" << "\n";
+								std::cout << currentTimestamp() << ", ACK, " << state.expectedSeqNum << "\n";
+								UDPPacket& pkt = state.packetsRecieved[state.expectedSeqNum]; 
+								uint16_t pktSize = ntohs(pkt.payloadSize);
+								outfile.write(pkt.data,pktSize);//only write to the file if we have sent the ACK message 
+								state.packetsRecieved.erase(state.expectedSeqNum);//erase the seq num from the map
+								state.expectedSeqNum++;//increase seqnum
 							}
 						}
 					}
