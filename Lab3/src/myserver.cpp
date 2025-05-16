@@ -123,10 +123,17 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				// Case 2: Buffer out of order packets 
 				if (seqNum > state.expectedSeqNum){					
 					std::cout << "Inserting" << seqNum << "into buffer" << "\n";
+					
+
+					uint16_t actualSize = ntohs(recievedPacket->payloadSize);
+					if(actualSize > MSS){
+						std::cerr << "Invalid payload Size:" << actualSize << " for seq " << seqNum << "\n";
+						continue;	
+					}
+
 					UDPPacket pktCopy;
 					pktCopy.sequenceNumber = recievedPacket->sequenceNumber;
 					pktCopy.payloadSize = recievedPacket->payloadSize;
-					uint16_t actualSize = ntohs(recievedPacket->payloadSize);
 					memcpy(pktCopy.data, recievedPacket->data,actualSize);
 					state.packetsRecieved[seqNum] = pktCopy;
 					//send acknoledgement
@@ -178,9 +185,21 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 								std::cout << currentTimestamp() << ", ACK, " << state.expectedSeqNum << "\n";
 								UDPPacket& pkt = state.packetsRecieved[state.expectedSeqNum]; 
 								uint16_t pktSize = ntohs(pkt.payloadSize);
-								outfile.write(pkt.data,pktSize);//only write to the file if we have sent the ACK message 
-								state.packetsRecieved.erase(state.expectedSeqNum);//erase the seq num from the map
-								state.expectedSeqNum++;//increase seqnum
+								if(pktSize > MSS){
+									std::cerr << "Invalid packet Size from Buffer:" << pktSize << "\n";
+									state.packetsRecieved.erase(state.expectedSeqNum);
+									state.expectedSeqNum++;
+									continue;
+								}
+								ssize_t sentBuff = sendAck(serverSocket, state.expectedSeqNum, &clientAddr, clientLen);
+								if(sentBuff < 0){
+									std::cerr << "Error Sending ACK Packet\n";
+								}else{
+									std::cout << currentTimestamp() << ", ACK, " << state.expectedSeqNum << "\n";
+									outfile.write(pkt.data,pktSize);//only write to the file if we have sent the ACK message 
+									state.packetsRecieved.erase(state.expectedSeqNum);//erase the seq num from the map
+									state.expectedSeqNum++;//increase seqnum
+								}
 							}
 						}
 					}
