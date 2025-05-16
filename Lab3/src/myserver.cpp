@@ -83,6 +83,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			if(clients.find(key) == clients.end()){
 				clients[key] = ClientState{}; 
 			}
+
 			//else the client is already in the map and we retrieve it
 			ClientState& state = clients[key];
 			
@@ -146,6 +147,8 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 						std::cerr << "Invalid Payload Size:" << "on seqNum" << seqNum << "\n";
 						continue;
 					}
+					outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
+					state.expectedSeqNum++;	
 					
 					bool ackDropped = dropPacket(lossRate);
 					//drop ack of expectedSeqNum 
@@ -158,8 +161,6 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 							perror("Error sending ACK Packet");
 						}else{
 							std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";	
-							outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
-							state.expectedSeqNum++;	
 						}
 						//Process the buffer 
 						while(state.packetsRecieved.count(state.expectedSeqNum)){
