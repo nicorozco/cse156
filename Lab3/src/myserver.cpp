@@ -105,11 +105,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				if (seqNum < state.expectedSeqNum){
 				    // Already received and written this packet; re-ACK if needed, but don't write again.
 				    std::cout << currentTimestamp() << ", DUPLICATE, " << seqNum << "\n";
-					bool dropData = dropPacket(lossRate);
 				    
-					if(dropData) {
-						std::cout << currentTimestamp() << ", DROP ACK, " << seqNum << "\n";
-					}else{ 
 						ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);//ack the duplicate
 						if (sentBytes < 0) {
 					    	perror("Error sending ACK Packet");
@@ -123,25 +119,14 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				// Case 2: Buffer out of order packets 
 				if (seqNum > state.expectedSeqNum){					
 					std::cout << "Inserting" << seqNum << "into buffer" << "\n";
-					
-
-					uint16_t actualSize = ntohs(recievedPacket->payloadSize);
-					if(actualSize > MSS){
-						std::cerr << "Invalid payload Size:" << actualSize << " for seq " << seqNum << "\n";
-						continue;	
-					}
-
 					UDPPacket pktCopy;
 					pktCopy.sequenceNumber = recievedPacket->sequenceNumber;
 					pktCopy.payloadSize = recievedPacket->payloadSize;
+					uint16_t actualSize = ntohs(recievedPacket->payloadSize);
 					memcpy(pktCopy.data, recievedPacket->data,actualSize);
 					state.packetsRecieved[seqNum] = pktCopy;
 					//send acknoledgement
-					bool dropBufferedAck = dropPacket(lossRate);
 					
-					if(dropBufferedAck){
-						std::cout << currentTimestamp() << ", DROP ACK, " << seqNum << "\n";
-					}
 						ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);//ack the duplicate
 						if (sentBytes < 0) {
 					    	perror("Error sending ACK Packet");
@@ -185,29 +170,12 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 								std::cout << currentTimestamp() << ", ACK, " << state.expectedSeqNum << "\n";
 								UDPPacket& pkt = state.packetsRecieved[state.expectedSeqNum]; 
 								uint16_t pktSize = ntohs(pkt.payloadSize);
-								if(pktSize > MSS){
-									std::cerr << "Invalid packet Size from Buffer:" << pktSize << "\n";
-									state.packetsRecieved.erase(state.expectedSeqNum);
-									state.expectedSeqNum++;
-									continue;
-								}
-								if(state.expectedSeqNum == seqNum){
-									state.packetsRecieved.erase(state.expectedSeqNum);
-									state.expectedSeqNum++;
-									continue;
-								}
-								ssize_t sentBuff = sendAck(serverSocket, state.expectedSeqNum, &clientAddr, clientLen);
-								if(sentBuff < 0){
-									std::cerr << "Error Sending ACK Packet\n";
-								}else{
-									std::cout << currentTimestamp() << ", ACK, " << state.expectedSeqNum << "\n";
-									outfile.write(pkt.data,pktSize);//only write to the file if we have sent the ACK message 
-									state.packetsRecieved.erase(state.expectedSeqNum);//erase the seq num from the map
-									state.expectedSeqNum++;//increase seqnum
-								}
+								outfile.write(pkt.data,pktSize);//only write to the file if we have sent the ACK message 
+								state.packetsRecieved.erase(state.expectedSeqNum);//erase the seq num from the map
+								state.expectedSeqNum++;//increase seqnum
 							}
 						}
-					}
+				}
 //_________________________________________________________________________________________________________________________
 				//Case 4: Reach end of File 
 				if(seqNum == EOF_SEQ){
@@ -228,7 +196,6 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			}
 		}
 	}
-}
 bool isPortValid(int port){
  if ( port < 1024 || port > 65553){
 	return false;
