@@ -41,13 +41,13 @@ bool dropPacket(int lossRate){
 }
 
 void echoLoop(int serverSocket,int lossRate,std::string outfilePath){	
-	uint32_t expectedSeqNum = 0;
-	std::map<uint32_t,UDPPacket> packetsRecieved;
-	
+
+	std::unordered_map<std::string,ClientState> clients;//create a map to hold the different clients 
 	char buffer[1472];
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	struct sockaddr_in clientAddr;
 	socklen_t clientLen = sizeof(clientAddr);
+	
 	uint32_t seqNum = 0;
 	ssize_t bytesRecieved;
 	std::map<int, UDPPacket> packetBuffer;
@@ -76,6 +76,17 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 		}
 
 		if(bytesRecieved > 0){//if we are recieving data		
+			//to identify who the packet is coming from, we are going to create a unique key utilizing the host ip and port number
+			std::string key = std::string(inet_ntoa(clientAddr.sin_addr)) + ":" + std::to_string(ntohs(clientAddr.sin_port));
+			
+			//if the client isn't within the client states already add to the map
+			if(clients.find(key) == clients.end()){
+				clients[key] = ClientState{}; 
+			}
+			//else the client is already in the map and we retrieve it
+			ClientState& state = clients[key];
+			
+			//process the packet for the same 
 			UDPPacket* recievedPacket = reinterpret_cast<UDPPacket*>(buffer);
 			uint16_t actualSize = ntohs(recievedPacket->payloadSize);//size of the data recieved, by removing the sequence number 
 			seqNum = ntohl(recievedPacket->sequenceNumber); // the sequence numbers sets the acknolwedgement we should be recieving 
@@ -91,20 +102,20 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				if(seqNum == EOF_SEQ){
 					std::cout << currentTimestamp() << ", EOF RECEIVED\n";
 					//process the buffer at the end 
-					while (packetsRecieved.count(expectedSeqNum) && !packetsRecieved.empty()) {
-							UDPPacket& pkt = packetsRecieved[expectedSeqNum];
+					while (state.packetsRecieved.count(state.expectedSeqNum) && !state.packetsRecieved.empty()) {
+							UDPPacket& pkt = state.packetsRecieved[state.expectedSeqNum];
 							uint16_t pktSize = ntohs(pkt.payloadSize);
-							std::cout << "[EOF WRITE] Seq=" << expectedSeqNum << ", Size=" << pktSize << "\n";
+							std::cout << "[EOF WRITE] Seq=" << state.expectedSeqNum << ", Size=" << pktSize << "\n";
 							outfile.write(pkt.data, pktSize);
-							packetsRecieved.erase(expectedSeqNum);
-							expectedSeqNum++;
+							state.packetsRecieved.erase(state.expectedSeqNum);
+							state.expectedSeqNum++;
 					}
 					std::cout << "Buffer is empty" << "\n";
 					outfile.flush();
 					break;
 				}
 				//Case 2: Recieved a packet already acked
-				if (seqNum < expectedSeqNum){
+				if (seqNum < state.expectedSeqNum){
 				    // Already received and written this packet; re-ACK if needed, but don't write again.
 				    std::cout << currentTimestamp() << ", DUPLICATE, " << seqNum << "\n";
 					bool dropDuplicate = dropPacket(lossRate);
@@ -120,7 +131,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 						}
 					}
 				//Case 3: Recieved the correct seq num 
-				}else if(seqNum == expectedSeqNum){	
+				}else if(seqNum == state.expectedSeqNum){	
 					if (actualSize > MSS){
 						//std::cout << actualSize << "\n";
 						std::cerr << "Invalid Payload Size:" << "on seqNum" << seqNum << "\n";
@@ -139,42 +150,42 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 						}else{
 							std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";	
 							outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
-							expectedSeqNum++;	
+							state.expectedSeqNum++;	
 						}
 						//Process the buffer 
-						while(packetsRecieved.count(expectedSeqNum)){
+						while(state.packetsRecieved.count(state.expectedSeqNum)){
 							bool ackDroppedBuffered = dropPacket(lossRate);
 							if(ackDroppedBuffered){// if the ack is break break out of the loop and await to recieved the expectedSeqnum
 								std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
 								break;
 							}else{
 								//send ack packet
-								ssize_t sentBuff = sendAck(serverSocket,expectedSeqNum,&clientAddr,clientLen);
+								ssize_t sentBuff = sendAck(serverSocket,state.expectedSeqNum,&clientAddr,clientLen);
 								if(sentBuff < 0){
 									 std::cerr << "Error Sending ACK Packet\n";
 								} else {
 									std::cout << "Writing Buffered Data" << "\n";
-									std::cout << currentTimestamp() << ", ACK, " << expectedSeqNum << "\n";
-									UDPPacket& pkt = packetsRecieved[expectedSeqNum]; 
+									std::cout << currentTimestamp() << ", ACK, " << state.expectedSeqNum << "\n";
+									UDPPacket& pkt = state.packetsRecieved[state.expectedSeqNum]; 
 									uint16_t pktSize = ntohs(pkt.payloadSize);
 									outfile.write(pkt.data,pktSize);//only write to the file if we have sent the ACK message 
-									packetsRecieved.erase(expectedSeqNum);//erase the seq num from the map
-									expectedSeqNum++;//increase seqnum
+									state.packetsRecieved.erase(state.expectedSeqNum);//erase the seq num from the map
+									state.expectedSeqNum++;//increase seqnum
 								}
 							}
 						}
 					}
 				// Case 4: Buffer out of order packets 
-				}else if (seqNum > expectedSeqNum){
+				}else if (seqNum > state.expectedSeqNum){
 					
-					if(packetsRecieved.count(seqNum)){
+					if(state.packetsRecieved.count(seqNum)){
 				        std::cout << currentTimestamp() << ", DUPLICATE BUFFERED, " << seqNum << "\n";
 						continue;
 					}
 					std::cout << "Inserting" << seqNum << "into buffer" << "\n";
 					UDPPacket pktCopy;
 					memcpy(&pktCopy, recievedPacket, sizeof(UDPPacket));
-					packetsRecieved[seqNum] = pktCopy;
+					state.packetsRecieved[seqNum] = pktCopy;
 				}
 			}	
 		}

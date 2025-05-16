@@ -1,6 +1,9 @@
 // H file for the client side
+#include <map>
+#include <unordered_map>
 #include <cstdint>
-#include <iostream> 
+#include <iostream>
+#include <chrono> 
 #pragma pack(push,1)
 
 const uint32_t EOF_SEQ = UINT32_MAX;
@@ -18,6 +21,11 @@ struct filePathPacket{
 
 struct ACKPacket{
 	uint32_t sequenceNumber;
+};
+struct ClientState {
+	uint32_t expectedSeqNum;//each client will have it's own expectedSeqNum
+	std::unordered_map<int,UDPPacket> packetsRecieved; //and it's own buffred packets 
+	std::chrono::steady_clock::time_point lastHeard;
 };
 
 bool isValidIPv4Format(const std::string& ip);
