@@ -1,0 +1,2857 @@
+910c910,946
+< "Let me see," said Holmes, standing at the corner and glancing along the line, "I should like just to remember the order of the houses here. It is a hobby of mine to have an exact knowledge of London. There is Mortimer's, the tobacconist, the little newspaper shop, the Coburg branch of the City and Suburban Bank, the Vegetarian Restaurant, and McFarlane's carriage-building depot. That carries us right on to the other block. And now, Doctor, we've done our work, so it's time we had some play. A sandwich and a cup of coffee, and then off to violin-land, where all is sweetness and delicacy and harmony, and there are no red-headed clients to vex us with their conundrums."
+---
+> "Let me see," said Holmes, standing at the corner and glancing along the l nothing by them."
+> 
+> "No, sir. But I want to find out about them, and who they are, and what their object was in playing this prank--if it was a prank--upon me. It was a pretty expensive joke for them, for it cost them two and thirty pounds."
+> 
+> "We shall endeavour to clear up these points for you. And, first, one or two questions, Mr. Wilson. This assistant of yours who first called your attention to the advertisement--how long had he been with you?"
+> 
+> "About a month then."
+> 
+> "How did he come?"
+> 
+> "In answer to an advertisement."
+> 
+> "Was he the only applicant?"
+> 
+> "No, I had a dozen."
+> 
+> "Why did you pick him?"
+> 
+> "Because he was handy and would come cheap."
+> 
+> "At half wages, in fact."
+> 
+> "Yes."
+> 
+> "What is he like, this Vincent Spaulding?"
+> 
+> "Small, stout-built, very quick in his ways, no hair on his face, though he's not short of thirty. Has a white splash of acid upon his forehead."
+> 
+> Holmes sat up in his chair in considerable excitement. "I thought as much," said he. "Have you ever observed that his ears are pierced for earrings?"
+> 
+> "Yes, sir. He told me that a gipsy had done it for him when he was a lad."
+> 
+> "Hum!" said Holmes, sinking back in deep thought. "He is still with you?"
+> 
+> "Oh, yes, sir; I have only just left him."
+> 
+> "And has your business been attended to in your absence?"
+912c948
+< My friend was an enthusiastic musician, being himself not only a very capable performer but a composer of no ordinary merit. All the afternoon he sat in the stalls wrapped in the most perfect happiness, gently waving his long, thin fingers in time to the music, while his gently smiling face and his languid, dreamy eyes were as unlike those of Holmes the sleuth-hound, Holmes the relentless, keen-witted, ready-handed criminal agent, as it was possible to conceive. In his singular character the dual nature alternately asserted itself, and his extreme exactness and astuteness represented, as I have often thought, the reaction against the poetic and contemplative mood which occasionally predominated in him. The swing of his nature took him from extreme languor to devouring energy; and, as I knew well, he was never so truly formidable as when, for days on end, he had been lounging in his armchair amid his improvisations and his black-letter editions. Then it was that the lust of the chase would suddenly come upon him, and that his brilliant reasoning power would rise to the level of intuition, until those who were unacquainted with his methods would look askance at him as on a man whose knowledge was not that of other mortals. When I saw him that afternoon so enwrapped in the music at St. James's Hall I felt that an evil time might be coming upon those whom he had set himself to hunt down.
+---
+> "Nothing to complain of, sir. There's never very much to do of a morning."
+914c950
+< "You want to go home, no doubt, Doctor," he remarked as we emerged.
+---
+> "That will do, Mr. Wilson. I shall be happy to give you an opinion upon the subject in the course of a day or two. To-day is Saturday, and I hope that by Monday we may come to a conclusion."
+916c952
+< "Yes, it would be as well."
+---
+> "Well, Watson," said Holmes when our visitor had left us, "what do you make of it all?"
+918c954
+< "And I have some business to do which will take some hours. This business at Coburg Square is serious."
+---
+> "I make nothing of it," I answered frankly. "It is a most mysterious business."
+920c956
+< "Why serious?"
+---
+> "As a rule," said Holmes, "the more bizarre a thing is the less mysterious it proves to be. It is your commonplace, featureless crimes which are really puzzling, just as a commonplace face is the most difficult to identify. But I must be prompt over this matter."
+922c958
+< "A considerable crime is in contemplation. I have every reason to believe that we shall be in time to stop it. But to-day being Saturday rather complicates matters. I shall want your help to-night."
+---
+> "What are you going to do, then?" I asked.
+924c960
+< "At what time?"
+---
+> "To smoke," he answered. "It is quite a three pipe problem, and I beg that you won't speak to me for fifty minutes." He curled himself up in his chair, with his thin knees drawn up to his hawk-like nose, and there he sat with his eyes closed and his black clay pipe thrusting out like the bill of some strange bird. I had come to the conclusion that he had dropped asleep, and indeed was nodding myself, when he suddenly sprang out of his chair with the gesture of a man who has made up his mind and put his pipe down upon the mantelpiece.
+926c962
+< "Ten will be early enough."
+---
+> "Sarasate plays at the St. James's Hall this afternoon," he remarked. "What do you think, Watson? Could your patients spare you for a few hours?"
+928c964
+< "I shall be at Baker Street at ten."
+---
+> "I have nothing to do to-day. My practice is never very absorbing."
+930c966
+< "Very well. And, I say, Doctor, there may be some little danger, so kindly put your army revolver in your pocket." He waved his hand, turned on his heel, and disappeared in an instant among the crowd.
+---
+> "Then put on your hat and come. I am going through the City first, and we can have some lunch on the way. I observe that there is a good deal of German music on the programme, which is rather more to my taste than Italian or French. It is introspective, and I want to introspect. Come along!"
+932c968,1006
+< I trust that I am not more dense than my neighbours, but I was always oppressed with a sense of my own stupidity in my dealings with Sherlock Holmes. Here I had heard what he had heard, I had seen what he had seen, and yet from his words it was evident that he saw clearly not only what had happened but what was about to happen, while to me the whole business was still confused and grotesque. As I drove home to my house in Kensington I thought over it all, from the extraordinary story of the red-headed copier of the Encyclopaedia down to the visit to Saxe-Coburg Square, and the ominous words with which he had parted from me. What was this nocturnal expedition, and why should I go armed? Where were we going, and what were we to do? I had the hint from Holmes that this smooth-faced pawnbroker's assistant was a formidable man--a man who might play a deep game. I tried to puzzle it out, but gave it up in despair and set the matter aside until night should bring an explanation.
+---
+> We travelled by the Underground as far as Aldersgate; and a short walk took us to Saxe-Coburg Square, the scene of the singular story which we had listened to in the morning. It was a poky, little, shabby-genteel place, where four lines of dingy two-storied brick houses looked out into a small railed-in enclosure, where a lawn of weedy grass and a few clumps of faded laurel bushes made a hard fight against a smoke-laden and uncongenial atmosphere. Three gilt balls and a brown board with "JABEZ WILSON" in white letters, upon a corner house, announced the place where our red-headed client carried on his business. Sherlock Holmes stopped in front of it with his head on one side and looked it all over, with his eyes shining brightly between puckered lids. Then he walked slowly up the street, and then down again to the corner, still looking keenly at the houses. Finally he returned to the pawnbroker's, and, having thumped vigorously upon the pavement with his stick two or three times, he went up to the door and knocked. It was instantly opened by a bright-looking, clean-shaven young fellow, who asked him to step in.
+> 
+> "Thank you," said Holmes, "I only wished to ask you how you would go from here to the Strand."
+> 
+> "Third right, fourth left," answered the assistant promptly, closing the door.
+> 
+> "Smart fellow, that," observed Holmes as we walked away. "He is, in my judgment, the fourth smartest man in London, and for daring I am not sure that he has not a claim to be third. I have known something of him before."
+> 
+> "Evidently," said I, "Mr. Wilson's assistant counts for a good deal in this mystery of the Red-headed League. I am sure that you inquired your way merely in order that you might see him."
+> 
+> "Not him."
+> 
+> "What then?"
+> 
+> "The knees of his trousers."
+> 
+> "And what did you see?"
+> 
+> "What I expected to see."
+> 
+> "Why did you beat the pavement?"
+> 
+> "My dear doctor, this is a time for observation, not for talk. We are spies in an enemy's country. We know something of Saxe-Coburg Square. Let us now explore the parts which lie behind it."
+> 
+> The road in which we found ourselves as we turned round the corner from the retired Saxe-Coburg Square presented as great a contrast to it as the front of a picture does to the back. It was one of the main arteries which conveyed the traffic of the City to the north and west. The roadway was blocked with the immense stream of commerce flowing in a double tide inward and outward, while the footpaths were black with the hurrying swarm of pedestrians. It was difficult to realise as we looked at the line of fine shops and stately business premises that they really abutted on the other side upon the faded and stagnant square which we had just quitted.
+> 
+> "Let me see," said Holmes, standing at the corner and glancing along the line, "I should like just to remember the order of the houses here. It is a hobby of mine to have an exact knowledge of London. There is Mortimer's, the tobacconist, the little newspaper shop, the Coburg branch of the City and Suburban Bank, the Vegetarian Restaurant, and McFarlane's carriage-building depot. That carries us right on to the other block. And now, Doctor, we've done our work, so it's time we had some play. A sandwich and a cup of coffee, and then off to violin-land, where all is sweetness and delicacy and harmony, and there are no red-headed clients to vex us with their conundrums."
+> 
+> My friend was an enthusiastic musician, being himself not only a very capable performer but a composer of no ordinary merit. All the afternoon he sat in the stalls wrapped in the most perfect happiness, gently waving his long, thin fingers in time to the music, while his gently smiling face and his languid, dreamy eyes were as unlike those of Holmes the sleuth-hound, Holmes the relentless, keen-witted, ready-handed criminal agent, as it was possible to conceive. In his singular character the dual nature alternately asserted itself, and his extreme exactness and astuteness represented, as I have often thought, the reaction against the poetic and contemplative mood which occasionally predominated in him. The swing of his nature took him from extreme languor to devouring energy; and, as I knew well, he was never so truly formidable as when, for days on e waiting for us."
+> 
+> We had reached the same crowded thoroughfare in which we had found ourselves in the morning. Our cabs were dismissed, and, following the guidance of Mr. Merryweather, we passed down a narrow passage and through a side door, which he opened for us. Within there was a small corridor, which ended in a very massive iron gate. This also was opened, and led down a flight of winding stone steps, which terminated at another formidable gate. Mr. Merryweather stopped to light a lantern, and then conducted us down a dark, earth-smelling passage, and so, after opening a third door, into a huge vault or cellar, which was piled all round with crates and massive boxes.
+> 
+> "You are not very vulnerable from above," Holmes remarked as he held up the lantern and gazed about him.
+> 
+> "Nor from below," said Mr. Merryweather, striking his stick upon the flags which lined the floor. "Why, dear me, it sounds quite hollow!" he remarked, looking up in surprise.
+> 
+> "I must really ask you to be a little more quiet!" said Holmes severely. "You have already imperilled the whole success of our expedition. Might I beg that you would have the goodness to sit down upon one of those boxes, and not to interfere?"
+> 
+> The solemn Mr. Merryweather perched himself upon a crate, with a very injured expression upon his face, while Holmes fell upon his knees upon the floor and, with the lantern and a magnifying lens, began to examine minutely the cracks between the stones. Aand yet from his words it was evident that he saw clearly not only what had happened but what was about to happen, while to me the whole business was still confused and grotesque. As I drove home to my house in Kensington I thought over it all, from the extraordinary story of the red-headed copier of the Encyclopaedia down to the visit to Saxe-Coburg Square, and the ominous words with which he had parted from me. What was this nocturnal expedition, and why should I go armed? Where were we going, and what were we to do? I had the hint from Holmes that this smooth-faced pawnbroker's assistant was a formidable man--a man who might play a deep game. I tried to puzzle it out, but gave it up in despair and set the matter aside until night should bring an explanation.
+1354c1428
+< "Boscombe Valley is a country district not very far from Ross, in Herefordshire. The largest landed proprietor in that part is a Mr. John Turner, who made his money in Australia and returned some years ago to the old country. One of the farms which he held, that of Hatherley, was let to Mr. Charles McCarthy, who was also an ex-Australian. The men had known each other in the colonies, so that it was not unnatural that when they came to settle down they should do so as near each other as possible. Turner was apparently the richer man, so McCarthy became his tenant but still remained, it seems, upon terms of perfect equality, as they were frequently together. McCarthy had one son, a lad of eighteen, and Turner had an only daughter of the same age, but neither of them had wives living. They appear to have avoided the society of the neighbouring English families and to have led retired lives, though both the McCarthys were fond of sport and were frequently seen at the race-meetings of the neighbourhood. McCarthy kept two servants--a man and a girl. Turner had a considerable household, some half-dozen at the least. That is as much as I have been able to gather about the families. Now for the facts.
+---
+> "Boscombe Valley is a country district not very far from Ross, in Herefordshire. The largest landed proprietor in that part is a Mr. John Turner, who made his money in Australia and returned some years ago to the old country. One of the farms which he held, that of Hatherley, was let to Mr. Charles McCarthy, who was also an ex-Australian. The men had known each other in the colonies, so that it was not unnatural that when they came to settle down they should do so as near each other as possible. Turner was apparently the richer man, so McCarthy became his tenant but still remained, it seems, upon terms of perfect equality, as they were frequently together. McCarthy had one son, a lad of eighteen, and Turner had an only daughter of the same age, but neither of them had wives living. They appear to have avoided the society of the neighbouring English families and to have led retired lives, though both the McCarthys were fond of sport and were frequently seen at the race-meetings of the neighbourhood. McCis arrest did not take place at once, but after the return to Hatherley Farm. On the inspector of constabulary informing him that he was a prisoner, he remarked that he was not surprised to hear it, and that it was no more than his deserts. This observation of his had the natural effect of removing any traces of doubt which might have remained in the minds of the coroner's jury."
+1356c1430
+< "On June 3rd, that is, on Monday last, McCarthy left his house at Hatherley about three in the afternoon and walked down to the Boscombe Pool, which is a small lake formed by the spreading out of the stream which runs down the Boscombe Valley. He had been out with his serving-man in the morning at Ross, and he had told the man that he must hurry, as he had an appointment of importance to keep at three. From that appointment he never came back alive.
+---
+> "It was a confession," I ejaculated.
+1358c1432
+< "From Hatherley Farmhouse to the Boscombe Pool is a quarter of a mile, and two people saw him as he passed over this ground. One was an old woman, whose name is not mentioned, and the other was William Crowder, a game-keeper in the employ of Mr. Turner. Both these witnesses depose that Mr. McCarthy was walking alone. The game-keeper adds that within a few minutes of his seeing Mr. McCarthy pass he had seen his son, Mr. James McCarthy, going the same way with a gun under his arm. To the best of his belief, the father was actually in sight at the time, and the son was following him. He thought no more of the matter until he heard in the evening of the tragedy that had occurred.
+---
+> "No, for it was followed by a protestation of innocence."
+1360c1434,1436
+< "The two McCarthys were seen after the time when William Crowder, the game-keeper, lost sight of them. The Boscombe Pool is thickly wooded round, with just a fringe of grass and of reeds round the edge. A girl of fourteen, Patience Moran, who is the daughter of the lodge-keeper of the Boscombe Valley estate, was in one of the woods picking flowers. She states that while she was there she saw, at the border of the wood and close by the lake, Mr. McCarthy and his son, and that they appeared to be having a violent quarrel. She heard Mr. McCarthy the elder using very strong language to his son, and she saw the latter raise up his hand as if to strike his father. She was so frightened by their violence that she ran away and told her mother when she reached home that she had left the two McCarthys quarrelling near Boscombe Pool, and that she was afraid that they were going to fight. She had hardly said the words when young Mr. McCarthy came running up to the lodge to say that he had found his father dead in the wood, and to ask for the help of the lodge-keeper. He was much excited, without either his gun or his hat, and his right hand and sleeve were observed to be stained with fresh blood. On following him they found the dead body stretched out upon the grass beside the pool. The head had been beaten in by repeated blows of some heavy and blunt weapon. The injuries were such as might very well have been inflicted by the butt-end of his son's gun, which was found lying on the grass within a few paces of the body. Under these circumstances the young man was instantly arrested, and a verdict of 'wilful murder' having been returned at the inquest on Tuesday, he was on Wednesday brought before the magistrates at Ross, who have referred the case to the next Assizes. Those are the main facts of the case as they came out before the coroner and the police-court."
+---
+> "Coming on the top of such a damning series of events, it was at least a most suspicious remark."
+> 
+> "On the contrary," said Holmes, "it is the brightest rift which I can at present see in the clouds. However innocent he might be, he could not be such an absolute imbecile as not to see that the circumstances were very black against him. Had he appeared surprised at his own arrest, or feigned indignation at it, I should have looked upon it as highly suspicious, because such surprise or anger would not be natural under the circumstances, and yet might appear to be the best policy to a scheming man. His frank acceptance of the situation marks him as either an innocent man, or else as a man of considerable self-restraint and firmness. As to his remark about his deserts, it was also not unnatural if you consider that he stood beside the dead body of his father, and that there is no doubt that he had that very day so far forgotten his filial duty as to bandy words with him, and ly wooded round, with just a fringe of grass and of reeds round the edge. A girl of fourteen, Patience Moran, who is the daughter of the lodge-keeper of the Boscombe Valley estate, was in one of the woods picking flowers. She states that while she was there she saw, at the border of the wood and close by the lake, Mr. McCarthy and his son, and that they appeared to be having a violent quarrel. She heard Mr. McCarthy the elder using very strong language to his son, and she saw the latter raise up his hand as if to strike his father. She was so frightened by their violence that she ran away and told her mother when she reached home that she had left the two McCarthys quarrelling near Boscombe Pool, and that she was afraid that they were going to fight. She had hardly said the words when young Mr. McCarthy came running up to the lodge to say that he had found his father dead in the wood, and to ask for the help of the lodge-keeper. He was much excited, without either his gun or his hat, and his right hand and sleeve were observed to be stained with fresh blood. On following him they found the dead body stretched out upon the grass beside the pool. The head had been beaten in by repeated blows of some heavy and blunt weapon. The injuries were such as might very well have been inflicted by the butt-end of his son's gun, which was found lying on the grass within a few paces of the body. Under these circumstances the young man was instantly arrested, and a verdict of 'wilful murder' having been returned at the inquest on Tuesday, he was on Wednesday brought before the magistrates at Ross, who have referred the case to the next Assizes. Those are the main facts of the case as they came out before the coroner and the police-court."
+1532,1534c1608
+< I walked down to the station with them, and then wandered through the streets of the little town, finally returning to the hotel, where I lay upon the sofa and tried to interest myself in a yellow-backed novel. The puny plot of the story was so thin, however, when compared to the deep mystery through which we were groping, and I found my attention wander so continually from the action to the fact, that I at last flung it across the room and gave myself up entirely to a consideration of the events of the day. Supposing that this unhappy young man's story were absolutely true, then what hellish thing, what absolutely unforeseen and extraordinary calamity could have occurred between the time when he parted from his father, and the moment when, drawn back by his screams, he rushed into the glade? It was something terrible and deadly. What could it be? Might not the nature of the injuries reveal something to my medical instincts? I rang the bell and called for the weekly county paper, which contained a verbatim account of the inquest. In the surgeon's deposition it was stated that the posterior third of the left parietal bone and the left half of the occipital bone had been shattered by a heavy blow from a blunt weapon. I marked the spot upon my own head. Clearly such a blow must have been struck from behind. That was to some extent in favour of the accused, as when seen quarrelling he was face to face with his father. Still, it did not go for very much, for the older man might have turned his back before the blow fell. Still, it might be worth while to call Holmes' attention to it. Then there was the peculiar dying reference to a rat. What could that mean? It could not be delirium. A man dying from a sudden blow does not commonly become delirious. No, it was more likely to be an attempt to explain how he met his fate. But what could it indicate? I cudgelled my brains to find some possible explanation. And then the incident of the grey cloth seen by young McCarthy. If that were true the murderer must have dropped some part of his dress, presumably his overcoat, in his flight, and must have had the hardihood to return and to carry it away at the instant when the son was kneeling with his back turned not a dozen paces off. What a tissue of mysteries and improbabilities the whole thing was! I did not wonder at Lestrade's opinion, and yet I had so much faith in Sherlock Holmes' insight that I could not lose hope as long as every fresh fact seemed to strengthen his conviction of young McCarthy's innocence.
+< 
+< It was late before Sherlock Holmes returned. He came back alone, for Lestrade was staying in lodgings in the town.
+---
+> I walked down to the station with them, and then wandered through the streets of the little town, finally returning to the hotel, where I lay upon the sofa and tried to interest myself in a yellow-backed novel. The puny plot of the story was so thin, however, when compared to the deep mystery through which we were groping, and I found my attention wander so continually from the action to the fact, that I at last flung it across the room and gave myself up entirely to a consideration of the events of the day. Supposing that this unhappy young man's story were absolutely true, then what hellish thing, what absolutely unforeseen and extraordinary calamity could have occurred between the time when he parted from his father, and the moment when, drawn back by his screams, he rushed into the glade? It was something terrible and deadly. What could it be? Might not the nature of the injuries reveal something to my medical instincts? I rang the bell and called for the weekly county paper, which contained a verbatim account of the inquest. In the surgeon's deposition it was stated that the posterior third of the left parietal bone and the left half of the occipital bone had been shattered by a heavy blow from a blunt weapon. I marked the spot upon my own head. Clearly such a blow must have been struck from behind. That was to some extent in favour of the accused, as when seen quarrelling he was face to face with his father. Still, it did not go for very much, for the older man might have turned his back before the blow fell. Still, it might be worth while to call Holmes' attention to it. Then there was the peculiar dying reference to a rat. What could that mean? It could not be delirium. A man dying from a sudden blow does not commonly become delirious. No, it was more likely to be an attempt to explain how he met his fate. But what could it indicate? I cudgelled my brains to find some possible explanation. And then the incident of the grey cloth seen by young McCarthy. If that were true the murderer must have dropped some part of his dress, presumably his overcoat, in his flight, and must have had the hardihood to return and to carry it away at the instant when the son was kneeling with his back turned not a dozen paces off. What a tissue of mysteries and improbabilities the whole thing was! I did not wonder at Lestrade's opinion, and yet I had so much faith in Sherlock ormed when he was hot upon such a scent as this. Men who had only known the quiet thinker and logician of Baker Street would have failed to recognise him. His face flushed and darkened. His brows were drawn into two hard black lines, while his eyes shone out from beneath them with a steely glitter. His face was bent downward, his shoulders bowed, his lips compressed, and the veins stood out like whipcord in his long, sinewy neck. His nostrils seemed to dilate with a purely animal lust for the chase, and his mind was so absolutely concentrated upon the matter before him that a question or remark fell unheeded upon his ears, or, at the most, only provoked a quick, impatient snarl in reply. Swiftly and silently he made his way along the track which ran through the meadows, and so by way of the woods to the Boscombe Pool. It was damp, marshy ground, as is all that district, and there were marks of many feet, both upon the path and amid the short grass which bounded it on either side. Sometimes Holmes would hurry on, sometimes stop dead, and once he made quite a little detour into the meadow. Lestrade and I walked behind him, the detective indifferent and contemptuous, while I watched my friend with the interest which sprang from the conviction that every one of his actions was directed towards a definite end.
+1536,1548c1610
+< "The glass still keeps very high," he remarked as he sat down. "It is of importance that it should not rain before we are able to go over the ground. On the other hand, a man should be at his very best and keenest for such nice work as that, and I did not wish to do it when fagged by a long journey. I have seen young McCarthy."
+< 
+< "And what did you learn from him?"
+< 
+< "Nothing."
+< 
+< "Could he throw no light?"
+< 
+< "None at all. I was inclined to think at one time that he knew who had done it and was screening him or her, but I am convinced now that he is as puzzled as everyone else. He is not a very quick-witted youth, though comely to look at and, I should think, sound at heart."
+< 
+< "I cannot admire his taste," I remarked, "if it is indeed a fact that he was averse to a marriage with so charming a young lady as this Miss Turner."
+< 
+< "Ah, thereby hangs a rather painful tale. This fellow is madly, insanely, in love with her, but some two years ago, when he was only a lad, and before he really knew her, for she had been away five years at a boarding-school, what does the idiot do but get into the clutches of a barmaid in Bristol and marry her at a registry office? No one knows a word of the matter, but you can imagine how maddening it must be to him to be upbraided for not doing what he would give his very eyes to do, but what he knows to be absolutely impossible. It was sheer frenzy of this sort which made him throw his hands up into the air when his father, at their last interview, was goading him on to propose to Miss Turner. On the other hand, he had no means of supporting himself, and his father, who was by all accounts a very hard man, would have thrown him over utterly had he known the truth. It was with his barmaid wife that he had spent the last three days in Bristol, and his father did not know where he was. Mark that point. It is of importance. Good has come out of evil, however, for the barmaid, finding from the papers that he is in serious trouble and likely to be hanged, has thrown him over utterly and has written to him to say that she has a husband already in the Bermuda Dockyard, so that there is really no tie between them. I think that that bit of news has consoled young McCarthy for all that he has suffered."
+---
+> The Boscombe Pool, which is a little reed-girt sheet of water some fifty yards across, is situated at the boundary between the Hatherley Fn imagine how maddening it must be to him to be upbraided for not doing what he would give his very eyes to do, but what he knows to be absolutely impossible. It was sheer frenzy of this sort which made him throw his hands up into the air when his father, at their last interview, was goading him on to propose to Miss Turner. On the other hand, he had no means of supporting himself, and his father, who was by all accounts a very hard man, would have thrown him over utterly had he known the truth. It was with his barmaid wife that he had spent the last three days in Bristol, and his father did not know where he was. Mark that point. It is of importance. Good has come out of evil, however, for the barmaid, finding from the papers that he is in serious trouble and likely to be hanged, has thrown him over utterly and has written to him to say that she has a husband already in the Bermuda Dockyard, so that there is really no tie between them. I think that that bit of news has consoled young McCarthy for all that he has suffered."
+4077c4139
+< Lord St. Simon shrugged his shoulders and raised his eyebrows. "We have been on a friendly footing for some years--I may say on a very friendly footing. She used to be at the Allegro. I have not treated her ungenerously, and she had no just cause of complaint against me, but you know what women are, Mr. Holmes. Flora was a dear little thing, but exceedingly hot-headed and devotedly attached to me. She wrote me dreadful letters when she heard that I was about to be married, and, to tell the truth, the reason why I had the marriage celebrated so quietly was that I feared lest there might be a scandal in the church. She came to Mr. Doran's door just after we returned, and she endeavoured to push her way in, uttering very abusive expressions towards my wife, and even threatening her, but I had foreseen the possibility of something of the sort, and I had two police fellows there in private clothes, who soon pushed her out again. She was quiet when she saw that there was no good in making a row."
+---
+> Lord St. Simon shrugged his shoulders and raised his eyebrows. "We have been on a friendly footing for some years--I may say on a very friendly footing. She used to be at the Allegro. I have not treated her ungenerously, and she had no just cause of complaint against me, but you know what women are, Mr. Holmes. Flora was aay what did you hope to arrive at through this?"
+4079c4141
+< "Did your wife hear all this?"
+---
+> "At some evidence implicating Flora Millar in the disappearance."
+4081c4143
+< "No, thank goodness, she did not."
+---
+> "I am afraid that you will find it difficult."
+4083c4145
+< "And she was seen walking with this very woman afterwards?"
+---
+> "Are you, indeed, now?" cried Lestrade with some bitterness. "I am afraid, Holmes, that you are not very practical with your deductions and your inferences. You have made two blunders in as many minutes. This dress does implicate Miss Flora Millar."
+4085c4147
+< "Yes. That is what Mr. Lestrade, of Scotland Yard, looks upon as so serious. It is thought that Flora decoyed my wife out and laid some terrible trap for her."
+---
+> "And how?"
+4087c4149
+< "Well, it is a possible supposition."
+---
+> "In the dress is a pocket. In the pocket is a card-case. In the card-case is a note. And here is the very note." He slapped it down upon the table in front of him. "Listen to this: 'You will see me when all is ready. Come at once. F. H. M.' Now my theory all along has been that Lady St. Simon was decoyed away by Flora Millar, and that she, with confederates, no doubt, was responsible for her disappearance. Here, signed with her initials, is the very note which was no doubt quietly slipped into her hand at the door and which lured her within their reach."
+4089c4151
+< "You think so, too?"
+---
+> "Very good, Lestrade," said Holmes, laughing. "You really are very fine indeed. Let me see it." He took up the paper in a listless way, but his attention instantly became riveted, and he gave a little cry of satisfaction. "This is indeed important," said he.
+4091c4153
+< "I did not say a probable one. But you do not yourself look upon this as likely?"
+---
+> "Ha! you find it so?"
+4093c4155
+< "I do not think Flora would hurt a fly."
+---
+> "Extremely so. I congratulate you warmly."
+4095c4157
+< "Still, jealousy is a strange transformer of characters. Pray what is your own theory as to what took place?"
+---
+> Lestrade rose in his triumph and bent his head to look. "Why," he shrieked, "you're looking at the wrong side!"
+4097c4159
+< "Well, really, I came to seek a theory, not to propound one. I have given you all the facts. Since you ask me, however, I may say that it has occurred to me as possible that the excitement of this affair, the consciousness that she had made so immense a social stride, had the effect of causing some little nervous disturbance in my wife."
+---
+> "On the contrary, this is the right  affair, the consciousness that she had made so immense a social stride, had the effect of causing some little nervous disturbance in my wife."
+4994c5056,5058
+< "The dress which I found waiting for me was of a peculiar shade of blue. It was of excellent material, a sort of beige, but it bore unmistakable signs of having been worn before. It could not have been a better fit if I had been measured for it. Both Mr. and Mrs. Rucastle expressed a delight at the look of it, which seemed quite exaggerated in its vehemence. They were waiting for me in the drawing-room, which is a very large room, stretching along the entire front of the house, with three long windows reaching down to the floor. A chair had been placed close to the central window, with its back turned towards it. In this I was asked to sit, and then Mr. Rucastle, walking up and down on the other side of the room, began to tell me a series of the funniest stories that I have ever listened to. You cannot imagine how comical he was, and I laughed until I was quite weary. Mrs. Rucastle, however, who has evidently no sense of humour, never so much as smiled, but sat with her hands in her lap, and a sad, anxious look upon her face. After an hour or so, Mr. Rucastle suddenly remarked that it was time to commence the duties of the day, and that I might change my dress and go to little Edward in the nursery.
+---
+> "The dress which I found waiting for me was of a peculiar shade of blue. It was of excellent material, a sort of beige, but it bore unming the furniture of my room and by rearranging my own little things. There was an old chest of drawers in the room, the two upper ones empty and open, the lower one locked. I had filled the first two with my linen, and as I had still much to pack away I was naturally annoyed at not having the use of the third drawer. It struck me that it might have been fastened by a mere oversight, so I took out my bunch of keys and tried to open it. The very first key fitted to perfection, and I drew the drawer open. There was only one thing in it, but I am sure that you would never guess what it was. It was my coil of hair.
+> 
+> "I took it up and examined it. It was of the same peculiar tint, and the same thickness. But then the impossibility of the thing obtruded itself upon me. How could my hair have been locked in the drawer? With trembling hands I undid my trunk, turned out the contents, and drew from the bottom my own hair. I laid the two tresses together, and I assure you that they were identical. Was it not extraordinary? Puzzle as I would, I could make nothing at all of what it meant. I returned the strange hair to the drawer, and I said nothing of the matter to the Rucastles as I felt that I had put myself in the wrong by opening a drawer which they had locked.
+4996c5060
+< "Two days later this same performance was gone through under exactly similar circumstances. Again I changed my dress, again I sat in the window, and again I laughed very heartily at the funny stories of which my employer had an immense repertoire, and which he told inimitably. Then he handed me a yellow-backed novel, and moving my chair a little sideways, that my own shadow might not fall upon the page, he begged me to read aloud to him. I read for about ten minutes, beginning in the heart of a chapter, and then suddenly, in the middle of a sentence, he ordered me to cease and to change my dress.
+---
+> "I am naturally observant, as you may have remarked, Mr. Holmes, and I soon had a pretty good plan of the whole house in my head. There was one wing, however, which appeared not to be inhabitt not fall upon the page, he begged me to read aloud to him. I read for about ten minutes, beginning in the heart of a chapter, and then suddenly, in the middle of a sentence, he ordered me to cease and to change my dress.
+8383,8420c8447,8453
+< controlled in the interests of the mother country, they also enjoyed
+< great advantages in her markets. Free trade existed nowhere upon the
+< earth; but the broad empire of Britain was open to American ships and
+< merchandise. It could be said, with good reason, that the disadvantages
+< which the colonists suffered through British regulation of their
+< industry and trade were more than offset by the privileges they enjoyed.
+< Still that is somewhat beside the point, for mere economic advantage is
+< not necessarily the determining factor in the fate of peoples. A
+< thousand circumstances had helped to develop on this continent a nation,
+< to inspire it with a passion for independence, and to prepare it for a
+< destiny greater than that of a prosperous dominion of the British
+< empire. The economists, who tried to prove by logic unassailable that
+< America would be richer under the British flag, could not change the
+< spirit of Patrick Henry, Samuel Adams, Benjamin Franklin, or George
+< Washington.
+< 
+< 
+< =References=
+< 
+< G.L. Beer, _Origin of the British Colonial System_ and _The Old Colonial
+< System_.
+< 
+< A. Bradley, _The Fight for Canada in North America_.
+< 
+< C.M. Andrews, _Colonial Self-Government_ (American Nation Series).
+< 
+< H. Egerton, _Short History of British Colonial Policy_.
+< 
+< F. Parkman, _France and England in North America_ (12 vols.).
+< 
+< R. Thwaites, _France in America_ (American Nation Series).
+< 
+< J. Winsor, _The Mississippi Valley_ and _Cartier to Frontenac_.
+< 
+< 
+< =Questions=
+< 
+< 1. How would you define "nationalism"?
+---
+> controlled in the interests of the mother countrtinuance in power and had as a consequence raised up many enemies in
+> their own ranks. Their opponents, the Tories, had by this time given up
+> all hope of restoring to the throne the direct Stuart line; but they
+> still cherished their old notions about divine right. With the
+> accession of George III the coveted opportunity came to them to rally
+> around the throne again. George received his Tory friends with open
+> arms, gave them offices, and bought them seats in the House of Commons.
+8422c8455,8468
+< 2. Can you give any illustrations of the way that war promotes
+---
+> =The British Parliamentary System.=--The peculiarities of the British
+> Parliament at the time made smooth the way for the king and his allies
+> with their designs for controlling the entire government. In the first
+> place, the House of Lords was composed mainly of hereditary nobles whose
+> number the king could increase by the appointment of his favorites, as
+> of old. Though the members of the House of Commons were elected by
+> popular vote, they did not speak for the mass of English people. Great
+> towns like Leeds, Manchester, and Birmingham, for example, had no
+> representatives at all. While there were about eight million inhabitants
+> in Great Britain, there were in 1768 only about 160,000 voters; that is
+> to say, only about one in every ten adult males had a voice in the
+> government. Many boroughs returned one or more members to the Commons
+> although they had merely a handful of voters or in some instances no
+> voters at all. Furthermore, these tiny boroughs were often controlled b give any illustrations of the way that war promotes
+8534,8540c8580,8589
+< continuance in power and had as a consequence raised up many enemies in
+< their own ranks. Their opponents, the Tories, had by this time given up
+< all hope of restoring to the throne the direct Stuart line; but they
+< still cherished their old notions about divine right. With the
+< accession of George III the coveted opportunity came to them to rally
+< around the throne again. George received his Tory friends with open
+< arms, gave them offices, and bought them seats in the House of Commons.
+---
+> conenting the clandestine conveyance of goods to and
+> from the said colonies and plantations and improving and securing the
+> trade between the same and Great Britain." The old Molasses Act had been
+> prohibitive; the Sugar Act of 1764 was clearly intended as a revenue
+> measure. Specified duties were laid upon sugar, indigo, calico, silks,
+> and many other commodities imported into the colonies. The enforcement
+> of the Molasses Act had been utterly neglected; but this Sugar Act had
+> "teeth in it." Special precautions as to bonds, security, and
+> registration of ship masters, accompanied by heavy penalties, promised
+> a vigorous execution of the new revenue law.
+8542,8555c8591,8602
+< =The British Parliamentary System.=--The peculiarities of the British
+< Parliament at the time made smooth the way for the king and his allies
+< with their designs for controlling the entire government. In the first
+< place, the House of Lords was composed mainly of hereditary nobles whose
+< number the king could increase by the appointment of his favorites, as
+< of old. Though the members of the House of Commons were elected by
+< popular vote, they did not speak for the mass of English people. Great
+< towns like Leeds, Manchester, and Birmingham, for example, had no
+< representatives at all. While there were about eight million inhabitants
+< in Great Britain, there were in 1768 only about 160,000 voters; that is
+< to say, only about one in every ten adult males had a voice in the
+< government. Many boroughs returned one or more members to the Commons
+< although they had merely a handful of voters or in some instances no
+< voters at all. Furthermore, these tiny boroughs were often controlled by
+---
+> The strict terms of the Sugar Act were strengthened by administrative
+> measures. Under a law of the previous year the commanders of armed
+> vessels stationed along the American coast were authorized to stop,
+> search, and, on suspicion, seize merchant ships approaching colonial
+> ports. By supplementary orders, the entire British official force in
+> America was instructed to be diligent in the execution of all trade and
+> navigation laws. Revenue collectors, officers of the army and navy, and
+> royal governors were curtly ordered to the front to do their full duty
+> in the matter of law enforcement. The ordinary motives for the discharge
+> of official obligations were sharpened by an appeal to avarice, for
+> naval officers who seized offenders against the law were rewarded by
+> large prizes out of the forfeitures and penay
+12160,12183c12207,12231
+< reading presidential addresses to Congress in joint assembly and adopted
+< in its stead the plan of sending his messages in writing--a custom that
+< was continued unbroken until 1913 when President Wilson returned to the
+< example set by the first chief magistrate.
+< 
+< =Republican Measures.=--The Republicans had complained of a great
+< national debt as the source of a dangerous "money power," giving
+< strength to the federal government; accordingly they began to pay it off
+< as rapidly as possible. They had held commerce in low esteem and looked
+< upon a large navy as a mere device to protect it; consequently they
+< reduced the number of warships. They had objected to excise taxes,
+< particularly on whisky; these they quickly abolished, to the intense
+< satisfaction of the farmers. They had protested against the heavy cost
+< of the federal government; they reduced expenses by discharging hundreds
+< of men from the army and abolishing many offices.
+< 
+< They had savagely criticized the Sedition law and Jefferson refused to
+< enforce it. They had been deeply offended by the assault on freedom of
+< speech and press and they promptly impeached Samuel Chase, a justice of
+< the Supreme Court, who had been especially severe in his attacks upon
+< offenders under the Sedition Act. Their failure to convict Justice Chase
+< by a narrow margin was due to no lack of zeal on their part but to the
+< Federalist strength in the Senate where the trial was held. They had
+< regarded the appointment of a large number of federal judges during the
+---
+> reading he
+> wilderness. Many of them had been across the Mississippi and had beheld
+> the rich lands awaiting the plow of the white man. Down the great river
+> they floated their wheat, corn, and bacon to ocean-going ships bound for
+> the ports of the seaboard or for Europe. The land journeys over the
+> mountain barriers with bulky farm produce, they knew from experience,
+> were almost impossible, and costly at best. Nails, bolts of cloth, tea,
+> and coffee could go or come that way, but not corn and bacon. A free
+> outlet to the sea by the Mississippi was as essential to the pioneers of
+> the Kentucky region as the harbor of Boston to the merchant princes of
+> that metropolis.
+> 
+> =Louisiana under Spanish Rule.=--For this reason they watched with deep
+> solicitude the fortunes of the Spanish king to whom, at the close of the
+> Seven Years' War, had fallen the Louisiana territory stretching from New
+> Orleans to the Rocky Mountains. While he controlled the mouth of the
+> Mississippi there was little to fear, for he had neither the army nor
+> the navy necessary to resist any invasion of American trade. Moreover,
+> Washington had been able, by the exercise of great tact, to secure from
+> Spain in 1795 a trading privilege through New Orleans which satisfied
+> the present requirements of the frontiersmen even if it did not allay
+> their fears for the future. So things stood when a swift succession of
+> events altered the whole situation.
+> 
+> =Louisiana Transferred to France.=--In July, 1802, a royar of federal judges during the
+14318,14341c14366,14389
+< _The Development of the Policy of "Protection."_--The war of 1812 and
+< the commercial policies of England which followed it had accentuated the
+< need for American economic independence. During that conflict, the
+< United States, cut off from English manufactures as during the
+< Revolution, built up home industries to meet the unusual call for iron,
+< steel, cloth, and other military and naval supplies as well as the
+< demands from ordinary markets. Iron foundries and textile mills sprang
+< up as in the night; hundreds of business men invested fortunes in
+< industrial enterprises so essential to the military needs of the
+< government; and the people at large fell into the habit of buying
+< American-made goods again. As the London _Times_ tersely observed of the
+< Americans, "their first war with England made them independent; their
+< second war made them formidable."
+< 
+< In recognition of this state of affairs, the tariff of 1816 was
+< designed: _first_, to prevent England from ruining these "infant
+< industries" by dumping the accumulated stores of years suddenly upon
+< American markets; and, _secondly_, to enlarge in the manufacturing
+< centers the demand for American agricultural produce. It accomplished
+< the purposes of its framers. It kept in operation the mills and furnaces
+< so recently built. It multiplied the number of industrial workers and
+< enhanced the demand for the produce of the soil. It brought about
+< another very important result. It turned the capital and enterprise of
+< New England from shipping to manufacturing, and converted her statesmen,
+---
+> _The Development of the Policy of "Protection."_--Thersive of the Constitution
+> of the United States." Mississippi answered: "It is disunion by
+> force--it is civil war." Virginia spoke more softly, condemning the
+> tariff and sustaining the principle of the Virginia resolutions but
+> denying that South Carolina could find in them any sanction for her
+> proceedings.
+> 
+> _Jackson Firmly Upholds the Union._--The eyes of the country were turned
+> upon Andrew Jackson. It was known that he looked with no friendly
+> feelings upon nullification, for, at a Jefferson dinner in the spring of
+> 1830 while the subject was in the air, he had with laconic firmness
+> announced a toast: "Our federal union; it must be preserved." When two
+> years later the open challenge came from South Carolina, he replied that
+> he would enforce the law, saying with his frontier directness: "If a
+> single drop of blood shall be shed there in opposition to the laws of
+> the United States, I will hang the first man I can lay my hands on
+> engaged in such conduct upon the first tree that I can reach." He made
+> ready to keep his word by preparing for the use of military and naval
+> forces in sustaining the authority of the federal government. Then in a
+> long and impassioned proclamation to the people of South Carolina he
+> pointed out the national character of the union, and announced his
+> solemn resolve to preserve it by all constitutional means. Nullification
+> he branded as "incompatible with the existence of the union,
+> contradicted expressly by the letter of the Cd converted her statesmen,
+20216,20228c20264,20272
+< farm-land views; farmers are pre-empting valleys and the sides of
+< waterways; and the day is not far distant when stock-raising must be
+< done mainly in small herds, with winter corrals, and then the cowboy's
+< days will end. Even now his condition disappoints those who knew him
+< only half a dozen years ago. His breed seems to have deteriorated and
+< his ranks are filling with men who work for wages rather than for the
+< love of the free life and bold companionship that once tempted men into
+< that calling. Splendid Cheyenne saddles are less and less numerous in
+< the outfits; the distinctive hat that made its way up from Mexico may or
+< may not be worn; all the civil authorities in nearly all towns in the
+< grazing country forbid the wearing of side arms; nobody shoots up these
+< towns any more. The fact is the old simon-pure cowboy days are gone
+< already."
+---
+> farm-land views; farmers are pre-empting valleys and th which the desert turned
+> upon him, he laughed and rolled up his sleeves, and spat upon his hands,
+> and slashed the face of the desert with canals and irrigating ditches,
+> and filled those ditches with water brought from deep in the earth or
+> high in the mountains; and of how, in the conquered and submissive soil,
+> he replaced the aloe with alfalfa, the mesquite with maize, the cactus
+> with cotton, forms one of the most inspiring chapters in our history. It
+> is one of the epics of civilization, this reclamation of the Southwest,
+> and its heroes, thank God, are Americans.
+20230,20239c20274,20286
+< =Settlement under the Homestead Act of 1862.=--Two factors gave a
+< special stimulus to the rapid settlement of Western lands which swept
+< away the Indians and the cattle rangers. The first was the policy of the
+< railway companies in selling large blocks of land received from the
+< government at low prices to induce immigration. The second was the
+< operation of the Homestead law passed in 1862. This measure practically
+< closed the long controversy over the disposition of the public domain
+< that was suitable for agriculture. It provided for granting, without any
+< cost save a small registration fee, public lands in lots of 160 acres
+< each to citizens and aliens who declared their intention of becoming
+---
+> "Other desert regions have been redeemed by irrigation--Egypt, for
+> example, and Mesopotamia and parts of the Sudan--but the people of all
+> those regions lay stretched out in the shade of a convenient palm,
+> metaphorically speaking, and waited for some one with more energy than
+> themselves to come along and do the work. But the Arizonians, mindful of
+> the fact that God, the government, and Carnegie help those who help
+> themselves, spent their days wielding the pick and shovel, and their
+> evenings in writing letters to Washington with toil-hardened hands.
+> After a time the government was prodded into action and the great dams
+> at Laguna and Roosevelt are the result. Then the people, organizing
+> themselves into cooperative leagues and water-users' associations, took
+> up the work of reclamation where the government left off; it is to these
+> energetic, persevering men who have drilled wells, plowedtheir intention of becoming
+21488,21511c21535,21557
+< The appeal to labor voiced by Mr. Bryan in his "crown of thorns" speech
+< was reinforced in the platform. "As labor creates the wealth of the
+< country," ran one plank, "we demand the passage of such laws as may be
+< necessary to protect it in all its rights." Referring to the recent
+< Pullman strike, the passions of which had not yet died away, the
+< platform denounced "arbitrary interference by federal authorities in
+< local affairs as a violation of the Constitution of the United States
+< and a crime against free institutions." A special objection was lodged
+< against "government by injunction as a new and highly dangerous form of
+< oppression by which federal judges, in contempt of the laws of states
+< and rights of citizens, become at once legislators, judges, and
+< executioners." The remedy advanced was a federal law assuring trial by
+< jury in all cases of contempt in labor disputes. Having made this
+< declaration of faith, the Democrats, with Mr. Bryan at the head, raised
+< their standard of battle.
+< 
+< =The Heated Campaign.=--The campaign which ensued outrivaled in the
+< range of its educational activities and the bitterness of its tone all
+< other political conflicts in American history, not excepting the fateful
+< struggle of 1860. Immense sums of money were contributed to the funds of
+< both parties. Railway, banking, and other corporations gave generously
+< to the Republicans; the silver miners, less lavishly but with the same
+< anxiety, supported the Democrats. The country was flooded with
+< pamphlets, posters, and handbills. Every public forum, from the great
+---
+> The appeal to labor voiced by Mr. Bryan in his "crown of thorns" speeche
+> Copper Trust was incorporated under the laws of New Jersey, its par
+> value capital being fixed shortly afterward at $175,000,000. A year
+> later the National Sugar Refining Company, of New Jersey, started with a
+> capital of $90,000,000, adopting the policy of issuing to the
+> stockholders no public statement of its earnings or financial condition.
+> Before another twelvemonth had elapsed all previous corporate financing
+> was reduced to small proportions by the flotation of the United States
+> Steel Corporation with a capital of more than a billion dollars, an
+> enterprise set in motion by the famous Morgan banking house of New York.
+> 
+> In nearly all these gigantic undertakings, the same great leaders in
+> finance were more or less intimately associated. To use the language of
+> an eminent authority: "They are all allied and intertwined by their
+> various mutual interests. For instance, the Pennsylvania Railroad
+> interests are on the one hand allied with the Vanderbilts and on the
+> other with the Rockefellers. The Vanderbilts are closely allied with the
+> Morgan group.... Viewed as a whole we find the dominating influences in
+> the trusts to be made up of a network of large and small capitalists,
+> many allied to one another by ties of more or less importance, but all
+> being appendages to or parts of the greater groups which are themselves
+> dependent on and allied with the two mammoth or Rockefeller and Morgan
+> groups. These two mammoth groups jointly ... constitute the heum, from the great
+24814,24836c24860,24885
+< the past. As President Roosevelt later said in speaking of the great
+< coal strike, "a few generations ago, the American workman could have
+< saved money, gone West, and taken up a homestead. Now the free lands
+< were gone. In earlier days, a man who began with a pick and shovel might
+< come to own a mine. That outlet was now closed as regards the immense
+< majority.... The majority of men who earned wages in the coal industry,
+< if they wished to progress at all, were compelled to progress not by
+< ceasing to be wage-earners but by improving the conditions under which
+< all the wage-earners of the country lived and worked."
+< 
+< The disappearance of the free land, President Roosevelt went on to say,
+< also produced "a crass inequality in the bargaining relation of the
+< employer and the individual employee standing alone. The great
+< coal-mining and coal-carrying companies which employed their tens of
+< thousands could easily dispense with the services of any particular
+< miner. The miner, on the other hand, however expert, could not dispense
+< with the companies. He needed a job; his wife and children would starve
+< if he did not get one.... Individually the miners were impotent when
+< they sought to enter a wage contract with the great companies; they
+< could make fair terms only by uniting into trade unions to bargain
+< collectively." It was of this state of affairs that President Taft spoke
+< when he favored the modification of the common law "so as to put
+< employees of little power and means on a level with their employers in
+---
+> the past. As Pres duties
+> assigned to managers, including questions of wages, hours, sanitation,
+> rest rooms, recreational facilities, and welfare work of every kind
+> designed to make the conditions in mills and factories safer and more
+> humane. Thus it was evident that hundreds of employers had abandoned the
+> old idea that they were dealing merely with individual employees and
+> that their obligations ended with the payment of any wages they saw fit
+> to fix. In short, they were seeking to develop a spirit of cooperation
+> to take the place of competition and enmity; and to increase the
+> production of commodities by promoting the efficiency and happiness of
+> the producers.
+> 
+> 
+> THE RISE AND GROWTH OF ORGANIZED LABOR
+> 
+> =The American Federation of Labor.=--Meanwhile a powerful association of
+> workers representing all the leading trades and crafts, organized into
+> unions of their own, had been built up outside the control of employers.
+> This was the American Federation of Labor, a nation-wide union of
+> unions, founded in 1886 on the basis of beginnings made five years
+> before. At the time of its establishment it had approximately 150,000
+> members. Its growth up to the end of the century was slow, for the total
+> enrollment in 1900 was only 300,000. At that point the increase became
+> marked. The membership reached 1,650,000 in 1904 and more than 3,000,000
+> in 1919. To be counted in the ranks of organized labor were several
+> strong unions, friendly to the Federation, though not affiliated wa level with their employers in
+36929,36953c36978,37002
+< instance, and the daily dose is increased to five or even seven grains
+< till the standard for the individual patient is arrived at. As the grey
+< powder alone sometimes causes irritation of the bowels, it should be
+< combined with iron, as in the following formula: Hydrarg. c. cret. gr. 1;
+< ferri sulph. exsiccat. gr. 1 or 2.
+< 
+< (2) _By Inunction._--Inunction consists in rubbing into the pores of the
+< skin an ointment composed of equal parts of 20 per cent. oleate of
+< mercury and lanolin. Every night after a hot bath, a dram of the
+< ointment (made up by the chemist in paper packets) is rubbed for fifteen
+< minutes into the skin where it is soft and comparatively free from
+< hairs. When the patient has been brought under the influence of the
+< mercury, inunction may be replaced by one of the other methods, of
+< administering the drug.
+< 
+< (3) _By Intra-muscular Injection._--This consists in introducing the
+< drug by means of a hypodermic syringe into the substance of the gluteal
+< muscles. The syringe is made of glass, and has a solid glass piston; the
+< needle of platino-iridium should be 5 cm. long and of a larger calibre
+< than the ordinary hypodermic needle. The preparation usually employed
+< consists of: metallic mercury or calomel 1 dram, lanolin and olive oil
+< each 2 drams; it must be warmed to allow of its passage through the
+< needle. Five minims--containing one grain of metallic mercury--represent
+< a dose, and this is injected into the muscles above and behind the great
+< trochanter once a week. The contents of the syringe are slowly
+---
+> instance, and the daily dose is increalcers. Less frequently there is a relapse of the eye affections, or of
+> paralytic symptoms from disease of the cerebral arteries.
+> 
+> #Tertiary Syphilis.#--While the manifestations of primary and secondary
+> syphilis are common, those of the tertiary period are by comparison
+> rare, and are observed chiefly in those who have either neglected
+> treatment or who have had their powers of resistance lowered by
+> privation, by alcoholic indulgence, or by tropical disease.
+> 
+> It is to be borne in mind that in a certain proportion of men and in a
+> larger proportion of women, the patient has no knowledge of having
+> suffered from syphilis. Certain slight but important signs may give the
+> clue in a number of cases, such as irregularity of the pupils or failure
+> to react to light, abnormality of the reflexes, and the discovery of
+> patches of leucoplakia on the tongue, cheek, or palate.
+> 
+> The _general character of tertiary manifestations_ may be stated as
+> follows: They attack by preference the tissues derived from the
+> mesoblastic layer of the embryo--the cellular tissue, bones, muscles,
+> and viscera. They are often localised to one particular tissue or organ,
+> such, for example, as the subcutaneous cellular tissue, the bones, or
+> the liver, and they are rarely symmetrical. They are usually aggressive
+> and persistent, with little tendency to natural cure, and they may be
+> dangerous to life, because of the destructive changes produced in such
+> organs as the brain or the larynx. Theof the syringe are slowly
+38607,38631c38656,38681
+< portions of the epidermis into the underlying connective tissue, as may
+< occur in wounds by needles, awls, forks, or thorns. The implanted
+< epidermis proliferates and forms a small cyst. They are met with chiefly
+< on the palmar aspect of the fingers, and vary in size from a split pea
+< to a cherry. The treatment consists in removing them by dissection.
+< 
+< _Parasitic cysts_ are produced by the growth within the tissues of
+< cyst-forming parasites, the best known being the taenia echinococcus,
+< which gives rise to the _hydatid cyst_. The liver is by far the most
+< common site of hydatid cysts in the human subject.
+< 
+< With regard to the further life-history of hydatids, the living elements
+< of the cyst may die and degenerate, or the cyst may increase in size
+< until it ruptures. As a result of pyogenic infection the cyst may be
+< converted into an abscess.
+< 
+< The _clinical features_ of hydatids vary so much with their situation
+< and size, that they are best discussed with the individual organs. In
+< general it may be said that there is a slow formation of a globular,
+< elastic, fluctuating, painless swelling. Fluctuation is detected when
+< the cyst approaches the surface, and it is then also that percussion
+< may elicit the "hydatid thrill" or fremitus. This thrill is not often
+< obtainable, and in any case is not pathognomonic of hydatids, as it may
+< be elicited in ascites and in other abdominal cysts. Pressure of the
+< cyst upon adjacent structures, and the occurrence of suppuration, are
+---
+> portiongrowths are the swellings most
+> likely to be mistaken for them. The diagnosis is sometimes only cleared
+> up by withdrawing the clear, jelly-like contents through a hollow
+> needle.
+> 
+> _Pathological Anatomy._--The wall of the cyst is composed of fibrous
+> tissue closely adherent to or fused with the surrounding tissues, so
+> that it cannot be shelled out. There is no endothelial lining, and the
+> fibrous tissue of the wall is in immediate contact with the colloid
+> material in the interior, which appears to be derived by a process of
+> degeneration from the surrounding connective tissue. In the region of
+> the knee the ganglion is usually multilocular, and consists of a
+> meshwork of fibrous tissue, the meshes of which are occupied by colloid
+> material.
+> 
+> It is often stated that a ganglion originates from a hernial protrusion
+> of the synovial membrane of a joint or tendon sheath. We have not been
+> able to demonstrate any communication between the cavity of the cyst
+> and that of an adjacent tendon sheath or joint. It is possible, however,
+> that the cyst may originate from a minute portion of synovial membrane
+> being protruded and strangulated so that it becomes disconnected from
+> that to which it originally belonged; it may then degenerate and give
+> rise to colloid material, which accumulates and forms a cyst. Ledderhose
+> and others regard ganglia as entirely new formations in the
+> peri-articular tissues, resulting from colloid degeneration of the
+> fibrous tissue of the capsuare
+39153,39182c39203,39226
+< lacerated over an area of two or three inches around the opening made by
+< the bullet and smoke and powder-staining and scorching are more marked
+< than at longer ranges.
+< 
+< When the bullet perforates, the exit wound is usually larger and more
+< extensively lacerated than the wound of entrance. Its margins are as a
+< rule everted, and it shows no marks of flame, smoke, or powder. These
+< features are common to all perforations caused by bullets.
+< 
+< Pistol wounds only produce dangerous effects when fired at close range,
+< and when the cavities of the skull, the thorax, or the abdomen are
+< implicated. In the abdomen a lethal injury may readily be caused even by
+< pistols of the "toy" order. These injuries will be described with
+< regional surgery.
+< 
+< Pistol-shot wounds of _joints_ and _soft parts_ are seldom of serious
+< import apart from the risk of haemorrhage and of infection.
+< 
+< _Treatment._--The treatment of wounds of the soft parts consists in
+< purifying the wounds of entrance and exit and the surrounding skin, and
+< in providing for drainage if this is indicated.
+< 
+< There being no urgency for the removal of the bullet, time should be
+< taken to have it localised by the X-rays, preferably by stereoscopic
+< plates. In some cases it is not necessary to remove the bullet.
+< 
+< #Wounds by Sporting Guns.#--In the common sporting or scatter gun, with
+< which accidents so commonly occur during the shooting season, the charge
+< of small shot or pellets leave the muzzle of the gun as a solid mass
+< which makes a single ragged wound having much the appearance of that
+---
+> lacerated over an area of two or three inchesentally, however, during range practice for example, and may then
+> come under the notice of the civil surgeon.
+> 
+> It is only necessary here to consider the effects of modern small-bore
+> rifle or machine-gun bullets.
+> 
+> The trajectory is practically flat up to 675 yards. In destructive
+> effect there is not much difference between the various high velocity
+> bullets used in different armies; they will kill up to a distance of two
+> miles. The hard covering is employed to enable the bullet to take the
+> grooves in the rifle, and to prevent it stripping as it passes through
+> the barrel. It also increases the penetrating power of the missile, but
+> diminishes its "stopping" power, unless a vital part or a long bone is
+> struck. By removing the covering from the point of the bullet, as is
+> done in the Dum-Dum bullet, or by splitting the end, the bullet is made
+> to expand or "mushroom" when it strikes the body, and its stopping power
+> is thereby greatly increased, the resulting wound being much more
+> severe. These "soft-nosed" expanding bullets are to be distinguished
+> from "explosive" bullets which contain substances which detonate on
+> impact. High velocity bullets are unlikely to lodge in the body unless
+> spent, or pulled up by a sandbag, or metal buckle on a belt, or a book
+> in the pocket, or the core and the case separating--"stripping" of the
+> bullet. Spent shot may merely cause bruising of the surface, or they may
+> pass through the skin and lodge in the subcutaneous tissng much the appearance of that
+40073,40093c40117,40127
+< the edges drawn together, provision being made at the ends for further
+< packing or for drainage-tubes.
+< 
+< If earth or street dirt has entered the wound, the surface may with
+< advantage be painted over with pure carbolic acid, as virulent
+< organisms, such as those of tetanus or spreading gangrene, are liable to
+< be present. Prophylactic injection of tetanus antitoxin may be
+< indicated.
+< 
+< 
+< 
+< 
+< CHAPTER XIII
+< 
+< CONSTITUTIONAL EFFECTS OF INJURIES
+< 
+< 
+< SYNCOPE--SHOCK--COLLAPSE--FAT EMBOLISM--TRAUMATIC ASPHYXIA--DELIRIUM
+<     IN SURGICAL PATIENTS: _Delirium in general_; _Delirium tremens_;
+<     _Traumatic delirium_.
+< 
+---
+> the edges drawn together, provision being made at ta crush of the hand, for example, is attended with
+> a more intense degree of shock than a correspondingly severe crush of
+> the foot; and injuries of such specially innervated parts as the testis,
+> the urethra, the face, or the spinal cord, are associated with severe
+> degrees, as are also those of parts innervated from the sympathetic
+> system, such as the abdominal or thoracic viscera. It is to be borne in
+> mind that a state of general anaesthesia does not prevent injurious
+> impulses reaching the brain and causing shock during an operation. If
+> the main nerves of the part are "blocked" by injection of a local
+> anaesthetic, however, the central nervous system is protected from these
+> impulses.
+40095c40129,40132
+< SYNCOPE, SHOCK, AND COLLAPSE
+---
+> While the aged frequently manifest but few signs of shock, they have a
+> correspondingly feeble power of recovery; and while many young children
+> suffer little, even after severe operations, others with much less cause
+> succumb to shock.
+40097,40099c40134,40140
+< Syncope, shock, and collapse are clinical conditions which, although
+< depending on different causes, bear a superficial resemblance to one
+< another.
+---
+> When the injured person's mind is absorbed with other matters than his
+> own condition,--as, for example, during the heat of a battle or in the
+> excitement of a railway accident or a conflagration,--even severe
+> injuries may be unattended by pain or shock at the time, although when
+> the period of excitement is over, the severity of the shock is all the
+> greater. The same thing is observed in persons injured while under the
+> influence of alcohol.
+40101,40111c40142,40143
+< #Syncope or Fainting.#--Syncope is the result of a suddenly produced
+< anaemia of the brain from temporary weakening or arrest of the heart's
+< action. In surgical practice, this condition is usually observed in
+< nervous persons who have been subjected to pain, as in the reduction of
+< a dislocation or the incision of a whitlow; or in those who have rapidly
+< lost a considerable quantity of blood. It may also follow the sudden
+< withdrawal of fluid from a large cavity, as in tapping an abdomen for
+< ascites, or withdrawing fluid from the pleural cavity. Syncope sometimes
+< occurs also during the administration of a general anaesthetic,
+< especially if there is a tendency to sickness and the patient is not
+< completely under. During an operation the onset of syncope is often
+---
+> _Clinical Features._--The patient is in a state of prostration. He is
+> roused from his conditionhe onset of syncope is often
+41866,41887c41898,41915
+< veins, as is shown by the fact that it is relieved by elevation of the
+< limb. When the whole length of the main trunk of the great saphena is
+< implicated, the pressure in the vein is high and the patient suffers a
+< good deal of pain and discomfort. When, on the contrary, the upper part
+< of the saphena and its valves are intact, and only the more distal veins
+< are involved, the pressure is not so high and there is comparatively
+< little suffering. The usual complaint is of a sense of weight and
+< fulness in the limb after standing or walking, sometimes accompanied by
+< actual pain, from which relief is at once obtained by raising the limb.
+< Cramp-like pains in the muscles are often associated with varix of the
+< deep veins.
+< 
+< The dilated and tortuous vein can be readily seen and felt when the
+< patient is examined in the upright posture. In advanced cases, bead-like
+< swellings are sometimes to be detected over the position of the valves,
+< and, on running the fingers along the course of the vessel, a firm
+< ridge, due to periphlebitis, may be detected on each side of the vein.
+< When the limb is oedematous, the outline of the veins is obscured, but
+< they can be identified on palpation as gutter-like tracks. When large
+< veins are implicated, a distinct impulse on coughing may be seen to pass
+< down as far as the knee; and if the vessel is sharply percussed a fluid
+< wave may be detected passing both up and down the vein.
+---
+> veins, as is shown by the fact thately woven silk
+> or worsted stocking, or a light and porous form of elastic bandage,
+> applied as a puttee, should be worn. These appliances should be put on
+> before the patient leaves his bed in the morning, and should only be
+> removed after he lies down at night. In this way the vessels are never
+> allowed to become dilated. Elastic stockings, and bandages made entirely
+> of india-rubber, are to be avoided. In early and mild cases these
+> measures are usually sufficient to relieve the patient's discomfort.
+> 
+> _Operative Treatment._--In aggravated cases, when the patient is
+> suffering pain, when his occupation is interfered with by repeated
+> attacks of phlebitis, or when there are large pouches on the veins,
+> operative treatment is called for. The younger the patient the clearer
+> is the indication to operate. It may be necessary to operate to enable a
+> patient to enter one of the public services, even although no symptoms
+> are present. The presence of an ulcer does not contra-indicate
+> operation; the ulcer should be excised, and the raw surface covered with
+> skin grafts, before dealing with the veins.
+41889,41890c41917,41922
+< If the patient is placed on a couch and the limb elevated, the veins are
+< emptied, and if pressure is then made over the region of the saphenous
+---
+> The _operation of Trendelenburg_ is especially appropriate to cases in
+> which the trunk of the great saphena vein in the thigh is alone
+> involved. It consists in exposing three or four inches of the vein in
+> its upper part, applying a ligature at the upper and lower ends of the
+> exposed portion, and, after tying all tributary branches, resecting this
+> portion of the veif pressure is then made over the region of the saphenous
+42821,42835c42853,42874
+< the sac is probably the best method of treatment, especially in those of
+< traumatic origin. These operations are attended with considerable risk
+< of hemiplegia from interference with the blood supply of the brain.
+< 
+< The _external carotid_ and the cervical portion of the _internal
+< carotid_ are seldom the primary seat of aneurysm, although they are
+< liable to be implicated by the upward spread of an aneurysm at the
+< bifurcation of the common trunk. In addition to the ordinary signs of
+< aneurysm, the clinical manifestations are chiefly referable to pressure
+< on the pharynx and larynx, and on the hypoglossal nerve. Aneurysm of the
+< internal carotid is of special importance on account of the way in which
+< it bulges into the pharynx in the region of the tonsil, in some cases
+< closely simulating a tonsillar abscess. Cases are on record in which
+< such an aneurysm has been mistaken for an abscess and incised, with
+< disastrous results.
+---
+> the sac ih was frequently met with in this situation in
+> the days of the barber-surgeons,--usually as a result of the artery
+> having been accidentally wounded while performing venesection of the
+> median basilic vein,--may be treated, according to the amount of
+> discomfort it causes, by a supporting bandage, or by ligation of the
+> artery above and below the point of communication.
+> 
+> Aneurysms of the vessels of the #forearm and hand# call for no special
+> mention; they are almost invariably traumatic, and are treated by
+> excision of the sac.
+> 
+> #Inguinal Aneurysm# (_Aneurysm of the Iliac and Femoral
+> Arteries_).--Aneurysms appearing in the region of Poupart's ligament may
+> have their origin in the external or common iliac arteries or in the
+> upper part of the femoral. On account of the tension of the fascia lata,
+> they tend to spread upwards towards the abdomen, and, to a less extent,
+> downwards into the thigh. Sometimes a constriction occurs across the
+> sac at the level of Poupart's ligament.
+> 
+> The pressure exerted on the nerves and veins of the lower extremity
+> causes pain, congestion, and oedema of the limb. Rupture may take place
+> externally, or into the cellular tissue of the iliac fossa.
+42837,42842c42876,42878
+< _Aneurysmal varix_ may occur in the neck as a result of stabs or bullet
+< wounds. The communication is usually between the common carotid artery
+< and the internal jugular vein. The resulting interference with the
+< cerebral circulation causes headache, giddiness, and other brain
+< symptoms, and a persistent loud murmur is usually a source of annoyance
+< to the patient and may be sufficient indication for operative treatment.
+---
+> These aneurysms have to be diagnosed from pulsating sarcoma growing from
+> the pelvic bones, and from an abscess or a mass of enlarged lymph glands
+> overlying the artery and transmitting its pulsation.
+42844,42845c42880,42881
+< #Intracranial aneurysm# involves the internal carotid and its branches,
+< or the basilar artery, and appears to be more frequently associated with
+---
+> The method of treatment that has met with most success is ligation of
+> the common ortly associated with
+48222,48248c48258,48287
+< affection as it occurs _in the long bones_. Gummatous disease in the
+< periosteum may be localised and result in the formation of a
+< well-defined node, or the whole shaft may become the seat of an
+< irregular nodular enlargement (Fig. 132). If the bone is macerated, it
+< is found to be heavier and bulkier than normal; there is diffuse
+< sclerosis with obliteration of the medullary canal, and the surface is
+< uneven from heaping up of new bone--hyperostosis (Fig. 131). If a
+< periosteal gumma breaks down and invades the skin, a syphilitic ulcer is
+< formed with carious bone at the bottom. A central gumma may eat away the
+< surrounding bone to such an extent that the shaft undergoes pathological
+< fracture. In the rare cases in which it attacks the articular end of a
+< long bone, gummatous disease may implicate the adjacent joint and give
+< rise to syphilitic arthritis.
+< 
+< [Illustration: FIG. 131.--Syphilitic Hyperostosis and Sclerosis of
+< Tibia, on section and on surface view.]
+< 
+< _Clinical Features._--There is severe boring pain--as if a gimlet were
+< being driven into the bone. It is worst at night, preventing sleep, and
+< has been ascribed to compression of the nerves in the narrowed Haversian
+< canals.
+< 
+< The _periosteal gumma_ appears as a smooth, circumscribed swelling which
+< is soft and elastic in the centre and firm at the margins, and shades
+< off into the surrounding bone. The gumma may be completely absorbed or
+< it may give place to a hard node. In some cases the gumma softens in the
+< centre, the skin becomes adherent, thin, and red, and finally gives way.
+---
+> affection as it oceformity (Fig. 132). The diffuse thickening all
+> round the bone obscures the sharp margins so that the bone becomes
+> circular in section and the anterior and mesial edges are blunted, and
+> the comparison to a cucumber is deserved. In some cases the tibia is
+> actually increased in length as well as in girth.
+> 
+> [Illustration: FIG. 132.--Sabre-blade Deformity of Left Tibia in
+> Inherited Syphilis.
+> 
+> (From a photograph lent by Sir George T. Beatson.)]
+> 
+> The contrast between the grossly enlarged and misshapen tibia and the
+> normal or even attenuated fibula is a striking one.
+> 
+> _Treatment_ is carried out on lines similar to those recommended in the
+> acquired disease. When curving of the tibia causes disability in
+> walking, the bone may be straightened by a cuneiform resection.
+> 
+> _Syphilitic dactylitis_ is met with chiefly in children. It may affect
+> any of the fingers or toes, but is commonest in the first phalanx of the
+> index-finger or of the thumb. Several fingers may be attacked at the
+> same time or in succession. The lesion consists in a gummatous
+> infiltration of the soft parts surrounding the phalanx, or a gummatous
+> osteomyelitis, but there is practically no tendency to break down and
+> discharge, or to the formation of a sequestrum as is so common in
+> tuberculous dactylitis.
+> 
+> The finger becomes the seat of a swelling, which is more evident on the
+> dorsal aspect, and, according to the distribution and extent of the
+> disease, it is acorn-shaped, fusiform, or cylinde, the skin becomes adherent, thin, and red, and finally gives way.
+54476,54479c54515,54530
+< out everyone has been enraptured by her? They say she is amazingly
+< beautiful."
+< 
+< The prince bowed to signify his respect and gratitude.
+---
+> oucess Bolkonskaya had brought some work in a
+> gold-embroidered velvet bag. Her pretty little upper lip, on which a
+> delicate dark down was just perceptible, was too short for her
+> teeth, but it lifted all the more sweetly, and was especially charming
+> when she occasionally drew it down to meet the lower lip. As is always
+> the case with a thoroughly attractive woman, her defect--the shortness
+> of her upper lip and her half-open mouth--seemed to be her own special
+> and peculiar form of beauty. Everyone brightened at the sight of
+> this pretty young woman, so soon to become a mother, so full of life
+> and health, and carrying her burden so lightly. Old men and dull
+> dispirited young ones who looked at her, after being in her company
+> and talking to her a little while, felt as if they too were
+> becoming, like her, full of life and health. All who talked to her,
+> and at each word saw her bright smile and the constant gleam of her
+> white teeth, thought that they were in a specially amiable mood that
+> day.
+54481,54508c54532,54538
+< "I often think," she continued after a short pause, drawing nearer
+< to the prince and smiling amiably at him as if to show that
+< political and social topics were ended and the time had come for
+< intimate conversation--"I often think how unfairly sometimes the
+< joys of life are distributed. Why has fate given you two such splendid
+< children? I don't speak of Anatole, your youngest. I don't like
+< him," she added in a tone admitting of no rejoinder and raising her
+< eyebrows. "Two such charming children. And really you appreciate
+< them less than anyone, and so you don't deserve to have them."
+< 
+< And she smiled her ecstatic smile.
+< 
+< "I can't help it," said the prince. "Lavater would have said I
+< lack the bump of paternity."
+< 
+< "Don't joke; I mean to have a serious talk with you. Do you know I
+< am dissatisfied with your younger son? Between ourselves" (and her
+< face assumed its melancholy expression), "he was mentioned at Her
+< Majesty's and you were pitied...."
+< 
+< The prince answered nothing, but she looked at him significantly,
+< awaiting a reply. He frowned.
+< 
+< "What would you have me do?" he said at last. "You know I did all
+< a father could for their education, and they have both turned out
+< fools. Hippolyte is at least a quiet fool, but Anatole is an active
+< one. That is the only difference between them." He said this smiling
+< in a way more natural and animated than usual, so that the wrinkles
+---
+> The little princess went round the table with quick, short,
+> swaying steps, her workbag on her arm, and gaily spreading out her
+> dress sat down on a sofa near the silver samovar, as if all she was
+> doing was a pleasure to herself and to all around her. "I have brought
+> my work," said she in French, displaying her bag and addressing all
+> present. "Mind, Annette, I hope you have not played a wicked trick
+> on me," she added, turning to her hostess. "You wrote that it was te natural and animated than usual, so that the wrinkles
+58084,58108c58114,58145
+< a sixth stroke. The doctors pronounced recovery impossible. After a
+< mute confession, communion was administered to the dying man,
+< preparations made for the sacrament of unction, and in his house there
+< was the bustle and thrill of suspense usual at such moments. Outside
+< the house, beyond the gates, a group of undertakers, who hid
+< whenever a carriage drove up, waited in expectation of an important
+< order for an expensive funeral. The Military Governor of Moscow, who
+< had been assiduous in sending aides-de-camp to inquire after the
+< count's health, came himself that evening to bid a last farewell to
+< the celebrated grandee of Catherine's court, Count Bezukhov.
+< 
+< The magnificent reception room was crowded. Everyone stood up
+< respectfully when the Military Governor, having stayed about half an
+< hour alone with the dying man, passed out, slightly acknowledging
+< their bows and trying to escape as quickly as from the glances fixed
+< on him by the doctors, clergy, and relatives of the family. Prince
+< Vasili, who had grown thinner and paler during the last few days,
+< escorted him to the door, repeating something to him several times
+< in low tones.
+< 
+< When the Military Governor had gone, Prince Vasili sat down all
+< alone on a chair in the ballroom, crossing one leg high over the
+< other, leaning his elbow on his knee and covering his face with his
+< hand. After sitting so for a while he rose, and, looking about him
+< with frightened eyes, went with unusually hurried steps down the
+---
+> a sixssion of
+> weariness.
+> 
+> "And I?" he said; "do you think it is easier for me? I am as worn
+> out as a post horse, but still I must have a talk with you, Catiche, a
+> very serious talk."
+> 
+> Prince Vasili said no more and his cheeks began to twitch nervously,
+> now on one side, now on the other, giving his face an unpleasant
+> expression which was never to be seen on it in a drawing room. His
+> eyes too seemed strange; at one moment they looked impudently sly
+> and at the next glanced round in alarm.
+> 
+> The princess, holding her little dog on her lap with her thin bony
+> hands, looked attentively into Prince Vasili's eyes evidently resolved
+> not to be the first to break silence, if she had to wait till morning.
+> 
+> "Well, you see, my dear princess and cousin, Catherine Semenovna,"
+> continued Prince Vasili, returning to his theme, apparently not
+> without an inner struggle; "at such a moment as this one must think of
+> everything. One must think of the future, of all of you... I love
+> you all, like children of my own, as you know."
+> 
+> The princess continued to look at him without moving, and with the
+> same dull expression.
+> 
+> "And then of course my family has also to be considered," Prince
+> Vasili went on, testily pushing away a little table without looking at
+> her. "You know, Catiche, that we--you three sisters, Mamontov, and
+> my wife--are the count's only direct heirs. I know, I know how hard it
+> is for you to talk or think of such matters. It is no easier for me;
+> but, my dear, I am e
+60241,60254c60278
+< direction. From the study, like pistol shots, came the frequent
+< sound of the old man angrily blowing his nose. Hardly had Prince
+< Andrew gone when the study door opened quickly and the stern figure of
+< the old man in the white dressing gown looked out.
+< 
+< "Gone? That's all right!" said he; and looking angrily at the
+< unconscious little princess, he shook his head reprovingly and slammed
+< the door.
+< 
+< 
+< 
+< 
+< 
+< BOOK TWO: 1805
+---
+> direction. From the study, like pistol shots,y."
+60255a60280
+> "Shall we have time to change clothes?"
+60256a60282
+> "I don't know, General...."
+60257a60284,60292
+> The regimental commander, going up to the line himself, ordered
+> the soldiers to change into their greatcoats. The company commanders
+> ran off to their companies, the sergeants major began bustling (the
+> greatcoats were not in very good condition), and instantly the squares
+> that had up to then been in regular order and silent began to sway and
+> stretch and hum with voices. On all sides soldiers were running to and
+> fro, throwing up their knapsacks with a jerk of their shoulders and
+> pulling the straps over their heads, unstrapping their overcoats and
+> drawing the sleeves on with upraised arms.
+60258a60294,60297
+> In half an hour all was again in order, only the squares had
+> become gray instead of black. The regimental commander walked with his
+> jerky steps to the front of the regiment and examined it from a
+> distance.
+60260c60299,60300
+< CHAPTER I
+---
+> "Whatever is this? This!" he shouted and stood still. "Commander
+> of the third company!"
+60261a60302,60305
+> "Commander of the third company wanted by the general!...
+> commander to the general... third company to the commander." The words
+> passed along the lines and an adjutant ran to look for the missing
+> officer.
+60263,60281c60307,60311
+< In October, 1805, a Russian army was occupying the villages and
+< towns of the Archduchy of Austria, and yet other regiments freshly
+< arriving from Russia were settling near the fortress of Braunau and
+< burdening the inhabitants on whom they were quartered. Braunau was the
+< headquarters of the commander-in-chief, Kutuzov.
+< 
+< On October 11, 1805, one of the infantry regiments that had just
+< reached Braunau had halted half a mile from the town, waiting to be
+< inspected by the commander in chief. Despite the un-Russian appearance
+< of the locality and surroundings--fruit gardens, stone fences, tiled
+< roofs, and hills in the distance--and despite the fact that the
+< inhabitants (who gazed with curiosity at the soldiers) were not
+< Russians, the regiment had just the appearance of any Russian regiment
+< preparing for an inspection anywhere in the heart of Russia.
+< 
+< On the evening of the last day's march an order had been received
+< that the commander in chief would inspect the regiment on the march.
+< Though the words of the order were not clear to the regimental
+< commander, and the question arose whether the troops were to be in
+---
+> When the eager but misrepeated words had reached their destination
+> in a cry of: "The general to the third company," the missing officer
+> appeared from behind his company and, though he was a middle-aged
+> man and not in the habit of running, trotted awkwardly stumbling on
+> his toes toward the gene arose whether the troops were to be in
+68755,68783c68785,68807
+< for it is past midnight--cannot now be altered," said he. "You have
+< heard them, and we shall all do our duty. But before a battle, there
+< is nothing more important..." he paused, "than to have a good sleep."
+< 
+< He moved as if to rise. The generals bowed and retired. It was
+< past midnight. Prince Andrew went out.
+< 
+< 
+< The council of war, at which Prince Andrew had not been able to
+< express his opinion as he had hoped to, left on him a vague and uneasy
+< impression. Whether Dolgorukov and Weyrother, or Kutuzov, Langeron,
+< and the others who did not approve of the plan of attack, were
+< right--he did not know. "But was it really not possible for Kutuzov to
+< state his views plainly to the Emperor? Is it possible that on account
+< of court and personal considerations tens of thousands of lives, and
+< my life, my life," he thought, "must be risked?"
+< 
+< "Yes, it is very likely that I shall be killed tomorrow," he
+< thought. And suddenly, at this thought of death, a whole series of
+< most distant, most intimate, memories rose in his imagination: he
+< remembered his last parting from his father and his wife; he
+< remembered the days when he first loved her. He thought of her
+< pregnancy and felt sorry for her and for himself, and in a nervously
+< emotional and softened mood he went out of the hut in which he was
+< billeted with Nesvitski and began to walk up and down before it.
+< 
+< The night was foggy and through the fog the moonlight gleamed
+< mysteriously. "Yes, tomorrow, tomorrow!" he thought. "Tomorrow
+< everything may be over for me! All these memories will be no more,
+---
+> for it is past midnight--s and
+> watchword--shaft, Olmutz. What a nuisance that our squadron will be in
+> reserve tomorrow," he thought. "I'll ask leave to go to the front,
+> this may be my only chance of seeing the Emperor. It won't be long now
+> before I am off duty. I'll take another turn and when I get back
+> I'll go to the general and ask him." He readjusted himself in the
+> saddle and touched up his horse to ride once more round his hussars.
+> It seemed to him that it was getting lighter. To the left he saw a
+> sloping descent lit up, and facing it a black knoll that seemed as
+> steep as a wall. On this knoll there was a white patch that Rostov
+> could not at all make out: was it a glade in the wood lit up by the
+> moon, or some unmelted snow, or some white houses? He even thought
+> something moved on that white spot. "I expect it's snow... that
+> spot... a spot--une tache," he thought. "There now... it's not a
+> tache... Natasha... sister, black eyes... Na... tasha... (Won't she be
+> surprised when I tell her how I've seen the Emperor?) Natasha...
+> take my sabretache..."--"Keep to the right, your honor, there are
+> bushes here," came the voice of an hussar, past whom Rostov was riding
+> in the act of falling asleep. Rostov lifted his head that had sunk
+> almost to his horse's mane and pulled up beside the hussar. He was
+> succumbing to irresistible, youthful, childish drowsiness. "But what
+> was I thinking? I mustn't forget. How shall I speak to the Emperor?
+> No, that's not it--that's tomorrow. Oh yesing may be over for me! All these memories will be no more,
+71615,71631c71639,71642
+< killed her, killed... She won't get over it! She won't survive...."
+< 
+< "Who?" asked Rostov.
+< 
+< "My mother! My mother, my angel, my adored angel mother," and
+< Dolokhov pressed Rostov's hand and burst into tears.
+< 
+< When he had become a little quieter, he explained to Rostov that
+< he was living with his mother, who, if she saw him dying, would not
+< survive it. He implored Rostov to go on and prepare her.
+< 
+< Rostov went on ahead to do what was asked, and to his great surprise
+< learned that Dolokhov the brawler, Dolokhov the bully, lived in Moscow
+< with an old mother and a hunchback sister, and was the most
+< affectionate of sons and brothers.
+< 
+< 
+---
+> killed her, killed... She won't get ov kept repeating to himself. And when he
+> had said it for the tenth time, Molibre's words: "Mais que diable
+> alloit-il faire dans cette galere?" occurred to him, and he began to
+> laugh at himself.
+71632a71644,71647
+> In the night he called his valet and told him to pack up to go to
+> Petersburg. He could not imagine how he could speak to her now. He
+> resolved to go away next day and leave a letter informing her of his
+> intention to part from her forever.
+71633a71649,71650
+> Next morning when the valet came into the room with his coffee,
+> Pierre was lying asleep on the ottoman with an open book in his hand.
+71635c71652,71653
+< CHAPTER VI
+---
+> He woke up and looked round for a while with a startled
+> expression, unable to realize where he was.
+71636a71655,71656
+> "The countess told me to inquire whether your excellency was at
+> home," said the valet.
+71638,71651c71658,71668
+< Pierre had of late rarely seen his wife alone. Both in Petersburg
+< and in Moscow their house was always full of visitors. The night after
+< the duel he did not go to his bedroom but, as he often did, remained
+< in his father's room, that huge room in which Count Bezukhov had died.
+< 
+< He lay down on the sofa meaning to fall asleep and forget all that
+< had happened to him, but could not do so. Such a storm of feelings,
+< thoughts, and memories suddenly arose within him that he could not
+< fall asleep, nor even remain in one place, but had to jump up and pace
+< the room with rapid steps. Now he seemed to see her in the early
+< days of their marriage, with bare shoulders and a languid,
+< passionate look on her face, and then immediately he saw beside her
+< Dolokhov's handsome, insolent, hard, and mocking face as he had seen
+< it at the banquet, and then that same face pale, quivering, and
+---
+> But before Pierre could decide what answer he would send, the
+> countess herself in a white satin dressing gown embroidered with
+> silver and with simply dressed hair (two immense plaits twice round
+> her lovely head like a coronet) entered the room, calm and majestic,
+> except that there was a wrathful wrinkle on her rather prominent
+> marble brow. With her imperturbable calm she did not begin to speak in
+> front of the valet. She knew of the duel and had come to speak about
+> it. She waited till the valet had set down the coffee things and
+> left the room. Pierre looked at her timidly over his spectacles, and
+> like a hare surrounded by hounds who lays back her ears and
+> continues to crouch motionless before her eneme pale, quivering, and
+79450,79477c79467,79471
+< irrecoverable days of her own girlhood and her own first ball. The
+< host also followed Natasha with his eyes and asked the count which was
+< his daughter.
+< 
+< "Charming!" said he, kissing the tips of his fingers.
+< 
+< In the ballroom guests stood crowding at the entrance doors awaiting
+< the Emperor. The countess took up a position in one of the front
+< rows of that crowd. Natasha heard and felt that several people were
+< asking about her and looking at her. She realized that those
+< noticing her liked her, and this observation helped to calm her.
+< 
+< "There are some like ourselves and some worse," she thought.
+< 
+< Peronskaya was pointing out to the countess the most important
+< people at the ball.
+< 
+< "That is the Dutch ambassador, do you see? That gray-haired man,"
+< she said, indicating an old man with a profusion of silver-gray
+< curly hair, who was surrounded by ladies laughing at something he
+< said.
+< 
+< "Ah, here she is, the Queen of Petersburg, Countess Bezukhova," said
+< Peronskaya, indicating Helene who had just entered. "How lovely! She
+< is quite equal to Marya Antonovna. See how the men, young and old, pay
+< court to her. Beautiful and clever... they say Prince--is quite mad
+< about her. But see, those two, though not good-looking, are even
+< more run after."
+---
+> irrecoverable days of her own girlhthey do they look as if they
+> were saying, 'Ah, she's not the one I'm after, so it's not worth
+> looking at her!' No, it's impossible," she thought. "They must know
+> how I long to dance, how splendidly I dance, and how they would
+> enjoy dancing with me."
+79479,79480c79473,79483
+< She pointed to a lady who was crossing the room followed by a very
+< plain daughter.
+---
+> The strains of the polonaise, which had continued for a considerable
+> time, had begun to sound like a sad reminiscence to Natasha's ears.
+> She wanted to cry. Peronskaya had left them. The count was at the
+> other end of the room. She and the countess and Sonya were standing by
+> themselves as in the depths of a forest amid that crowd of
+> strangers, with no one interested in them and not wanted by anyone.
+> Prince Andrew with a lady passed by, evidently not recognizing them.
+> The handsome Anatole was smilingly talking to a partner on his arm and
+> looked at Natasha as one looks at a wall. Boris passed them twice
+> and each time turned away. Berg and his wife, who were not dancing,
+> came up to them.
+79482,79483c79485,79488
+< "She is a splendid match, a millionairess," said Peronskaya. "And
+< look, here come her suitors."
+---
+> This family gathering seemed humiliating to Natasha--as if there
+> were nowhere else for the family to talk but here at the ball. She did
+> not listen to or look at Vera, who was telling her something about her
+> own green dress.
+79485,79486c79490,79494
+< "That is Bezukhova's brother, Anatole Kuragin," she said, indicating
+< a handsome officer of the Horse Guards who passed by them with head
+---
+> At last the Emperor stopped beside his last partner (he had danced
+> with three) and the music ceased. A worried aide-de-camp ran up to the
+> Rostovs requesting them to stand farther back, though as it was they
+> were already close to the wall, and from the gallery resounded the
+> distinct, precise, entidsome officer of the Horse Guards who passed by them with head
+81802,81825c81810,81816
+< whole pack rushed across the field toward the very spot where the wolf
+< had disappeared. The hazel bushes parted behind the hounds and
+< Daniel's chestnut horse appeared, dark with sweat. On its long back
+< sat Daniel, hunched forward, capless, his disheveled gray hair hanging
+< over his flushed, perspiring face.
+< 
+< "Ulyulyulyu! ulyulyu!..." he cried. When he caught sight of the
+< count his eyes flashed lightning.
+< 
+< "Blast you!" he shouted, holding up his whip threateningly at the
+< count.
+< 
+< "You've let the wolf go!... What sportsmen!" and as if scorning to
+< say more to the frightened and shamefaced count, he lashed the heaving
+< flanks of his sweating chestnut gelding with all the anger the count
+< had aroused and flew off after the hounds. The count, like a
+< punished schoolboy, looked round, trying by a smile to win Simon's
+< sympathy for his plight. But Simon was no longer there. He was
+< galloping round by the bushes while the field was coming up on both
+< sides, all trying to head the wolf, but it vanished into the wood
+< before they could do so.
+< 
+< 
+< 
+---
+> whole pack rushed across the fieldmost and, watching the wolf,
+> galloped heavily aside to intercept it. But the quickness of the
+> wolf's lope and the borzoi's slower pace made it plain that Karay
+> had miscalculated. Nicholas could already see not far in front of
+> him the wood where the wolf would certainly escape should she reach
+> it. But, coming toward him, he saw hounds and a huntsman galloping
+> almost straight at the wolf. There was still hope. A long, yellowish
+81826a81818,81823
+> young borzoi, one Nicholas did not know, from another leash, rushed
+> impetuously at the wolf from in front and almost knocked her over. But
+> the wolf jumped up more quickly than anyone could have expected and,
+> gnashing her teeth, flew at the yellowish borzoi, which, with a
+> piercing yelp, fell with its head on the ground, bleeding from a
+> gash in its side.
+81828c81825
+< CHAPTER V
+---
+> "Karay? Old fellow!..." wailed Nicholas.
+81829a81827,81833
+> Thanks to the delay caused by this crossing of the wolf's path,
+> the old dog with its felted hair hanging from its thigh was within
+> five paces of it. As if aware of her danger, the wolf turned her
+> eyes on Karay, tucked her tail yet further between her legs, and
+> increased her speed. But here Nicholas only saw that something
+> happened to Karay--the borzoi was suddenly on the wolf, and they
+> rolled together down into a gully just in front of them.
+81831,81837c81835,81837
+< Nicholas Rostov meanwhile remained at his post, waiting for the
+< wolf. By the way the hunt approached and receded, by the cries of
+< the dogs whose notes were familiar to him, by the way the voices of
+< the huntsmen approached, receded, and rose, he realized what was
+< happening at the copse. He knew that young and old wolves were
+< there, that the hounds had separated into two packs, that somewhere
+< a wolf was being chased, and that something had gone wrong. He
+---
+> That instant, when Nicholas saw the wolf struggling in the gully
+> with the dogs, while from under them could be seen her gray hair and
+> outstretched hind leg and her frightened choking head, wne wrong. He
+83373,83385c83373,83374
+< glimpses of swiftly moving legs and the shadows of the troyka they
+< were passing. The whistling sound of the runners on the snow and the
+< voices of girls shrieking were heard from different sides.
+< 
+< Again checking his horses, Nicholas looked around him. They were
+< still surrounded by the magic plain bathed in moonlight and spangled
+< with stars.
+< 
+< "Zakhar is shouting that I should turn to the left, but why to the
+< left?" thought Nicholas. "Are we getting to the Melyukovs'? Is this
+< Melyukovka? Heaven only knows where we are going, and heaven knows
+< what is happening to us--but it is very strange and pleasant
+< whatever it is." And he looked round in the sleigh.
+---
+> glimpses of swiftly moving legs and  to
+> table with her."
+83387,83389c83376,83390
+< "Look, his mustache and eyelashes are all white!" said one of the
+< strange, pretty, unfamiliar people--the one with fine eyebrows and
+< mustache.
+---
+> "Ah! ah!" screamed Natasha, rolling her eyes with horror.
+> 
+> "Yes? And how... did he speak?"
+> 
+> "Yes, like a man. Everything quite all right, and he began
+> persuading her; and she should have kept him talking till cockcrow,
+> but she got frightened, just got frightened and hid her face in her
+> hands. Then he caught her up. It was lucky the maids ran in just
+> then..."
+> 
+> "Now, why frighten them?" said Pelageya Danilovna.
+> 
+> "Mamma, you used to try your fate yourself..." said her daughter.
+> 
+> "And how does one do it in a barn?" inquired Sonya.
+83391,83407c83392,83415
+< "I think this used to be Natasha," thought Nicholas, "and that was
+< Madame Schoss, but perhaps it's not, and this Circassian with the
+< mustache I don't know, but I love her."
+< 
+< "Aren't you cold?" he asked.
+< 
+< They did not answer but began to laugh. Dimmler from the sleigh
+< behind shouted something--probably something funny--but they could not
+< make out what he said.
+< 
+< "Yes, yes!" some voices answered, laughing.
+< 
+< "But here was a fairy forest with black moving shadows, and a
+< glitter of diamonds and a flight of marble steps and the silver
+< roofs of fairy buildings and the shrill yells of some animals. And
+< if this is really Melyukovka, it is still stranger that we drove
+< heaven knows where and have come to Melyukovka," thought Nicholas.
+---
+> "Well, say you went to the barn now, and listened. It depends on
+> what you hear; hammering and knocking--that's bad; but a sound of
+> shifting grain is good and one sometimes hears that, too."
+> 
+> "Mamma, tell us what happened to you in the barn."
+> 
+> Pelageya Danilovna smiled.
+> 
+> "Oh, I've forgotten..." she replied. "But none of you would go?"
+> 
+> "Yes, I will; Pelageya Danilovna, let me! I'll go," said Sonya.
+> 
+> "Well, why not, if you're not afraid?"
+> 
+> "Louisa Ivanovna, may I?" asked Sonya.
+> 
+> Whether they were playing the ring and string game or the ruble game
+> or talking as now, Nicholas did not leave Sonya's side, and gazed at
+> her with quite new eyes. It seemed to him that it was only today,
+> thanks to that burnt-cork mustache, that he had fully learned to
+> know her. And really, that evening, Sonya was brighter, more animated,
+> and prettier than Nicholas had ever seen her before.
+> 
+> "So that's what she is like; what to Melyukovka," thought Nicholas.
+84373,84395c84381,84382
+< evidently confirming the opinion that everything was going from bad to
+< worse, but whether telling a story or giving an opinion the speaker
+< always stopped, or was stopped, at the point beyond which his
+< criticism might touch the sovereign himself.
+< 
+< At dinner the talk turned on the latest political news: Napoleon's
+< seizure of the Duke of Oldenburg's territory, and the Russian Note,
+< hostile to Napoleon, which had been sent to all the European courts.
+< 
+< "Bonaparte treats Europe as a pirate does a captured vessel," said
+< Count Rostopchin, repeating a phrase he had uttered several times
+< before. "One only wonders at the long-suffering or blindness of the
+< crowned heads. Now the Pope's turn has come and Bonaparte doesn't
+< scruple to depose the head of the Catholic Church--yet all keep
+< silent! Our sovereign alone has protested against the seizure of the
+< Duke of Oldenburg's territory, and even..." Count Rostopchin paused,
+< feeling that he had reached the limit beyond which censure was
+< impossible.
+< 
+< "Other territories have been offered in exchange for the Duchy of
+< Oldenburg," said Prince Bolkonski. "He shifts the Dukes about as I
+< might move my serfs from Bald Hills to Bogucharovo or my Ryazan
+< estates."
+---
+> evidently confirming the opinion that everything was goiout his hand to
+> the prince.
+84397,84399c84384,84388
+< "The Duke of Oldenburg bears his misfortunes with admirable strength
+< of character and resignation," remarked Boris, joining in
+< respectfully.
+---
+> "Good-by, my dear fellow.... His words are music, I never tire of
+> hearing him!" said the old prince, keeping hold of the hand and
+> offering his cheek to be kissed.
+> 
+> Following Rostopchin's example the others also rose.
+84401,84403c84390,84432
+< He said this because on his journey from Petersburg he had had the
+< honor of being presented to the Duke. Prince Bolkonski glanced at
+< the young man as if about to say something in reply, but changed his
+---
+> 
+> 
+> 
+> 
+> CHAPTER IV
+> 
+> 
+> Princess Mary as she sat listening to the old men's talk and
+> faultfinding, understood nothing of what she heard; she only
+> wondered whether the guests had all observed her father's hostile
+> attitude toward her. She did not even notice the special attentions
+> and amiabilities shown her during dinner by Boris Drubetskoy, who
+> was visiting them for the third time already.
+> 
+> Princess Mary turned with absent-minded questioning look to
+> Pierre, who hat in hand and with a smile on his face was the last of
+> the guests to approach her after the old prince had gone out and
+> they were left alone in the drawing room.
+> 
+> "May I stay a little longer?" he said, letting his stout body sink
+> into an armchair beside her.
+> 
+> "Oh yes," she answered. "You noticed nothing?" her look asked.
+> 
+> Pierre was in an agreeable after-dinner mood. He looked straight
+> before him and smiled quietly.
+> 
+> "Have you known that young man long, Princess?" he asked.
+> 
+> "Who?"
+> 
+> "Drubetskoy."
+> 
+> "No, not long..."
+> 
+> "Do you like him?"
+> 
+> "Yes, he is an agreeable young man.... Why do you ask me that?" said
+> Princess Mary, still thinking of that morning's conversation with
+> her father.
+> 
+> "Because I have noticed that when a young man comes on leave from
+> Pet in reply, but changed his
+86989,87019c87018,87026
+< but that she was better now. Natasha had not left her room that
+< morning. With compressed and parched lips and dry fixed eyes, she
+< sat at the window, uneasily watching the people who drove past and
+< hurriedly glancing round at anyone who entered the room. She was
+< evidently expecting news of him and that he would come or would
+< write to her.
+< 
+< When the count came to see her she turned anxiously round at the
+< sound of a man's footstep, and then her face resumed its cold and
+< malevolent expression. She did not even get up to greet him. "What
+< is the matter with you, my angel? Are you ill?" asked the count.
+< 
+< After a moment's silence Natasha answered: "Yes, ill."
+< 
+< In reply to the count's anxious inquiries as to why she was so
+< dejected and whether anything had happened to her betrothed, she
+< assured him that nothing had happened and asked him not to worry.
+< Marya Dmitrievna confirmed Natasha's assurances that nothing had
+< happened. From the pretense of illness, from his daughter's
+< distress, and by the embarrassed faces of Sonya and Marya
+< Dmitrievna, the count saw clearly that something had gone wrong during
+< his absence, but it was so terrible for him to think that anything
+< disgraceful had happened to his beloved daughter, and he so prized his
+< own cheerful tranquillity, that he avoided inquiries and tried to
+< assure himself that nothing particularly had happened; and he was only
+< dissatisfied that her indisposition delayed their return to the
+< country.
+< 
+< 
+< 
+< 
+---
+> but that she was better now. m. She was afraid that
+> the count or Bolkonski, who might arrive at any moment, if they knew
+> of this affair (which she hoped to hide from them) might challenge
+> Anatole to a duel, and she therefore asked Pierre to tell his
+> brother-in-law in her name to leave Moscow and not dare to let her set
+> eyes on him again. Pierre--only now realizing the danger to the old
+> count, Nicholas, and Prince Andrew--promised to do as she wished.
+> Having briefly and exactly explained her wishes to him, she let him go
+> to the drawing room.
+87021c87028,87031
+< CHAPTER XIX
+---
+> "Mind, the count knows nothing. Behave as if you know nothing
+> either," she said. "And I will go and tell her it is no use
+> expecting him! And stay to dinner if you care to!" she called after
+> Pierre.
+87022a87033,87034
+> Pierre met the old count, who seemed nervous and upset. That morning
+> Natasha had told him that she had rejected Bolkonski.
+87024c87036,87045
+< From the day his wife arrived in Moscow Pierre had been intending to
+---
+> "Troubles, troubles, my dear fellow!" he said to Pierre. "What
+> troubles one has with these girls without their mother! I do so regret
+> having come here.... I will be frank with you. Have you heard she
+> has broken off her engagement without consulting anybody? It's true
+> this engagement never was much to my liking. Of course he is an
+> excellent man, but still, with his father's disapproval they
+> wouldn't have been happy, and Natasha won't lack suitors. Still, it
+> has been going on so long, and to take such a step without father's or
+> mother's consent! And now she's ill, and God knows what! It's hard,
+> Count, hard to manage dafe arrived in Moscow Pierre had been intending to
+87488,87499c87509
+< "He left long ago. She has been at death's door."
+< 
+< "I much regret her illness," said Prince Andrew; and he smiled
+< like his father, coldly, maliciously, and unpleasantly.
+< 
+< "So Monsieur Kuragin has not honored Countess Rostova with his
+< hand?" said Prince Andrew, and he snorted several times.
+< 
+< "He could not marry, for he was married already," said Pierre.
+< 
+< Prince Andrew laughed disagreeably, again reminding one of his
+< father.
+---
+> "He left long ago. Shre you," said he to her.
+87501,87503c87511,87512
+< "And where is your brother-in-law now, if I may ask?" he said.
+< 
+< "He has gone to Peters... But I don't know," said Pierre.
+---
+> "Before me? No! All is over for me," she replied with shame and
+> self-abasement.
+87505,87507c87514,87516
+< "Well, it doesn't matter," said Prince Andrew. "Tell Countess
+< Rostova that she was and is perfectly free and that I wish her all
+< that is good."
+---
+>  "All over?" he repeated. "If I were not myself, but the handsomest,
+> cleverest, and best man in the world, and were free, I would this
+> moment ask on my knees for your hand and your love!"
+87509,87511c87518,87519
+< Pierre took the packet. Prince Andrew, as if trying to remember
+< whether he had something more to say, or waiting to see if Pierre
+< would say anything, looked fixedly at him.
+---
+> For the first time for many days Natasha wept tears of gratitude and
+> tenderness, and glancing at Pierre she went out of the room.
+87513,87514c87521,87524
+< "I say, do you remember our discussion in Petersburg?" asked Pierre,
+< "about..."
+---
+> Pierre too when she had gone almost ran into the anteroom,
+> restraining tears of tenderness and joy that choked him, and without
+> finding the sleeves of his fur cloak threw it on and got into his
+> sleigh.
+87516,87517c87526
+< "Yes," returned Prince Andrew hastily. "I said that a fallen woman
+< should be forgiven, but I didn't say I could forgive her. I can't."
+---
+> "Where to now, your excellency?" asked the coachman.
+87519c87528,87532
+< "But can this be compared...?" said Pierre.
+---
+> "Where to?" Pierre asked himself. "Where can I go now? Surely not to
+> the Club or to pay calls?" All men seemed so pitiful, so poor, in
+> comparison with this feeling of tenderness and love he experienced: in
+> comparison with that softened, grateful, last look she had given him
+> through her tears.
+87521,87525c87534,87536
+< Prince Andrew interrupted him and cried sharply: "Yes, ask her
+< hand again, be magnanimous, and so on?... Yes, that would be very
+< noble, but I am unable to follow in that gentleman's footsteps. If you
+< wish to be my friend never speak to me of that... of all that! Well,
+< good-by. So you'll give her the packet?"
+---
+> "Home!" said Pierre, and despite twenty-two degrees of frost
+> Fahrenheit he threw open the bearskin cloak from his broad chest and
+> inhaled the air with joy.
+87527c87538,87542
+< Pierre left the room and went to the old prince and Princess Mary.
+---
+> It was clear and frosty. Above the dirty, ill-lit streets, above the
+> black roofs, stretched the dark starry sky. Only looking up at the sky
+> did Pierre cease to feel how sordid and humiliating were all mundane
+> things compared with the heights to which his soul had just been
+> raised. At the entrance to the Arbat Square an immense ence and Princess Mary.
+88067c88082,88090
+< that responsibility himself.
+---
+> that responsibility himsel had found a phrase that pleased
+> him, fully expressed his feelings, and has since become famous. On
+> returning home at two o'clock that night he sent for his secretary,
+> Shishkov, and told him to write an order to the troops and a
+> rescript to Field Marshal Prince Saltykov, in which he insisted on the
+> words being inserted that he would not make peace so long as a
+> single armed Frenchman remained on Russian soil.
+> 
+> Next day the following letter was sent to Napoleon:
+88069,88095c88092,88109
+< The longer the Emperor remained in Vilna the less did everybody-
+< tired of waiting--prepare for the war. All the efforts of those who
+< surrounded the sovereign seemed directed merely to making him spend
+< his time pleasantly and forget that war was impending.
+< 
+< In June, after many balls and fetes given by the Polish magnates, by
+< the courtiers, and by the Emperor himself, it occurred to one of the
+< Polish aides-de-camp in attendance that a dinner and ball should be
+< given for the Emperor by his aides-de-camp. This idea was eagerly
+< received. The Emperor gave his consent. The aides-de-camp collected
+< money by subscription. The lady who was thought to be most pleasing to
+< the Emperor was invited to act as hostess. Count Bennigsen, being a
+< landowner in the Vilna province, offered his country house for the
+< fete, and the thirteenth of June was fixed for a ball, dinner,
+< regatta, and fireworks at Zakret, Count Bennigsen's country seat.
+< 
+< 
+< The very day that Napoleon issued the order to cross the Niemen, and
+< his vanguard, driving off the Cossacks, crossed the Russian
+< frontier, Alexander spent the evening at the entertainment given by
+< his aides-de-camp at Bennigsen's country house.
+< 
+< It was a gay and brilliant fete. Connoisseurs of such matters
+< declared that rarely had so many beautiful women been assembled in one
+< place. Countess Bezukhova was present among other Russian ladies who
+< had followed the sovereign from Petersburg to Vilna and eclipsed the
+< refined Polish ladies by her massive, so called Russian type of
+---
+> 
+> Monsieur mon frere,
+> 
+> Yesterday I learned that, despite the loyalty which I have kept my
+> engagements with Your Majesty, your troops have crossed the Russian
+> frontier, and I have this moment received from Petersburg a note, in
+> which Count Lauriston informs me, as a reason for this aggression,
+> that Your Majesty has considered yourself to be in a state of war with
+> me from the time Prince Kuragin asked for his passports. The reasons
+> on which the Duc de Bassano based his refusal to deliver them to him
+> would never have led me to suppose that that could serve as a
+> pretext for aggression. In fact, the ambassador, as he himself has
+> declared, was never authorized to make that demand, and as soon as I
+> was informed of it I let him know how much I disapproved of it and
+> ordered him to remain at his post. If Your Majesty does not intend
+> to shed the blood of our peoples for such a misunderstanding, and
+> consents to withdraw your troops from Russian territory, I will regard
+> what has passed as not havingish ladies by her massive, so called Russian type of
+88422,88445c88436,88450
+< could have been found him, but Marshal Davout was one of those men who
+< purposely put themselves in most depressing conditions to have a
+< justification for being gloomy. For the same reason they are always
+< hard at work and in a hurry. "How can I think of the bright side of
+< life when, as you see, I am sitting on a barrel and working in a dirty
+< shed?" the expression of his face seemed to say. The chief pleasure
+< and necessity of such men, when they encounter anyone who shows
+< animation, is to flaunt their own dreary, persistent activity.
+< Davout allowed himself that pleasure when Balashev was brought in.
+< He became still more absorbed in his task when the Russian general
+< entered, and after glancing over his spectacles at Balashev's face,
+< which was animated by the beauty of the morning and by his talk with
+< Murat, he did not rise or even stir, but scowled still more and
+< sneered malevolently.
+< 
+< When he noticed in Balashev's face the disagreeable impression
+< this reception produced, Davout raised his head and coldly asked
+< what he wanted.
+< 
+< Thinking he could have been received in such a manner only because
+< Davout did not know that he was adjutant general to the Emperor
+< Alexander and even his envoy to Napoleon, Balashev hastened to
+< inform him of his rank and mission. Contrary to his expectation,
+< Davout, after hearing him, became still surlier and ruder.
+---
+> could have been found him, bun answer to Balashav's low and respectful bow, and coming
+> up to him at once began speaking like a man who values every moment of
+> his time and does not condescend to prepare what he has to say but
+> is sure he will always say the right thing and say it well.
+> 
+> "Good day, General!" said he. "I have received the letter you
+> brought from the Emperor Alexander and am very glad to see you." He
+> glanced with his large eyes into Balashav's face and immediately
+> looked past him.
+> 
+> It was plain that Balashev's personality did not interest him at
+> all. Evidently only what took place within his own mind interested
+> him. Nothing outside himself had any significance for him, because
+> everything in the world, it seemed to him, depended entirely on his
+> will.
+88447,88448c88452,88460
+< "Where is your dispatch?" he inquired. "Give it to me. I will send
+< it to the Emperor."
+---
+> "I do not, and did not, desire war," he continued, "but it has
+> been forced on me. Even now" (he emphasized the word) "I am ready to
+> receive any explanations you can give me."
+> 
+> And he began clearly and concisely to explain his reasons for
+> dissatisfaction with the Russian government. Judging by the calmly
+> moderate and amicable tone in which the French Emperor spoke, Balashev
+> was firmly persuaded that he wished for peace and intended to enter
+> into negotiations.
+88450c88462,88465
+< Balashev replied that he had been ordered to hand it personally to
+---
+> When Napoleon, having finished speaking, looked inquiringly at the
+> Russian envoy, Balashev began a speech he had prepared long before:
+> "Sire! The Emperor, my master..." but the sight of the Emperor's
+> eyes bent on him confused him. "You are flurried--compose nd it personally to
+89779,89780c89794,89811
+< theory by a huge experiment and proving its soundness to the whole
+< world was slipping away from him.
+---
+> theory by a huge experiment an from his commanders. During his absence he had been
+> promoted captain, and when the regiment was put on war footing with an
+> increase in numbers, he was again allotted his old squadron.
+> 
+> The campaign began, the regiment was moved into Poland on double
+> pay, new officers arrived, new men and horses, and above all everybody
+> was infected with the merrily excited mood that goes with the
+> commencement of a war, and Rostov, conscious of his advantageous
+> position in the regiment, devoted himself entirely to the pleasures
+> and interests of military service, though he knew that sooner or later
+> he would have to relinquish them.
+> 
+> The troops retired from Vilna for various complicated reasons of
+> state, political and strategic. Each step of the retreat was
+> accompanied by a complicated interplay of interests, arguments, and
+> passions at headquarters. For the Pavlograd hussars, however, the
+> whole of this retreat during the finest period of summer and with
+> sufficient supplies was a very simple and agreeable business.
+89782,89802c89813,89819
+< The discussions continued a long time, and the longer they lasted
+< the more heated became the disputes, culminating in shouts and
+< personalities, and the less was it possible to arrive at any general
+< conclusion from all that had been said. Prince Andrew, listening to
+< this polyglot talk and to these surmises, plans, refutations, and
+< shouts, felt nothing but amazement at what they were saying. A thought
+< that had long since and often occurred to him during his military
+< activities--the idea that there is not and cannot be any science of
+< war, and that therefore there can be no such thing as a military
+< genius--now appeared to him an obvious truth. "What theory and science
+< is possible about a matter the conditions and circumstances of which
+< are unknown and cannot be defined, especially when the strength of the
+< acting forces cannot be ascertained? No one was or is able to
+< foresee in what condition our or the enemy's armies will be in a day's
+< time, and no one can gauge the force of this or that detachment.
+< Sometimes--when there is not a coward at the front to shout, 'We are
+< cut off!' and start running, but a brave and jolly lad who shouts,
+< 'Hurrah!'--a detachment of five thousand is worth thirty thousand,
+< as at Schon Grabern, while at times fifty thousand run from eight
+< thousand, as at Austerlitz. What science can there be in a matter in
+< which, as in all practical matters, nothing can be defined and
+---
+> It was only at headquarters that there was depression, uneasiness,
+> and intriguing; in the body of the army they did not ask themselves
+> where they were going or why. If they regretted having to retreat,
+> it was only because they had to leave billets they had grown
+> accustomed to, or some pretty young Polish lady. If the thought that
+> things looked bad chanced to enter anyone's head, he tried to be as
+> cheerful as befits a good soldier and not to think ofcan be defined and
+90994,91005c91011,91013
+< e, though incorrectly, Pierre got the answer he sought. L'russe
+< Besuhof made 666. This discovery excited him. How, or by what means,
+< he was connected with the great event foretold in the Apocalypse he
+< did not know, but he did not doubt that connection for a moment. His
+< love for Natasha, Antichrist, Napoleon, the invasion, the comet,
+< 666, L'Empereur Napoleon, and L'russe Besuhof--all this had to
+< mature and culminate, to lift him out of that spellbound, petty sphere
+< of Moscow habits in which he felt himself held captive and lead him to
+< a great achievement and great happiness.
+< 
+< 
+< *Forty-two.
+---
+> e, though incorrectly, Pierr
+> "I think..." Pierre replied, "that he has nothing to forgive....
+> If I were in his place..."
+91006a91015,91020
+> By association of ideas, Pierre was at once carried back to the
+> day when, trying to comfort her, he had said that if he were not
+> himself but the best man in the world and free, he would ask on his
+> knees for her hand; and the same feeling of pity, tenderness, and love
+> took possession of him and the same words rose to his lips. But she
+> did not give him time to say them.
+91007a91022,91025
+> "Yes, you... you..." she said, uttering the word you rapturously-
+> "that's a different thing. I know no one kinder, more generous, or
+> better than you; nobody could be! Had you not been there then, and now
+> too, I don't know what would have become of me, because..."
+91009,91025c91027,91047
+< On the eve of the Sunday when the special prayer was read, Pierre
+< had promised the Rostovs to bring them, from Count Rostopchin whom
+< he knew well, both the appeal to the people and the news from the
+< army. In the morning, when he went to call at Rostopchin's he met
+< there a courier fresh from the army, an acquaintance of his own, who
+< often danced at Moscow balls.
+< 
+< "Do, please, for heaven's sake, relieve me of something!" said the
+< courier. "I have a sackful of letters to parents."
+< 
+< Among these letters was one from Nicholas Rostov to his father.
+< Pierre took that letter, and Rostopchin also gave him the Emperor's
+< appeal to Moscow, which had just been printed, the last army orders,
+< and his own most recent bulletin. Glancing through the army orders,
+< Pierre found in one of them, in the lists of killed, wounded, and
+< rewarded, the name of Nicholas Rostov, awarded a St. George's Cross of
+< the Fourth Class for courage shown in the Ostrovna affair, and in
+---
+> Tears suddenly rose in her eyes, she turned away, lifted her music
+> before her eyes, began singing again, and again began walking up and
+> down the room.
+> 
+> Just then Petya came running in from the drawing room.
+> 
+> Petya was now a handsome rosy lad of fifteen with full red lips
+> and resembled Natasha. He was preparing to enter the university, but
+> he and his friend Obolenski had lately, in secret, agreed to join
+> the hussars.
+> 
+> Petya had come rushing out to talk to his namesake about this
+> affair. He had asked Pierre to find out whether he would be accepted
+> in the hussars.
+> 
+> Pierre walked up and down the drawing room, not listening to what
+> Petya was saying.
+> 
+> Petya pulled him by the arm to attract his attention.
+> 
+> "Well, what about my plan?urth Class for courage shown in the Ostrovna affair, and in
+91439,91454c91461,91468
+< in, the crowd, carrying Petya with it, streamed forward into the
+< Kremlin Square which was already full of people. There were people not
+< only in the square, but everywhere--on the slopes and on the roofs. As
+< soon as Petya found himself in the square he clearly heard the sound
+< of bells and the joyous voices of the crowd that filled the whole
+< Kremlin.
+< 
+< For a while the crowd was less dense, but suddenly all heads were
+< bared, and everyone rushed forward in one direction. Petya was being
+< pressed so that he could scarcely breathe, and everybody shouted,
+< "Hurrah! hurrah! hurrah!" Petya stood on tiptoe and pushed and
+< pinched, but could see nothing except the people about him.
+< 
+< All the faces bore the same expression of excitement and enthusiasm.
+< A tradesman's wife standing beside Petya sobbed, and the tears ran
+< down her cheeks.
+---
+> in, the crow to disperse. It was already late, and Petya had not eaten
+> anything and was drenched with perspiration, yet he did not go home
+> but stood with that diminishing, but still considerable, crowd
+> before the palace while the Emperor dined--looking in at the palace
+> windows, expecting he knew not what, and envying alike the notables he
+> saw arriving at the entrance to dine with the Emperor and the court
+> footmen who served at table, glimpses of whom could be seen through
+> the windows.
+91456,91457c91470,91471
+< "Father! Angel! Dear one!" she kept repeating, wiping away her tears
+< with her fingers.
+---
+> While the Emperor was dining, Valuev, looking out of the window,
+> said:
+91459c91473
+< "Hurrah!" was heard on all sides.
+---
+> "The people are still hoping to see Your Majesty again."
+91461,91462c91475,91477
+< For a moment the crowd stood still, but then it made another rush
+< forward.
+---
+> The dinner was nearly over, and the Emperor, munching a biscuit,
+> rose and went out onto the balcony. The people, with Petya among them,
+> rushed toward the balcony.
+91464,91468c91479,91481
+< Quite beside himself, Petya, clinching his teeth and rolling his
+< eyes ferociously, pushed forward, elbowing his way and shouting
+< "hurrah!" as if he were prepared that instant to kill himself and
+< everyone else, but on both sides of him other people with similarly
+< ferocious faces pushed forward and everybody shouted "hurrah!"
+---
+> "Angel! Dear one! Hurrah! Father!..." cried the crowd, and Petya
+> with it, and again the women and men of weaker mold, Petya among them,
+> wept with joy.
+91470,91471c91483,91491
+< "So this is what the Emperor is!" thought Petya. "No, I can't
+< petition him myself--that would be too bold." But in spite of this
+---
+> A largish piece of the biscuit the Emperor was holding in his hand
+> broke off, fell on the balcony parapet, and then to the ground. A
+> coachman in a jerkin, who stood nearest, sprang forward and snatched
+> it up. Several people in the crowd rushed at the coachman. Seeing this
+> the Emperor had a plateful of biscuits brought him and began
+> throwing them down from the balcony. Petya's eyes grew bloodshot,
+> and still more excited by the danger of being crushed, he rushed at
+> the biscuits. He did not know why, but he had to have a biscuit from
+> the of this
+96903,96929c96923,96945
+< brimming over with mystic forces! Yes, indeed, I loved her. I made
+< romantic plans of love and happiness with her! Oh, what a boy I
+< was!" he said aloud bitterly. "Ah me! I believed in some ideal love
+< which was to keep her faithful to me for the whole year of my absence!
+< Like the gentle dove in the fable she was to pine apart from me....
+< But it was much simpler really.... It was all very simple and
+< horrible."
+< 
+< "When my father built Bald Hills he thought the place was his: his
+< land, his air, his peasants. But Napoleon came and swept him aside,
+< unconscious of his existence, as he might brush a chip from his
+< path, and his Bald Hills and his whole life fell to pieces. Princess
+< Mary says it is a trial sent from above. What is the trial for, when
+< he is not here and will never return? He is not here! For whom then is
+< the trial intended? The Fatherland, the destruction of Moscow! And
+< tomorrow I shall be killed, perhaps not even by a Frenchman but by one
+< of our own men, by a soldier discharging a musket close to my ear as
+< one of them did yesterday, and the French will come and take me by
+< head and heels and fling me into a hole that I may not stink under
+< their noses, and new conditions of life will arise, which will seem
+< quite ordinary to others and about which I shall know nothing. I shall
+< not exist..."
+< 
+< He looked at the row of birches shining in the sunshine, with
+< their motionless green and yellow foliage and white bark. "To die...
+< to be killed tomorrow... That I should not exist... That all this
+< should still be, but no me...."
+---
+> brimming over with mystic forces! Yes, indeed, I loved her. I olensk too he judged correctly that the French might
+> outflank us, as they had larger forces. But he could not understand
+> this," cried Prince Andrew in a shrill voice that seemed to escape him
+> involuntarily: "he could not understand that there, for the first
+> time, we were fighting for Russian soil, and that there was a spirit
+> in the men such as I had never seen before, that we had held the
+> French for two days, and that that success had increased our
+> strength tenfold. He ordered us to retreat, and all our efforts and
+> losses went for nothing. He had no thought of betraying us, he tried
+> to do the best he could, he thought out everything, and that is why he
+> is unsuitable. He is unsuitable now, just because he plans out
+> everything very thoroughly and accurately as every German has to.
+> How can I explain?... Well, say your father has a German valet, and he
+> is a splendid valet and satisfies your father's requirements better
+> than you could, then it's all right to let him serve. But if your
+> father is mortally sick you'll send the valet away and attend to
+> your father with your own unpracticed, awkward hands, and will
+> soothe him better than a skilled man who is a stranger could. So it
+> has been with Barclay. While Russia was well, a foreigner could
+> serve her and be a splendid minister; but as soon as she is in
+> danger she needs one of her own kin. But in your Club they have been
+> making him out a traitor! They slander him as a traitor, and the
+> only result wi but no me...."
+100914,100941c100930,100931
+< while carts were passing out of the gate. Pierre turned away with
+< repugnance, and closing his eyes quickly fell back on the carriage
+< seat. "No, I don't want that, I don't want to see and understand that.
+< I want to understand what was revealing itself to me in my dream.
+< One second more and I should have understood it all! But what am I
+< to do? Harness, but how can I harness everything?" and Pierre felt
+< with horror that the meaning of all he had seen and thought in the
+< dream had been destroyed.
+< 
+< The groom, the coachman, and the innkeeper told Pierre that an
+< officer had come with news that the French were already near
+< Mozhaysk and that our men were leaving it.
+< 
+< Pierre got up and, having told them to harness and overtake him,
+< went on foot through the town.
+< 
+< The troops were moving on, leaving about ten thousand wounded behind
+< them. There were wounded in the yards, at the windows of the houses,
+< and the streets were crowded with them. In the streets, around carts
+< that were to take some of the wounded away, shouts, curses, and
+< blows could be heard. Pierre offered the use of his carriage, which
+< had overtaken him, to a wounded general he knew, and drove with him
+< to Moscow. On the way Pierre was told of the death of his
+< brother-in-law Anatole and of that of Prince Andrew.
+< 
+< 
+< 
+< 
+---
+> while carts were passing out the proclamation," said the adjutant. "The young man is in prison
+> and I expect it will go hard with him."
+100943c100933,100934
+< CHAPTER X
+---
+> An old gentleman wearing a star and another official, a German
+> wearing a cross round his neck, approached the speaker.
+100944a100936,100952
+> "It's a complicated story, you know," said the adjutant. "That
+> proclamation appeared about two months ago. The count was informed
+> of it. He gave orders to investigate the matter. Gabriel Ivanovich
+> here made the inquiries. The proclamation had passed through exactly
+> sixty-three hands. He asked one, 'From whom did you get it?' 'From
+> so-and-so.' He went to the next one. 'From whom did you get it?' and
+> so on till he reached Vereshchagin, a half educated tradesman, you
+> know, 'a pet of a trader,'" said the adjutant smiling. "They asked
+> him, 'Who gave it you?' And the point is that we knew whom he had it
+> from. He could only have had it from the Postmaster. But evidently
+> they had come to some understanding. He replied: 'From no one; I
+> made it up myself.' They threatened and questioned him, but he stuck
+> to that: 'I made it up myself.' And so it was reported to the count,
+> who sent for the man. 'From whom did you get the proclamation?' 'I
+> wrote it myself.' Well, you know the count," said the adjutant
+> cheerfully, with a smile of pride, "he flared up dreadfully--and
+> just think of the fellow's audacity, lying, and obstinacy!"
+100946,100947c100954,100955
+< On the thirteenth of August Pierre reached Moscow. Close to the
+< gates of the city he was met by Count Rostopchin's adjutant.
+---
+>  "And the count wanted him to say it was from Klyucharev? I
+> understand!" said Pierre.
+100949,100950c100957
+< "We have been looking for you everywhere," said the adjutant. "The
+< count wants to see you particularly. He asks you to come to him at
+---
+> "Not at all," rejoinet wants to see you particularly. He asks you to come to him at
+102832,102864c102839,102876
+< a hundred thousand rubles' worth of goods. Can they be saved when
+< the army has gone? Eh, what people! 'Against God's might our hands
+< can't fight.'"
+< 
+< "Come inside, your honor!" repeated the tradesman, bowing.
+< 
+< The officer stood perplexed and his face showed indecision.
+< 
+< "It's not my business!" he exclaimed, and strode on quickly down one
+< of the passages.
+< 
+< From one open shop came the sound of blows and vituperation, and
+< just as the officer came up to it a man in a gray coat with a shaven
+< head was flung out violently.
+< 
+< This man, bent double, rushed past the tradesman and the officer.
+< The officer pounced on the soldiers who were in the shops, but at that
+< moment fearful screams reached them from the huge crowd on the
+< Moskva bridge and the officer ran out into the square.
+< 
+< "What is it? What is it?" he asked, but his comrade was already
+< galloping off past Vasili the Beatified in the direction from which
+< the screams came.
+< 
+< The officer mounted his horse and rode after him. When he reached
+< the bridge he saw two unlimbered guns, the infantry crossing the
+< bridge, several overturned carts, and frightened and laughing faces
+< among the troops. Beside the cannon a cart was standing to which two
+< horses were harnessed. Four borzois with collars were pressing close
+< to the wheels. The cart was loaded high, and at the very top, beside a
+< child's chair with its legs in the air, sat a peasant woman uttering
+< piercing and desperate shrieks. He was told by his fellow officers
+< that the screams of the crowd and the shrieks of the woman were due to
+---
+> a hundred thousand rubles' worth of goods. Can they be saved w behind the corner of the house with a frightened yet
+> resolute look, carrying a rolled-up check kerchief in her hand.
+> While still a few steps from the officer she unfolded the kerchief and
+> took out of it a white twenty-five-ruble assignat and hastily handed
+> it to him.
+> 
+> "If his excellency had been at home, as a kinsman he would of
+> course... but as it is..."
+> 
+> Mavra Kuzminichna grew abashed and confused. The officer did not
+> decline, but took the note quietly and thanked her.
+> 
+> "If the count had been at home..." Mavra Kuzminichna went on
+> apologetically. "Christ be with you, sir! May God preserve you!"
+> said she, bowing as she saw him out.
+> 
+> Swaying his head and smiling as if amused at himself, the officer
+> ran almost at a trot through the deserted streets toward the Yauza
+> bridge to overtake his regiment.
+> 
+> But Mavra Kuzminichna stood at the closed gate for some time with
+> moist eyes, pensively swaying her head and feeling an unexpected
+> flow of motherly tenderness and pity for the unknown young officer.
+> 
+> 
+> 
+> 
+> 
+> CHAPTER XXIII
+> 
+> 
+> From an unfinished house on the Varvarka, the ground floor of
+> which was a dramshop, came drunken shouts and songs. On benches
+> round the tables in a dirty little room sat some ten factory hands.
+> Tipsy and perspiring, with dim eyes and wide-open mouths, they were
+> all laboriously singing some song or other. They were singing
+> discordantly, arduously, and with great effort, evidently not
+> because they wished to sing, but because they wanteman were due to
+104932c104944,104947
+< said the countess.
+---
+> said the countestep and then another, and found
+> herself in the middle of a small room containing baggage. Another man-
+> Timokhin--was lying in a corner on the benches beneath the icons,
+> and two others--the doctor and a valet--lay on the floor.
+104934c104949,104957
+< "Lie down? All right, I will. I'll lie down at once," said Natasha.
+---
+> The valet sat up and whispered something. Timokhin, kept awake by
+> the pain in his wounded leg, gazed with wide-open eyes at this strange
+> apparition of a girl in a white chemise, dressing jacket, and
+> nightcap. The valet's sleepy, frightened exclamation, "What do you
+> want? What's the matter?" made Natasha approach more swiftly to what
+> was lying in the corner. Horribly unlike a man as that body looked,
+> she must see him. She passed the valet, the snuff fell from the candle
+> wick, and she saw Prince Andrew clearly with his arms outside the
+> quilt, and such as she had always seen him.
+104936,104980c104959,104964
+< When Natasha had been told that morning that Prince Andrew was
+< seriously wounded and was traveling with their party, she had at first
+< asked many questions: Where was he going? How was he wounded? Was it
+< serious? And could she see him? But after she had been told that she
+< could not see him, that he was seriously wounded but that his life was
+< not in danger, she ceased to ask questions or to speak at all,
+< evidently disbelieving what they told her, and convinced that say what
+< she might she would still be told the same. All the way she had sat
+< motionless in a corner of the coach with wide open eyes, and the
+< expression in them which the countess knew so well and feared so much,
+< and now she sat in the same way on the bench where she had seated
+< herself on arriving. She was planning something and either deciding or
+< had already decided something in her mind. The countess knew this, but
+< what it might be she did not know, and this alarmed and tormented her.
+< 
+< "Natasha, undress, darling; lie down on my bed."
+< 
+< A bed had been made on a bedstead for the countess only. Madame
+< Schoss and the two girls were to sleep on some hay on the floor.
+< 
+< "No, Mamma, I will lie down here on the floor," Natasha replied
+< irritably and she went to the window and opened it. Through the open
+< window the moans of the adjutant could be heard more distinctly. She
+< put her head out into the damp night air, and the countess saw her
+< slim neck shaking with sobs and throbbing against the window frame.
+< Natasha knew it was not Prince Andrew who was moaning. She knew Prince
+< Andrew was in the same yard as themselves and in a part of the hut
+< across the passage; but this dreadful incessant moaning made her
+< sob. The countess exchanged a look with Sonya.
+< 
+< "Lie down, darling; lie down, my pet," said the countess, softly
+< touching Natasha's shoulders. "Come, lie down."
+< 
+< "Oh, yes... I'll lie down at once," said Natasha, and began
+< hurriedly undressing, tugging at the tapes of her petticoat.
+< 
+< When she had thrown off her dress and put on a dressing jacket,
+< she sat down with her foot under her on the bed that had been made
+< up on the floor, jerked her thin and rather short plait of hair to the
+< front, and began replaiting it. Her long, thin, practiced fingers
+< rapidly unplaited, replaited, and tied up her plait. Her head moved
+< from side to side from habit, but her eyes, feverishly wide, looked
+< fixedly before her. When her toilet for the night was finished she
+< sank gently onto the sheet spread over the hay on the side nearest the
+< door.
+---
+> He was the same as ever, but the feverish color of his face, his
+> glittering eyes rapturously turned toward her, and especially his
+> neck, delicate as a child's, revealed by the turn-down collar of his
+> shirt, gave him a peculiarly innocent, childlike look, such as she had
+> never seen on him before. She went up to him and with a swift,
+> flexible, youthful movement dropped on her knees.
+104982c104966
+< "Natasha, you'd better lie in the middle," said Sonya.
+---
+> He smiled and held out his hand to her.
+104984,104985d104967
+< "I'll stay here," muttered Natasha. "Do lie down," she added
+< crossly, and buried her face in the pillow.
+104987,104999d104968
+< The countess, Madame Schoss, and Sonya undressed hastily and lay
+< down. The small lamp in front of the icons was the only light left
+< in the room. But in the yard there was a light from the fire at Little
+< Mytishchi a mile and a half away, and through the night came the noise
+< of people shouting at a tavern Mamonov's Cossacks had set up across
+< the street, and the adjutant's unceasing moans could still be heard.
+< 
+< For a long time Natasha listened attentively to the sounds that
+< reached her from inside and outside the room and did not move. First
+< she heard her mother praying and sighing and the creaking of her bed
+< under her, then Madame Schoss' familiar whistling snore and Sonya's
+< gentle breathing. Then the countess called to Natasha. Natasha did not
+< answer.
+105001d104969
+< "I think she's asleep, Mamma," said Sonya softly.
+105003,105004d104970
+< After short silence the countess spoke again but this time no one
+< replied.
+105006,105021c104972,105045
+< Soon after that Natasha heard her mother's even breathing. Natasha
+< did not move, though her little bare foot, thrust out from under the
+< quilt, was growing cold on the bare floor.
+< 
+< As if to celebrate a victory over everybody, a cricket chirped in
+< a crack in the wall. A cock crowed far off and another replied near
+< by. The shouting in the tavern had died down; only the moaning of
+< the adjutant was heard. Natasha sat up.
+< 
+< "Sonya, are you asleep? Mamma?" she whispered.
+< 
+< No one replied. Natasha rose slowly and carefully, crossed
+< herself, and stepped cautiously on the cold and dirty floor with her
+< slim, supple, bare feet. The boards of the floor creaked. Stepping
+< cautiously from one foot to the other she ran like a kitten the few
+< steps to the door and grasped the cold door handle.
+---
+> CHAPTER XXXII
+> 
+> 
+> Seven days had passed since Prince Andrew found himself in the
+> ambulance station on the field of Borodino. His feverish state and the
+> inflammation of his bowels, which were injured, were in the doctor's
+> 
+> opinion sure to carry him off. But on the seventh day he ate with
+> pleasure a piece of bread with some tea, and the doctor noticed that
+> his temperature was lower. He had regained consciousness that morning.
+> The first night after they left Moscow had been fairly warm and he had
+> remained in the caleche, but at Mytishchi the wounded man himself
+> asked to be taken out and given some tea. The pain caused by his
+> removal into the hut had made him groan aloud and again lose
+> consciousness. When he had been placed on his camp bed he lay for a
+> long time motionless with closed eyes. Then he opened them and
+> whispered softly: "And the tea?" His remembering such a small detail
+> of everyday life astonished the doctor. He felt Prince Andrew's pulse,
+> and to his surprise and dissatisfaction found it had improved. He
+> was dissatisfied because he knew by experience that if his patient did
+> not die now, he would do so a little later with greater suffering.
+> Timokhin, the red-nosed major of Prince Andrew's regiment, had
+> joined him in Moscow and was being taken along with him, having been
+> wounded in the leg at the battle of Borodino. They were accompanied by
+> a doctor, Prince Andrew's valet, his coachman, and two orderlies.
+> 
+> They gave Prince Andrew some tea. He drank it eagerly, looking
+> with feverish eyes at the door in front of him as if trying to
+> understand and remember something.
+> 
+> "I don't want any more. Is Timokhin here?" he asked.
+> 
+> Timokhin crept along the bench to him.
+> 
+> "I am here, your excellency."
+> 
+> "How's your wound?"
+> 
+> "Mine, sir? All right. But how about you?"
+> 
+> Prince Andrew again pondered as if trying to remember something.
+> 
+> "Couldn't one get a book?" he asked.
+> 
+> "What book?"
+> 
+> "The Gospels. I haven't one."
+> 
+> The doctor promised to procure it for him and began to ask how he
+> was feeling. Prince Andrew answered all his questions reluctantly
+> but reasonably, and then said he wanted a bolster placed under him
+> as he was uncomfortable and in great pain. The doctor and valet lifted
+> the cloak with which he was covered and, making wry faces at the
+> noisome smell of mortifying flesh that came from the wound, began
+> examining that dreadful place. The doctor was very much displeased
+> about something and made a change in the dressings, turning the
+> wounded man over so that he groaned again and grew unconscious and
+> delirious from the agony. He kept asking them to get him the book
+> and put it under him.
+> 
+> "What trouble would it be to you?" he said. "I have not got one.
+> Please get it for me and put it under for a moment," he pleaded in a
+> piteous voice.
+> 
+> The doctor went into the passage to wash his hands.
+> 
+> "You fellows have no conscience," said he to the valet who was
+> pouring water over his hands. "For just one moment I didn't look after
+> you... It's such pain, you know, that I wonder how he can bear it."
+> 
+> "By the Lord Jesus Christ, I thought we had put something under
+> him!" said the valet.
+> 
+> The first time Prince Andrew understoodd the cold door handle.
+105424,105450c105448,105472
+< looting, and to reassure the inhabitants. But Pierre did not know
+< this; he was entirely absorbed in what lay before him, and was
+< tortured--as those are who obstinately undertake a task that is
+< impossible for them not because of its difficulty but because of its
+< incompatibility with their natures--by the fear of weakening at the
+< decisive moment and so losing his self-esteem.
+< 
+< Though he heard and saw nothing around him he found his way by
+< instinct and did not go wrong in the side streets that led to the
+< Povarskoy.
+< 
+< As Pierre approached that street the smoke became denser and denser-
+< he even felt the heat of the fire. Occasionally curly tongues of flame
+< rose from under the roofs of the houses. He met more people in the
+< streets and they were more excited. But Pierre, though he felt that
+< something unusual was happening around him, did not realize that he
+< was approaching the fire. As he was going along a foot path across a
+< wide-open space adjoining the Povarskoy on one side and the gardens of
+< Prince Gruzinski's house on the other, Pierre suddenly heard the
+< desperate weeping of a woman close to him. He stopped as if
+< awakening from a dream and lifted his head.
+< 
+< By the side of the path, on the dusty dry grass, all sorts of
+< household goods lay in a heap: featherbeds, a samovar, icons, and
+< trunks. On the ground, beside the trunks, sat a thin woman no longer
+< young, with long, prominent upper teeth, and wearing a black cloak and
+< cap. This woman, swaying to and fro and muttering something, was
+---
+> lootin the large house
+> that was as yet burning only at one end, just below the roof, and
+> around which swarmed a crowd of Frenchmen. At first Pierre did not
+> realize what these men, who were dragging something out, were about;
+> but seeing before him a Frenchman hitting a peasant with a blunt saber
+> and trying to take from him a fox-fur coat, he vaguely understood that
+> looting was going on there, but he had no time to dwell on that idea.
+> 
+> The sounds of crackling and the din of falling walls and ceilings,
+> the whistle and hiss of the flames, the excited shouts of the
+> people, and the sight of the swaying smoke, now gathering into thick
+> black clouds and now soaring up with glittering sparks, with here
+> and there dense sheaves of flame (now red and now like golden fish
+> scales creeping along the walls), and the heat and smoke and
+> rapidity of motion, produced on Pierre the usual animating effects
+> of a conflagration. It had a peculiarly strong effect on him because
+> at the sight of the fire he felt himself suddenly freed from the ideas
+> that had weighed him down. He felt young, bright, adroit, and
+> resolute. He ran round to the other side of the lodge and was about to
+> dash into that part of it which was still standing, when just above
+> his head he heard several voices shouting and then a cracking sound
+> and the ring of something heavy falling close beside him.
+> 
+> Pierre looked up and saw at a window of the large house some
+> Frenchmen who had just thrown out the drawer ofro and muttering something, was
+111206,111230c111228,111235
+< People have called this kind of war "guerrilla warfare" and assume
+< that by so calling it they have explained its meaning. But such a
+< war does not fit in under any rule and is directly opposed to a
+< well-known rule of tactics which is accepted as infallible. That
+< rule says that an attacker should concentrate his forces in order to
+< be stronger than his opponent at the moment of conflict.
+< 
+< Guerrilla war (always successful, as history shows) directly
+< infringes that rule.
+< 
+< This contradiction arises from the fact that military science
+< assumes the strength of an army to be identical with its numbers.
+< Military science says that the more troops the greater the strength.
+< Les gros bataillons ont toujours raison.*
+< 
+< 
+< *Large battalions are always victorious.
+< 
+< 
+< For military science to say this is like defining momentum in
+< mechanics by reference to the mass only: stating that momenta are
+< equal or unequal to each other simply because the masses involved
+< are equal or unequal.
+< 
+< Momentum (quantity of motion) is the product of mass and velocity.
+---
+> People huch companies, of various sizes and characters. There were some
+> that adopted all the army methods and had infantry, artillery, staffs,
+> and the comforts of life. Others consisted solely of Cossack
+> cavalry. There were also small scratch groups of foot and horse, and
+> groups of peasants and landowners that remained unknown. A sacristan
+> commanded one party which captured several hundred prisoners in the
+> course of a month; and there was Vasilisa, the wife of a village
+> elder, who slew hundreds of the French.
+111232,111233c111237,111250
+< In military affairs the strength of an army is the product of its
+< mass and some unknown x.
+---
+> The partisan warfare flamed up most fiercely in the latter days of
+> October. Its first period had passed: when the partisans themselves,
+> amazed at their own boldness, feared every minute to be surrounded and
+> captured by the French, and hid in the forests without unsaddling,
+> hardly daring to dismount and always expecting to be pursued. By the
+> end of October this kind of warfare had taken definite shape: it had
+> become clear to all what could be ventured against the French and what
+> could not. Now only the commanders of detachments with staffs, and
+> moving according to rules at a distance from the French, still
+> regarded many things as impossible. The small bands that had started
+> their activities long before and had already observed the French
+> closely considered things possible which the commanders of the big
+> detachments did not dare to contemplate. The Cossacks and peasants who
+> crept in among the French now considered everything possible.
+111235,111240c111252
+< Military science, seeing in history innumerable instances of the
+< fact that the size of any army does not coincide with its strength and
+< that small detachments defeat larger ones, obscurely admits the
+< existence of this unknown factor and tries to discover it--now in a
+< geometric formation, now in the equipment employed, now, and most
+< usually, in the genius of the commanders. But the assignment of
+---
+> On October, in the genius of the commanders. But the assignment of
+111328,111335c111340,111349
+< such companies, of various sizes and characters. There were some
+< that adopted all the army methods and had infantry, artillery, staffs,
+< and the comforts of life. Others consisted solely of Cossack
+< cavalry. There were also small scratch groups of foot and horse, and
+< groups of peasants and landowners that remained unknown. A sacristan
+< commanded one party which captured several hundred prisoners in the
+< course of a month; and there was Vasilisa, the wife of a village
+< elder, who slew hundreds of the French.
+---
+> sa tall man as straight as an arrow,
+> pale-faced, fair-haired, with narrow light eyes and with calm
+> self-satisfaction in his face and bearing. Though it was impossible to
+> say in what the peculiarity of the horse and rider lay, yet at first
+> glance at the esaul and Denisov one saw that the latter was wet and
+> uncomfortable and was a man mounted on a horse, while looking at the
+> esaul one saw that he was as comfortable and as much at ease as always
+> and that he was not a man who had mounted a horse, but a man who was
+> one with his horse, a being consequently possessed of twofold
+> strength.
+111337,111350c111351,111362
+< The partisan warfare flamed up most fiercely in the latter days of
+< October. Its first period had passed: when the partisans themselves,
+< amazed at their own boldness, feared every minute to be surrounded and
+< captured by the French, and hid in the forests without unsaddling,
+< hardly daring to dismount and always expecting to be pursued. By the
+< end of October this kind of warfare had taken definite shape: it had
+< become clear to all what could be ventured against the French and what
+< could not. Now only the commanders of detachments with staffs, and
+< moving according to rules at a distance from the French, still
+< regarded many things as impossible. The small bands that had started
+< their activities long before and had already observed the French
+< closely considered things possible which the commanders of the big
+< detachments did not dare to contemplate. The Cossacks and peasants who
+< crept in among the French now considered everything possible.
+---
+> A little ahead of them walked a peasant guide, wet to the skin and
+> wearing a gray peasant coat and a white knitted cap.
+> 
+> A little behind, on a poor, small, lean Kirghiz mount with an
+> enormous tail and mane and a bleeding mouth, rode a young officer in a
+> blue French overcoat.
+> 
+> Beside him rode an hussar, with a boy in a tattered French uniform
+> and blue cap behind him on the crupper of his horse. The boy held on
+> to the hussar with cold, red hands, and raising his eyebrows gazed
+> about him with surprise. This was the French drummer boy captured that
+> morning.
+111352c111364,111368
+< On October 22, Denisov (who was one of the irregulars) was with
+---
+> Behind them along the narrow, sodden, cutup forest road came hussars
+> in threes and fours, and then Cossacks: some in felt cloaks, some in
+> French greatcoats, and some with horsecloths over their heads. The
+> horses, being drenched by the rain, all looked black whether
+> chestnut or bay. Their necks, with their wet, close 22, Denisov (who was one of the irregulars) was with
+114541,114568c114557,114598
+< One would have thought that under the almost incredibly wretched
+< conditions the Russian soldiers were in at that time--lacking warm
+< boots and sheepskin coats, without a roof over their heads, in the
+< snow with eighteen degrees of frost, and without even full rations
+< (the commissariat did not always keep up with the troops)--they
+< would have presented a very sad and depressing spectacle.
+< 
+< On the contrary, the army had never under the best material
+< conditions presented a more cheerful and animated aspect. This was
+< because all who began to grow depressed or who lost strength were
+< sifted out of the army day by day. All the physically or morally
+< weak had long since been left behind and only the flower of the
+< army--physically and mentally--remained.
+< 
+< More men collected behind the wattle fence of the Eighth Company
+< than anywhere else. Two sergeants major were sitting with them and
+< their campfire blazed brighter than others. For leave to sit by
+< their wattle they demanded contributions of fuel.
+< 
+< "Eh, Makeev! What has become of you, you son of a bitch? Are you
+< lost or have the wolves eaten you? Fetch some more wood!" shouted a
+< red-haired and red-faced man, screwing up his eyes and blinking
+< because of the smoke but not moving back from the fire. "And you,
+< Jackdaw, go and fetch some wood!" said he to another soldier.
+< 
+< This red-haired man was neither a sergeant nor a corporal, but being
+< robust he ordered about those weaker than himself. The soldier they
+< called "Jackdaw," a thin little fellow with a sharp nose, rose
+---
+> One would have thought that under the almost incredibly wrele," said an old soldier. "It's the only one
+> worth remembering; but since that... it's only been tormenting folk."
+> 
+> "And do you know, Daddy, the day before yesterday we ran at them
+> and, my word, they didn't let us get near before they just threw
+> down their muskets and went on their knees. 'Pardon!' they say. That's
+> only one case. They say Platov took 'Poleon himself twice. But he
+> didn't know the right charm. He catches him and catches him--no
+> good! He turns into a bird in his hands and flies away. And there's no
+> way of killing him either."
+> 
+> "You're a first-class liar, Kiselev, when I come to look at you!"
+> 
+> "Liar, indeed! It's the real truth."
+> 
+> "If he fell into my hands, when I'd caught him I'd bury him in the
+> ground with an aspen stake to fix him down. What a lot of men he's
+> ruined!"
+> 
+> "Well, anyhow we're going to end it. He won't come here again,"
+> remarked the old soldier, yawning.
+> 
+> The conversation flagged, and the soldiers began settling down to
+> sleep.
+> 
+> "Look at the stars. It's wonderful how they shine! You would think
+> the women had spread out their linen," said one of the men, gazing
+> with admiration at the Milky Way.
+> 
+> "That's a sign of a good harvest next year."
+> 
+> "We shall want some more wood."
+> 
+> "You warm your back and your belly gets frozen. That's queer."
+> 
+> "O Lord!"
+> 
+> "What are you pushing for? Is the fire only for you? Look how he's
+> sprawling!"
+> 
+> In the silence that ensued, the snoring of those who had fallen
+> asleep could be heard. Others
+117236,117244c117266
+< say.
+< 
+< "Why does she come prowling here? What does she want? I can't bear
+< these ladies and all these civilities!" said he aloud in Sonya's
+< presence, evidently unable to repress his vexation, after the
+< princess' carriage had disappeared.
+< 
+< "Oh, Nicholas, how can you talk like that?" cried Sonya, hardly able
+< to conceal her delight. "She is so kind and Mamma is so fond of her!"
+---
+> say.s to him that she now spoke.
+117246,117261c117268,117272
+< Nicholas did not reply and tried to avoid speaking of the princess
+< any more. But after her visit the old countess spoke of her several
+< times a day.
+< 
+< She sang her praises, insisted that her son must call on her,
+< expressed a wish to see her often, but yet always became ill-humored
+< when she began to talk about her.
+< 
+< Nicholas tried to keep silence when his mother spoke of the
+< princess, but his silence irritated her.
+< 
+< "She is a very admirable and excellent young woman," said she,
+< "and you must go and call on her. You would at least be seeing
+< somebody, and I think it must be dull for you only seeing us."
+< 
+< "But I don't in the least want to, Mamma."
+---
+> "I thought you would allow me to tell you this," she said. "I had
+> come so near to you... and to all your family that I thought you would
+> not consider my sympathy misplaced, but I was mistaken," and
+> suddenly her voice trembled. "I don't know why," she continued,
+> recovering herself, "but you used to be different, and..."
+117263,117265c117274,117275
+< "You used to want to, and now you don't. Really I don't understand
+< you, my dear. One day you are dull, and the next you refuse to see
+< anyone."
+---
+> "There are a thousand reasons why," laying special emphasis on the
+> why. "Thank you, Princess," he added softly. "Sometimes it is hard."
+117267c117277,117284
+< "But I never said I was dull."
+---
+> "So that's why! That's why!" a voice whispered in Princess Mary's
+> soul. "No, it was not only that gay, kind, and frank look, not only
+> that handsome exterior, that I loved in him. I divined his noble,
+> resolute, self-sacrificing spirit too," she said to herself. "Yes,
+> he is poor now and I am rich.... Yes, that's the only reason....
+> Yes, were it not for that..." And remembering his former tenderness,
+> and looking now at his kind, sorrowful face, she suddenly understood
+> the cause of his coldness.
+117269,117272c117286,117287
+< "Why, you said yourself you don't want even to see her. She is a
+< very admirable young woman and you always liked her, but now
+< suddenly you have got some notion or other in your head. You hide
+< everything from me."
+---
+> "But why, Count, why?" she almost cried, unconsciously moving closer
+> to him. "Why? Tell me. You must tell me!"
+117274c117289
+< "Not at all, Mamma."
+---
+> He was silent.
+117276c117291,117296
+< "If I were asking you to do something disagreeable now--but I only
+---
+> "I don't understand your why, Count," she continued, "but it's
+> hard for me... I confess it. For some reason you wish to deprive me of
+> our former friendship. And that hurts me." There were tears in her
+> eyes and in her voice. "I have had so little happiness in life that
+> every loss is hard for me to bear.... Excuse me, good-by!" and
+> suddenly she began mething disagreeable now--but I only
+118976,118980c118996,119006
+< "A diary, Nicholas," she replied, handing him a blue exercise book
+< filled with her firm, bold writing.
+< 
+< "A diary?" Nicholas repeated with a shade of irony, and he took up
+< the book.
+---
+> "A diary, Nicholas," she replied, handing him a blue exercholas. "Yes, Pierre always was a dreamer and
+> always will be," he continued, returning to the talk in the study
+> which had evidently disturbed him. "Well, what business is it of
+> mine what goes on there--whether Arakcheev is bad, and all that?
+> What business was it of mine when I married and was so deep in debt
+> that I was threatened with prison, and had a mother who could not
+> see or understand it? And then there are you and the children and
+> our affairs. Is it for my own pleasure that I am at the farm or in the
+> office from morning to night? No, but I know I must work to comfort my
+> mother, to repay you, and not to leave the children such beggars as
+> I was."
+118982c119008,119013
+< It was in French.
+---
+> Countess Mary wanted to tell him that man does not live by bread
+> alone and that he attached too much importance to these matters. But
+> she knew she must not say this and that it would be useless to do
+> so. She only took his hand and kissed it. He took this as a sign of
+> approval and a confirmation of his thoughts, and after a few
+> minutes' reflection continued to think aloud.
+118983a119015,119017
+> "You know, Mary, today Elias Mitrofanych" (this was his overseer)
+> "came back from the Tambov estate and told me they are already
+> offering eighty thousand rubles for the forest."
+118985,119010c119019,119021
+< December 4. Today when Andrusha (her eldest boy) woke up he did
+< not wish to dress and Mademoiselle Louise sent for me. He was
+< naughty and obstinate. I tried threats, but he only grew angrier. Then
+< I took the matter in hand: I left him alone and began with nurse's
+< help to get the other children up, telling him that I did not love
+< him. For a long time he was silent, as if astonished, then he jumped
+< out of bed, ran to me in his shirt, and sobbed so that I could not
+< calm him for a long time. It was plain that what troubled him most was
+< that he had grieved me. Afterwards in the evening when I gave him
+< his ticket, he again began crying piteously and kissing me. One can do
+< anything with him by tenderness.
+< 
+< 
+< "What is a 'ticket'?" Nicholas inquired.
+< 
+< "I have begun giving the elder ones marks every evening, showing how
+< they have behaved."
+< 
+< Nicholas looked into the radiant eyes that were gazing at him, and
+< continued to turn over the pages and read. In the diary was set down
+< everything in the children's lives that seemed noteworthy to their
+< mother as showing their characters or suggesting general reflections
+< on educational methods. They were for the most part quite
+< insignificant trifles, but did not seem so to the mother or to the
+< father either, now that he read this diary about his children for
+< the first time.
+---
+> And with an eager face Nicholas began to speak of the possibility of
+> repurchasing Otradnoe before long, and added: "Another ten years of
+> life and I shall leave the children... in an excellent position."
+119012c119023
+< Under the date "5" was entered:
+---
+> Countess Mary listened to her husband and underUnder the date "5" was entered:
+120655,120683c120666,120695
+< and always expects the law that he has learned to be fulfilled.
+< 
+< But learning just as certainly that his will is subject to laws,
+< he does not and cannot believe this.
+< 
+< However often experiment and reasoning may show a man that under the
+< same conditions and with the same character he will do the same
+< thing as before, yet when under the same conditions and with the
+< same character he approaches for the thousandth time the action that
+< always ends in the same way, he feels as certainly convinced as before
+< the experiment that he can act as he pleases. Every man, savage or
+< sage, however incontestably reason and experiment may prove to him
+< that it is impossible to imagine two different courses of action in
+< precisely the same conditions, feels that without this irrational
+< conception (which constitutes the essence of freedom) he cannot
+< imagine life. He feels that however impossible it may be, it is so,
+< for without this conception of freedom not only would he be unable
+< to understand life, but he would be unable to live for a single
+< moment.
+< 
+< He could not live, because all man's efforts, all his impulses to
+< life, are only efforts to increase freedom. Wealth and poverty, fame
+< and obscurity, power and subordination, strength and weakness,
+< health and disease, culture and ignorance, work and leisure, repletion
+< and hunger, virtue and vice, are only greater or lesser degrees of
+< freedom.
+< 
+< A man having no freedom cannot be conceived of except as deprived of
+< life.
+---
+> and always expects the law that he has learned to be fulfillede question is dealt with, that for history this question does not
+> refer to the essence of man's free will but its manifestation in the
+> past and under certain conditions.
+> 
+> In regard to this question, history stands to the other sciences
+> as experimental science stands to abstract science.
+> 
+> The subject for history is not man's will itself but our
+> presentation of it.
+> 
+> And so for history, the insoluble mystery presented by the
+> incompatibility of free will and inevitability does not exist as it
+> does for theology, ethics, and philosophy. History surveys a
+> presentation of man's life in which the union of these two
+> contradictions has already taken place.
+> 
+> In actual life each historic event, each human action, is very
+> clearly and definitely understood without any sense of
+> contradiction, although each event presents itself as partly free
+> and partly compulsory.
+> 
+> To solve the question of how freedom and necessity are combined
+> and what constitutes the essence of these two conceptions, the
+> philosophy of history can and should follow a path contrary to that
+> taken by other sciences. Instead of first defining the conceptions
+> of freedom and inevitability in themselves, and then ranging the
+> phenomena of life under those definitions, history should deduce a
+> definition of the conception of freedom and inevitability themselves
+> from the immense quantity of phenomena of which it is cognizant and
+> that always appear dependent on these two elements.
+120685c120697
+< If the conception of freedom appears to reason to be a senseless
+---
+> Whatever presentatiless
