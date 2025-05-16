@@ -102,7 +102,8 @@ int main (int argc, char* argv[]) {
 	std::string Port;
 	std::string infilePath;
 	std::string outfilePath;
-	std::unordered_set<int> unackedPackets;	
+	std::unordered_set<uint32_t, int> unackedPackets;	
+	const int MAX_RETRIES_PER_PACKET = 5;
 	char buffer[1472];
 	std::string line;
 	uint32_t nextSeqNum = 0;
@@ -227,7 +228,7 @@ int main (int argc, char* argv[]) {
 				return -1;
 			}
 			std::cout << "Seq # "<< nextSeqNum << "Payload Sent" << bytesRead << "\n";
-			unackedPackets.insert(nextSeqNum);
+			unackedPackets[nextSeqNum] = 0;
 			nextSeqNum++;
 		}
 
@@ -258,14 +259,19 @@ int main (int argc, char* argv[]) {
 			// if the fd is not ready retransmit, only retransmit the older unacknoldge sequence number 
 			for(uint32_t seq = baseSeqNum; seq < nextSeqNum; seq++){ //if the map isnt empty
 				if(unackedPackets.count(seq)){
-					int retrans = retransmit(baseSeqNum,clientSocket,(struct sockaddr*)&serverAddress,file);
-					if (retrans == -1){
-						std::cerr << "error retransmitting" << "\n";
-					}else{
-						std::cout << "Timeout waiting for echo. Retry#" << retries << "\n";
-					}
-					break;
+					unackedPackets[seq]++;
+					if (unackedPackets[seq] > MAX_RETRIES_PER_PACKET){
+						std::cerr << "Seq" << seq << "Failed Too Many Times\n";
+						unackedPackets.erase(seq);
+						continue;
 				}
+				int retrans = retransmit(seq,clientSocket, (struct sockaddr*)&serverAddress, file);
+				if(retrans == -1){
+					std::cerr << "Error Transmitting Seq=" << seq << "\n";
+				}else{
+					std::cout << "Retransmitting seq= " << seq << ", attempt " << unackedPackets[seq] << "\n";
+				}
+			break;
 		}
 		}else if (activity < 0){
 			std::cerr << "Select Error\n";
