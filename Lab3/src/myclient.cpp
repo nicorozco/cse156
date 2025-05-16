@@ -40,7 +40,7 @@ bool isValidIPv4Format(const std::string& ip){
 	std::regex ipv4Pattern(R"(^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$)");
 	return std::regex_match(ip, ipv4Pattern);
 }
-int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* serverAddress,std::ifstream& file){
+int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* serverAddress,std::ifstream& file, const std::map<uint32_t, std::pair<long,uint16_t>>& metaMap){
 	
 	constexpr std::size_t MSS = sizeof(UDPPacket{}.data);
 	std::cout << "MSS: " << MSS << "\n";	
@@ -50,8 +50,13 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	lostPacket.sequenceNumber = htonl(expectedSeqNum);//set the sequence number
 	std::cout << "Resending Sequence Number = " << expectedSeqNum << "\n";
 	
-	long offset = static_cast<long>(expectedSeqNum) * MSS;
-	std::cout << "Offset" << offset << "\n";	
+	auto it = metaMap.find(expectedSeqNum);
+	if(it == metaMap.end()){
+		std::cerr << "Missing metadata for seq=" << expectedSeqNum <<"\n";
+		return -1;
+	}
+	long offset = it->second.first;
+	uint16_t dataSize = it->second.second;
 	
 	file.seekg(0,std::ios::end);
 	std::streampos fileSize = file.tellg();	
@@ -62,7 +67,7 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	}
 
 	file.seekg(offset, std::ios::beg); //utilize seekg() to point the fd to the data and use SEEK_SET to go from the beginning of the file
-	file.read(lostPacket.data,MSS); //utilize read to read into the data
+	file.read(lostPacket.data,dataSize); //utilize read to read into the data
 
 	std::streamsize bytes_reRead = file.gcount();
 	std::cout << "Data ReRead" << bytes_reRead << "\n";	
@@ -85,6 +90,7 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 			return -1;
 		}
 	}
+    std::cout << "RETRANSMIT: seq= " << expectedSeqNum << ", bytesRead=" << bytes_reRead << ", offset=" << offset << "\n";	
 	lostPacket.payloadSize = htons(static_cast<uint16_t>(bytes_reRead));
 	int totalSize = sizeof(lostPacket.sequenceNumber) + sizeof(lostPacket.payloadSize) + bytes_reRead;
 	auto* ipv4 = (struct sockaddr_in*)serverAddress;
@@ -97,7 +103,7 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 
 
 int main (int argc, char* argv[]) {
-	
+	std::map<uint32_t, std::pair<long, uint16_t>> sentPacketMeta;	
 	std::string serverIP;
 	std::string Port;
 	std::string infilePath;
@@ -206,6 +212,7 @@ int main (int argc, char* argv[]) {
 
 	while(true){
 		//while we are within the window and there is data to read --> create packet and trasmit data
+		std::cout << "Top of Loop" << "\n";
 		while(nextSeqNum < baseSeqNum + WINDOW_SIZE){
 			UDPPacket packet;
 			memset(&packet,0,sizeof(packet));
@@ -217,6 +224,10 @@ int main (int argc, char* argv[]) {
 				std::cerr << "Required Minimum MSS is X+1\n";
 				break;
 			}
+			long offset = file.tellg() - bytesRead;
+			sentPacketMeta[nextSeqNum] = std::make_pair(offset,static_cast<uint16_t>(bytesRead));
+			
+			std::cout << "ORIGINAL SEND: seq=" << nextSeqNum << ", bytesRead=" << bytesRead << ", offset=" << offset << "\n";
 			packet.payloadSize = htons(static_cast<uint16_t>(bytesRead));
 			packet.sequenceNumber = htonl(nextSeqNum);	
 			int totalSize = sizeof(packet.sequenceNumber) + sizeof(packet.payloadSize) + bytesRead;
@@ -231,13 +242,6 @@ int main (int argc, char* argv[]) {
 			nextSeqNum++;
 		}
 		
-		auto currentTime = std::chrono::steady_clock::now();
-		auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
-		if (!recievedFirstPacket && elapsed >= 30) {
-    			std::cerr << "Cannot detect server\n";
-    			close(clientSocket);
-    			return 2;
-		}
 		fd_set rset; // create socket set
 		FD_ZERO(&rset);//clear the socket set
 		FD_SET(clientSocket,&rset); //add the clientsocket to the set 
@@ -250,25 +254,36 @@ int main (int argc, char* argv[]) {
 		
 		if(activity == 0){
 			std::cerr << "Timeout waiting for echo. Retry #" << retries << "\n";
-			// if the fd is not ready retransmit, only retransmit the older unacknoldge sequence number 
-			for(uint32_t seq = baseSeqNum; seq < nextSeqNum; seq++){ //if the map isnt empty
+			
+			auto currentTime = std::chrono::steady_clock::now();
+			auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
+			if (!recievedFirstPacket && elapsed >= 30) {
+					std::cerr << "Cannot detect server\n";
+					close(clientSocket);
+					return 2;
+				}
+			retries++;
+				//check if the lowest sequence number not acknlowedge
+			for(uint32_t seq = baseSeqNum; seq < nextSeqNum; seq++){ 	
 				if(unackedPackets.count(seq)){
 					unackedPackets[seq]++;
+
 					if (unackedPackets[seq] > MAX_RETRIES){
 						std::cerr << "Seq" << seq << "Failed Too Many Times\n";
 						unackedPackets.erase(seq);
 						continue;
 					}
-					int retrans = retransmit(seq,clientSocket, (struct sockaddr*)&serverAddress, file);
+					int retrans = retransmit(seq,clientSocket, (struct sockaddr*)&serverAddress, file, sentPacketMeta);
 					if(retrans == -1){
 						std::cerr << "Error Transmitting Seq=" << seq << "\n";
 					}else{
 						std::cout << "Retransmitting seq= " << seq << ", attempt " << unackedPackets[seq] << "\n";
 					}
-				break;
+				}
 			}
 		}
-		}else if (activity < 0){
+
+		if (activity < 0){
 			std::cerr << "Select Error\n";
 			return -1;
 		}

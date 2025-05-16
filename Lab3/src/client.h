@@ -30,5 +30,5 @@ struct ClientState {
 
 bool isValidIPv4Format(const std::string& ip);
 
-int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* serverAddress,std::ifstream& file);
+int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* serverAddress,std::ifstream& file,const std::map<uint32_t, std::pair<long, uint16_t>>& metaMap);
 

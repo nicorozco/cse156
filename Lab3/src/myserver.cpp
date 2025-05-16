@@ -105,14 +105,18 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				if (seqNum < state.expectedSeqNum){
 				    // Already received and written this packet; re-ACK if needed, but don't write again.
 				    std::cout << currentTimestamp() << ", DUPLICATE, " << seqNum << "\n";
-				    
+				   	bool dropAck = dropPacket(lossRate);
+					if(dropAck){
+						std::cout << currentTimestamp() << ", DROP ACK, " << seqNum << "\n";
+					} else {
 						ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);//ack the duplica						
 						if (sentBytes < 0) {
 					    	perror("Error sending ACK Packet");
 						} else {
 					    	std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
 						}
-					continue;
+					}
+				continue;
 				}
 //________________________________________________________________________________________________________________________________________________________
 				// Case 2: Buffer out of order packets 
@@ -123,7 +127,13 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 					pktCopy.payloadSize = recievedPacket->payloadSize;
 					uint16_t actualSize = ntohs(recievedPacket->payloadSize);
 					memcpy(pktCopy.data, recievedPacket->data,actualSize);
-					state.packetsRecieved[seqNum] = pktCopy;
+					if(actualSize > MSS){
+						std::cerr << "Invalid Payload Size: " << actualSize << " on seqNum " << seqNum << "\n";
+						continue;
+					}
+					if(!state.packetsRecieved.count(seqNum)){
+						state.packetsRecieved[seqNum] = pktCopy;
+					}
 					//send acknoledgement
 					
 						ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);//ack the duplicate
