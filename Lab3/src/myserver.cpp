@@ -106,16 +106,15 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				    // Already received and written this packet; re-ACK if needed, but don't write again.
 				    std::cout << currentTimestamp() << ", DUPLICATE, " << seqNum << "\n";
 				    
-						ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);//ack the duplicate
+						ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);//ack the duplica						
 						if (sentBytes < 0) {
 					    	perror("Error sending ACK Packet");
 						} else {
 					    	std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
 						}
-					}
 					continue;
 				}
-//___________________________________________________________________________________________________________________________________________________________
+//________________________________________________________________________________________________________________________________________________________
 				// Case 2: Buffer out of order packets 
 				if (seqNum > state.expectedSeqNum){					
 					std::cout << "Inserting" << seqNum << "into buffer" << "\n";
@@ -196,6 +195,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			}
 		}
 	}
+}
 bool isPortValid(int port){
  if ( port < 1024 || port > 65553){
 	return false;
