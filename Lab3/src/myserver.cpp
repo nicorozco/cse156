@@ -191,6 +191,11 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 									state.expectedSeqNum++;
 									continue;
 								}
+								if(state.expectedSeqNum == seqNum){
+									state.packetsRecieved.erase(state.expectedSeqNum);
+									state.expectedSeqNum++;
+									continue;
+								}
 								ssize_t sentBuff = sendAck(serverSocket, state.expectedSeqNum, &clientAddr, clientLen);
 								if(sentBuff < 0){
 									std::cerr << "Error Sending ACK Packet\n";
