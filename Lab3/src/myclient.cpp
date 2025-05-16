@@ -103,7 +103,6 @@ int main (int argc, char* argv[]) {
 	std::string infilePath;
 	std::string outfilePath;
 	std::unordered_map<uint32_t, int> unackedPackets;	
-	const int MAX_RETRIES_PER_PACKET = 5;
 	char buffer[1472];
 	std::string line;
 	uint32_t nextSeqNum = 0;
@@ -231,7 +230,14 @@ int main (int argc, char* argv[]) {
 			unackedPackets[nextSeqNum] = 0;
 			nextSeqNum++;
 		}
-
+		
+		auto currentTime = std::chrono::steady_clock::now();
+		auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
+		if (!recievedFirstPacket && elapsed >= 30) {
+    			std::cerr << "Cannot detect server\n";
+    			close(clientSocket);
+    			return 2;
+		}
 		fd_set rset; // create socket set
 		FD_ZERO(&rset);//clear the socket set
 		FD_SET(clientSocket,&rset); //add the clientsocket to the set 
@@ -243,24 +249,12 @@ int main (int argc, char* argv[]) {
 		int activity = select(clientSocket+1,&rset,NULL,NULL,&timeout);
 		
 		if(activity == 0){
-			auto currentTime = std::chrono::steady_clock::now();
-			auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
-			if (!recievedFirstPacket && elapsed >= 30) {
-    				std::cerr << "Cannot detect server\n";
-    				close(clientSocket);
-    				return 2;
-			}
-			retries++;
 			std::cerr << "Timeout waiting for echo. Retry #" << retries << "\n";
-			if(retries >= MAX_RETRIES){
-				std::cerr << "Cannot detect server\n";
-				return 2;
-			}
 			// if the fd is not ready retransmit, only retransmit the older unacknoldge sequence number 
 			for(uint32_t seq = baseSeqNum; seq < nextSeqNum; seq++){ //if the map isnt empty
 				if(unackedPackets.count(seq)){
 					unackedPackets[seq]++;
-					if (unackedPackets[seq] > MAX_RETRIES_PER_PACKET){
+					if (unackedPackets[seq] > MAX_RETRIES){
 						std::cerr << "Seq" << seq << "Failed Too Many Times\n";
 						unackedPackets.erase(seq);
 						continue;
