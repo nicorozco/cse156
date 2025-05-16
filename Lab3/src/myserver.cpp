@@ -124,7 +124,10 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 				if (seqNum > state.expectedSeqNum){					
 					std::cout << "Inserting" << seqNum << "into buffer" << "\n";
 					UDPPacket pktCopy;
-					memcpy(&pktCopy, recievedPacket, sizeof(UDPPacket));
+					pktCopy.sequenceNumber = recievedPacket->sequenceNumber;
+					pktCopy.payloadSize = recievedPacket->payloadSize;
+					uint16_t actualSize = ntohs(recievedPacket->payloadSize);
+					memcpy(pktCopy.data, recievedPacket->data,actualSize);
 					state.packetsRecieved[seqNum] = pktCopy;
 					//send acknoledgement
 					bool dropBufferedAck = dropPacket(lossRate);
