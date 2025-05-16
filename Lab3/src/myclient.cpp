@@ -25,7 +25,7 @@
 #include <fstream>
 #include <unordered_set>
 #define WINDOW_SIZE 5
-#define TIMEOUT_SEC 60
+#define TIMEOUT_SEC 30
 
 std::string currentTimestamp(){
     auto now = std::chrono::system_clock::now();
@@ -102,7 +102,7 @@ int main (int argc, char* argv[]) {
 	std::string Port;
 	std::string infilePath;
 	std::string outfilePath;
-	std::unordered_set<uint32_t, int> unackedPackets;	
+	std::unordered_map<uint32_t, int> unackedPackets;	
 	const int MAX_RETRIES_PER_PACKET = 5;
 	char buffer[1472];
 	std::string line;
@@ -264,18 +264,19 @@ int main (int argc, char* argv[]) {
 						std::cerr << "Seq" << seq << "Failed Too Many Times\n";
 						unackedPackets.erase(seq);
 						continue;
-				}
-				int retrans = retransmit(seq,clientSocket, (struct sockaddr*)&serverAddress, file);
-				if(retrans == -1){
-					std::cerr << "Error Transmitting Seq=" << seq << "\n";
-				}else{
-					std::cout << "Retransmitting seq= " << seq << ", attempt " << unackedPackets[seq] << "\n";
-				}
-			break;
+					}
+					int retrans = retransmit(seq,clientSocket, (struct sockaddr*)&serverAddress, file);
+					if(retrans == -1){
+						std::cerr << "Error Transmitting Seq=" << seq << "\n";
+					}else{
+						std::cout << "Retransmitting seq= " << seq << ", attempt " << unackedPackets[seq] << "\n";
+					}
+				break;
+			}
 		}
 		}else if (activity < 0){
 			std::cerr << "Select Error\n";
-			exit(-1);
+			return -1;
 		}
 		//processing ACKED Packets		
 		bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
