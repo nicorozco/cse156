@@ -48,7 +48,6 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 
 	UDPPacket lostPacket; //create the packet
 	lostPacket.sequenceNumber = htonl(expectedSeqNum);//set the sequence number
-	std::cout << "Resending Sequence Number = " << expectedSeqNum << "\n";
 	
 	auto it = metaMap.find(expectedSeqNum);
 	if(it == metaMap.end()){
@@ -70,7 +69,6 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	file.read(lostPacket.data,dataSize); //utilize read to read into the data
 
 	std::streamsize bytes_reRead = file.gcount();
-	std::cout << "Data ReRead" << bytes_reRead << "\n";	
 	
 	if (bytes_reRead <= 0){ // if we read bytes form the file and it's less than 0{
 		if(file.eof()){
@@ -211,8 +209,6 @@ int main (int argc, char* argv[]) {
 	}
 
 	while(true){
-		//while we are within the window and there is data to read --> create packet and trasmit data
-		std::cout << "Top of Loop" << "\n";
 		while(nextSeqNum < baseSeqNum + WINDOW_SIZE){
 			UDPPacket packet;
 			memset(&packet,0,sizeof(packet));
@@ -237,7 +233,6 @@ int main (int argc, char* argv[]) {
 				close(clientSocket);
 				return -1;
 			}
-			std::cout << "Seq # "<< nextSeqNum << "Payload Sent" << bytesRead << "\n";
 			unackedPackets[nextSeqNum] = 0;
 			nextSeqNum++;
 		}
@@ -278,6 +273,7 @@ int main (int argc, char* argv[]) {
 						std::cerr << "Error Transmitting Seq=" << seq << "\n";
 					}else{
 						std::cout << "Retransmitting seq= " << seq << ", attempt " << unackedPackets[seq] << "\n";
+					continue;
 					}
 				}
 			}
