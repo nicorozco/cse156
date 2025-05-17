@@ -266,6 +266,9 @@ int main (int argc, char* argv[]) {
 					if (unackedPackets[seq] > MAX_RETRIES){
 						std::cerr << "Seq" << seq << "Failed Too Many Times\n";
 						unackedPackets.erase(seq);
+						if(seq == baseSeqNum){
+							baseSeqNum++;
+						}
 						continue;
 					}
 					int retrans = retransmit(seq,clientSocket, (struct sockaddr*)&serverAddress, file, sentPacketMeta);
