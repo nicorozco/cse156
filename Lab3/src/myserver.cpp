@@ -60,11 +60,9 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 	std::string filePath(pathPacket->filepath);
 	if (pathRecieved < 0){
 		perror("Error receiving filepath");
-	}else {
-		std::string filePath(pathPacket->filepath);
 	}
 	//open file path 
-	std::ofstream outfile(outfilePath,std::ios::binary);
+	std::ofstream outfile(filePath,std::ios::binary);
 	if(!outfile.is_open()){
 		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
 	}	
@@ -75,26 +73,23 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 			std::cout << "Error Recieved Bytes" << "\n";
 		}
 
-		if(bytesRecieved > 0){//if we are recieving data		
-			//to identify who the packet is coming from, we are going to create a unique key utilizing the host ip and port number
+		if(bytesRecieved > 0){		
 			std::string key = std::string(inet_ntoa(clientAddr.sin_addr)) + ":" + std::to_string(ntohs(clientAddr.sin_port));
 			
-			//if the client isn't within the client states already add to the map
 			if(clients.find(key) == clients.end()){
 				clients[key] = ClientState{}; 
 			}
 
-			//else the client is already in the map and we retrieve it
 			ClientState& state = clients[key];
 			
-			//process the packet for the same 
 			UDPPacket* recievedPacket = reinterpret_cast<UDPPacket*>(buffer);
-			uint16_t actualSize = ntohs(recievedPacket->payloadSize);//size of the data recieved, by removing the sequence number 
-			seqNum = ntohl(recievedPacket->sequenceNumber); // the sequence numbers sets the acknolwedgement we should be recieving 
-			//std::cout << "Data Recieved" << seqNum << " " << recievedPacket->data << "\n";	
-			//simulate packet loss i
+			uint16_t actualSize = ntohs(recievedPacket->payloadSize); 
+			seqNum = ntohl(recievedPacket->sequenceNumber); 
 			bool dataDropped = dropPacket(lossRate);
-			
+			if(actualSize == 0){
+				std::cerr << "Zero payload detect at SeqNum= " << seqNum <<				", skipping write\n";
+				continue;
+			}	
 			if (dataDropped){ //if we random value generate falls within the loss rate it is lost
 				std::cout << currentTimestamp()<< ", DROP DATA, " << seqNum << "\n";
 			}else{
@@ -125,8 +120,9 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 					UDPPacket pktCopy;
 					pktCopy.sequenceNumber = recievedPacket->sequenceNumber;
 					pktCopy.payloadSize = recievedPacket->payloadSize;
-					uint16_t actualSize = ntohs(recievedPacket->payloadSize);
 					memcpy(pktCopy.data, recievedPacket->data,actualSize);
+					i
+					
 					if(actualSize > MSS){
 						std::cerr << "Invalid Payload Size: " << actualSize << " on seqNum " << seqNum << "\n";
 						continue;
@@ -153,6 +149,7 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 						continue;
 					}
 					outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
+					outfile.flush();
 					state.expectedSeqNum++;	
 					
 					bool ackDropped = dropPacket(lossRate);
@@ -177,9 +174,16 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 							} else {
 								std::cout << "Writing Buffered Data" << "\n";
 								std::cout << currentTimestamp() << ", ACK, " << state.expectedSeqNum << "\n";
-								UDPPacket& pkt = state.packetsRecieved[state.expectedSeqNum]; 
+								UDPPacket& pkt = state.packetsRecieved[state.expectedSeqNum];	
 								uint16_t pktSize = ntohs(pkt.payloadSize);
+								if (pktSize == 0) {
+									std::cerr << "Zero payload in buffered packet at seqNum=" << state.expectedSeqNum << ", skipping\n";
+									state.packetsRecieved.erase(state.expectedSeqNum);
+									state.expectedSeqNum++;
+    								continue;
+								}	 
 								outfile.write(pkt.data,pktSize);//only write to the file if we have sent the ACK message 
+								outfile.flush();
 								state.packetsRecieved.erase(state.expectedSeqNum);//erase the seq num from the map
 								state.expectedSeqNum++;//increase seqnum
 							}
@@ -193,8 +197,15 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 					while (state.packetsRecieved.count(state.expectedSeqNum) && !state.packetsRecieved.empty()) {
 							UDPPacket& pkt = state.packetsRecieved[state.expectedSeqNum];
 							uint16_t pktSize = ntohs(pkt.payloadSize);
+							if (pktSize == 0) {
+							    std::cerr << "[EOF SKIP] Zero-length packet at seqNum=" << state.expectedSeqNum << ", skipping\n";
+    							state.packetsRecieved.erase(state.expectedSeqNum);
+    							state.expectedSeqNum++;
+    							continue;
+							}
 							std::cout << "[EOF WRITE] Seq=" << state.expectedSeqNum << ", Size=" << pktSize << "\n";
 							outfile.write(pkt.data, pktSize);
+							outfile.flush();
 							state.packetsRecieved.erase(state.expectedSeqNum);
 							state.expectedSeqNum++;
 					}
@@ -269,7 +280,6 @@ int main(int argc, char* argv[]){
 		close(serverSocket);
 		return 1;
 	}
-	std::string outfile = "output.txt";
 	echoLoop(serverSocket,lossRate,outfile);
 	std::cout << "Finishing Recieving" << "\n";
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
