@@ -232,6 +232,7 @@ int main (int argc, char* argv[]) {
 				perror("sendto failed");
 				close(clientSocket);
 				return -1;
+			}
 			
 			if(!unackedPackets.count(nextSeqNum)){
 				unackedPackets[nextSeqNum] = 0;

@@ -111,13 +111,15 @@ void echoLoop(int serverSocket,int lossRate){
 					if(!state.packetsRecieved.count(seqNum)){
 						state.packetsRecieved[seqNum] = pktCopy;
 					}
-						ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);//ack the duplicate
-						if (sentBytes < 0) {
-					    	perror("Error sending ACK Packet");
-						} else {
-					    	std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
-						}
+						
+					ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);//ack the duplicate
+					if (sentBytes < 0) {
+					    perror("Error sending ACK Packet");
+					} else {
+					    std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
+					}
 				}
+				
 				if(seqNum == state.expectedSeqNum){	
 					if (actualSize > MSS){
 						std::cerr << "Invalid Payload Size:" << "on seqNum" << seqNum << "\n";
