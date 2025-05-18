@@ -183,7 +183,6 @@ void echoLoop(int serverSocket,int lossRate){
 					}
 					std::cout << "Buffer is empty" << "\n";
 					outfile.flush();
-					break;
 				}	
 			}
 		}
