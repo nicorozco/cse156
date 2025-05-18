@@ -1,6 +1,6 @@
 myclient.cpp
 
-**Purpose:** Reads a file, segments it into UDP packets, and reliably sends it to the server.
+Purpose: Reads a file, segments it into UDP packets, and reliably sends it to the server.
 
 Key Components:
 - main():
@@ -72,3 +72,6 @@ struct ClientState {
     uint32_t expectedSeqNum = 0;
     std::map<uint32_t, UDPPacket> packetsRecieved;
 };
+
+Shortcomings:
+- Due to timecontraint unable to fix the issue of some packets being written in wrong order, also has a tendency to get stuck if packets gets dropped repedetly back to back  
