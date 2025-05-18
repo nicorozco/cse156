@@ -3,18 +3,27 @@ Realiable File Application utilizing UDP
 
 Nicolas Orozco (norozco6)
 
-Purpose:
-Develop a UDP client and server, for the client to send packets over udp and for the server to compile the file back into the correct order
-Files:
-	-src:
-		-myclient.cpp
-		-client.h
-		-myserver.cpp
-	-doc:
-		- Documentation
-	
-	-bin: 
-		-client (executable) client application to be ran 
-		-server(executable) server application to be ran
-	-Makefile:
-		- to generate executable in bin
+UDP File Transfer with Reliability (Sliding Window Protocol)
+
+This project implements a reliable file transfer protocol over UDP. The client reads and sends a file to the server in chunks, while the server acknowledges received data and reconstructs the file. The implementation simulates real-world packet loss and uses a sliding window mechanism for retransmission and flow control.
+
+Features
+
+Sliding Window protocol with window size 5
+Per-packet retransmission up to 5 times
+Simulated packet/ACK loss via dropPacket()
+Timeout-based retransmission using select()
+Handles duplicate packets and out-of-order delivery
+Graceful EOF handling and file reconstruction
+
+Usage
+
+Server ./myserver
+
+port: Port to listen on (e.g. 8080)
+lossRate: Simulated packet loss percentage (e.g. 10 means 10%)
+Client ./myclient <server_ip> <server_port> <input_file_path> <output_file_path_on_server>
+
+Sends a file to the server at server_ip:server_port
+Server reconstructs the file at the specified path
+
