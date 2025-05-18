@@ -1,0 +1,80 @@
+## 📝 Code Structure Documentation
+
+### 📁 `myclient.cpp`
+
+**Purpose:** Reads a file, segments it into UDP packets, and reliably sends it to the server.
+
+#### Key Components:
+- `main()`:
+  - Parses arguments.
+  - Opens file, sets up socket.
+  - Uses a sliding window to send packets.
+  - Retransmits unacknowledged packets every 2 seconds (up to 5 times).
+  - Sends EOF once all packets are acknowledged.
+
+- `retransmit(...)`:
+  - Reads packet data from the file using metadata map.
+  - Sends a retransmission of the specified sequence number.
+
+#### Important Data Structures:
+- `unackedPackets`: `unordered_map<uint32_t, int>`  
+  Tracks unacknowledged packets and their retry counts.
+
+- `sentPacketMeta`: `map<uint32_t, pair<long, uint16_t>>`  
+  Stores file offsets and size for each sent sequence number.
+
+- `MSS`: Defined via the size of `UDPPacket.data`.
+
+---
+
+### 📁 `myserver.cpp`
+
+**Purpose:** Receives UDP packets, simulates packet/ACK loss, reorders and writes them to file.
+
+#### Key Components:
+- `main()`:
+  - Validates port and lossRate.
+  - Binds a UDP socket and starts `echoLoop`.
+
+- `echoLoop(...)`:
+  - Listens for packets in a loop.
+  - Handles new connections per IP:Port combo.
+  - Sends ACKs for each valid packet.
+  - Buffers out-of-order packets.
+  - Writes in-order data to file.
+
+- `sendAck(...)`: Sends a 4-byte sequence number as acknowledgment.
+- `dropPacket(...)`: Simulates packet or ACK loss based on probability.
+- `ClientState`: Maintains:
+  - `expectedSeqNum`: Next expected sequence number.
+  - `packetsRecieved`: Buffer for out-of-order packets.
+
+---
+
+### 📦 `client.h` (assumed)
+
+Defines core packet structures:
+
+```cpp
+#define MSS 1466
+#define EOF_SEQ 99999999
+
+struct UDPPacket {
+    uint32_t sequenceNumber;
+    uint16_t payloadSize;
+    char data[MSS];
+};
+
+struct ACKPacket {
+    uint32_t sequenceNumber;
+};
+
+struct filePathPacket {
+    char filepath[256];
+};
+
+struct ClientState {
+    uint32_t expectedSeqNum = 0;
+    std::map<uint32_t, UDPPacket> packetsRecieved;
+};
+```
