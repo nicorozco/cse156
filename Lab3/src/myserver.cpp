@@ -40,7 +40,7 @@ bool dropPacket(int lossRate){
 	return randVal < percLossRate;
 }
 
-void echoLoop(int serverSocket,int lossRate,std::string outfilePath){	
+void echoLoop(int serverSocket,int lossRate){	
 
 	std::unordered_map<std::string,ClientState> clients;//create a map to hold the different clients 
 	char buffer[1472];
@@ -121,7 +121,6 @@ void echoLoop(int serverSocket,int lossRate,std::string outfilePath){
 					pktCopy.sequenceNumber = recievedPacket->sequenceNumber;
 					pktCopy.payloadSize = recievedPacket->payloadSize;
 					memcpy(pktCopy.data, recievedPacket->data,actualSize);
-					i
 					
 					if(actualSize > MSS){
 						std::cerr << "Invalid Payload Size: " << actualSize << " on seqNum " << seqNum << "\n";
@@ -280,7 +279,7 @@ int main(int argc, char* argv[]){
 		close(serverSocket);
 		return 1;
 	}
-	echoLoop(serverSocket,lossRate,outfile);
+	echoLoop(serverSocket,lossRate);
 	std::cout << "Finishing Recieving" << "\n";
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	//d.) recieved a packet

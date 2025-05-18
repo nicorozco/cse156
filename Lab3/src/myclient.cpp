@@ -232,8 +232,10 @@ int main (int argc, char* argv[]) {
 				perror("sendto failed");
 				close(clientSocket);
 				return -1;
+			
+			if(!unackedPackets.count(nextSeqNum)){
+				unackedPackets[nextSeqNum] = 0;
 			}
-			unackedPackets[nextSeqNum] = 0;
 			nextSeqNum++;
 		}
 		
@@ -276,7 +278,6 @@ int main (int argc, char* argv[]) {
 						std::cerr << "Error Transmitting Seq=" << seq << "\n";
 					}else{
 						std::cout << "Retransmitting seq= " << seq << ", attempt " << unackedPackets[seq] << "\n";
-					continue;
 					}
 				}
 			}
