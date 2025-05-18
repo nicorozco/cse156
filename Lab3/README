@@ -9,8 +9,7 @@ Files:
 	-src:
 		-myclient.cpp
 		-client.h
-		-smyerver.cpp
-
+		-myserver.cpp
 	-doc:
 		- Documentation
 	
