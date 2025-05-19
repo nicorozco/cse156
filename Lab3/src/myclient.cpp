@@ -42,8 +42,6 @@ bool isValidIPv4Format(const std::string& ip){
 }
 int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* serverAddress,std::ifstream& file, const std::map<uint32_t, std::pair<long,uint16_t>>& metaMap){
 	
-	constexpr std::size_t MSS = sizeof(UDPPacket{}.data);
-	std::cout << "MSS: " << MSS << "\n";	
 	file.clear();
 
 	UDPPacket lostPacket; //create the packet
@@ -197,7 +195,6 @@ int main (int argc, char* argv[]) {
 	socklen_t addrlen = sizeof(serverAddress);
 	//reading data & sending packets
 	auto startTime = std::chrono::steady_clock::now();
-	bool recievedFirstPacket = false;
 
 	//utilize a simple packet 
 	filePathPacket pathPacket;
@@ -220,9 +217,9 @@ int main (int argc, char* argv[]) {
 			std::streamsize bytesRead = file.gcount();
 			if(bytesRead <= 0){
 				break;
-			}else if (bytesRead == 0){
+			}else if (bytesRead < 34){
 				std::cerr << "Required Minimum MSS is X+1\n";
-				break;
+				return 1;
 			}
 			long offset = file.tellg() - bytesRead;
 			sentPacketMeta[nextSeqNum] = std::make_pair(offset,static_cast<uint16_t>(bytesRead));
@@ -258,24 +255,20 @@ int main (int argc, char* argv[]) {
 			
 			auto currentTime = std::chrono::steady_clock::now();
 			auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
-			if (!recievedFirstPacket && elapsed >= 30) {
+			if (elapsed >= 30) {
 					std::cerr << "Cannot detect server\n";
 					close(clientSocket);
-					return 2;
-				}
+					return 3;
+			}
 			retries++;
 				//check if the lowest sequence number not acknlowedge
 			for(uint32_t seq = baseSeqNum; seq < nextSeqNum; seq++){ 	
 				if(unackedPackets.count(seq)){
 					unackedPackets[seq]++;
 
-					if (unackedPackets[seq] > MAX_RETRIES){
-						std::cerr << "Seq" << seq << "Failed Too Many Times\n";
-						unackedPackets.erase(seq);
-						if(seq == baseSeqNum){
-							baseSeqNum++;
-						}
-						continue;
+					if (unackedPackets[seq] >= MAX_RETRIES){
+						std::cerr << "Reached max retransmission limit\n";
+						return 4;
 					}
 					int retrans = retransmit(seq,clientSocket, (struct sockaddr*)&serverAddress, file, sentPacketMeta);
 					if(retrans == -1){
@@ -297,11 +290,7 @@ int main (int argc, char* argv[]) {
 			uint32_t net_seq;
 			memcpy(&net_seq,buffer,sizeof(uint32_t));
 			seqNum = ntohl(net_seq); //extract the sequence number
-
-			//std::cout << "Sequence Number of Recieved Packet" << seqNum << "\n";
-			recievedFirstPacket = true;
 			startTime = std::chrono::steady_clock::now();
-			// if the sequence number is in the unackedpacket, slides the window 
 			if(unackedPackets.count(seqNum)){
 				baseWindow = baseSeqNum + WINDOW_SIZE;
 				std::cout << currentTimestamp() <<", ACK, "<< seqNum <<"," << baseSeqNum << "," << nextSeqNum <<"," << baseWindow << "\n"; 
