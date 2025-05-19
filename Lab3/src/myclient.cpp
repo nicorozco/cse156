@@ -88,6 +88,11 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 			return -1;
 		}
 	}
+	 if(bytes_reRead != dataSize) {
+			std::cerr << "Warning: Read " << bytes_reRead << " bytes but expected " << dataSize 
+					  << " bytes for seq=" << expectedSeqNum << "\n";
+			// Continue but use the actual bytes read
+    }	
 	lostPacket.payloadSize = htons(static_cast<uint16_t>(bytes_reRead));
 	int totalSize = sizeof(lostPacket.sequenceNumber) + sizeof(lostPacket.payloadSize) + bytes_reRead;
 	auto* ipv4 = (struct sockaddr_in*)serverAddress;
@@ -316,8 +321,11 @@ int main (int argc, char* argv[]) {
 			UDPPacket eofPacket;
 			memset(&eofPacket,0,sizeof(eofPacket));
 			eofPacket.sequenceNumber = htonl(EOF_SEQ);
-			sendto(clientSocket, &eofPacket, sizeof(uint32_t), 0,
+			eofPacket.payloadSize = htons(0);
+			int eofSize = sizeof(eofPacket.sequenceNumber) + sizeof(eofPacket.payloadSize);
+			sendto(clientSocket, &eofPacket, eofSize, 0,
        (struct sockaddr*)&serverAddress, sizeof(serverAddress));
+			sleep(1);
 			std::cout << "All Packet send and no more data to send" << "\n";
 			break;
 		}

@@ -58,7 +58,7 @@ void echoLoop(int serverSocket,int lossRate){
 		perror("Error receiving filepath");
 	}
 	//open file path 
-	std::ofstream outfile(filePath,std::ios::binary);
+	std::ofstream outfile(filePath,std::ios::binary | std::ios::trunc);
 	if(!outfile.is_open()){
 		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
 	}	
