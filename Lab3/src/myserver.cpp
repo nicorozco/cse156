@@ -163,27 +163,59 @@ void echoLoop(int serverSocket,int lossRate){
 							}
 						}
 				}
+	
 				if(seqNum == EOF_SEQ){
 					std::cout << currentTimestamp() << ", EOF RECEIVED\n";
 					//process the buffer at the end 
-					while (state.packetsRecieved.count(state.expectedSeqNum) && !state.packetsRecieved.empty()) {
+					while (!state.packetsRecieved.empty()) {
+						if(state.packetsRecieved.count(state.expectedSeqNum)){	
 							UDPPacket& pkt = state.packetsRecieved[state.expectedSeqNum];
 							uint16_t pktSize = ntohs(pkt.payloadSize);
-							if (pktSize == 0) {
-							    std::cerr << "[EOF SKIP] Zero-length packet at seqNum=" << state.expectedSeqNum << ", skipping\n";
-    							state.packetsRecieved.erase(state.expectedSeqNum);
-    							state.expectedSeqNum++;
-    							continue;
+							if (pktSize > 0) { 
+								std::cout << "[EOF WRITE] Seq=" << state.expectedSeqNum << ", Size=" << pktSize << "\n";
+								outfile.write(pkt.data, pktSize);
+								outfile.flush();
+							} else {
+								std::cerr << "[EOF SKIP] Zero-length packet at seqNum=" << state.expectedSeqNum << ", skipping\n";
 							}
-							std::cout << "[EOF WRITE] Seq=" << state.expectedSeqNum << ", Size=" << pktSize << "\n";
-							outfile.write(pkt.data, pktSize);
-							outfile.flush();
 							state.packetsRecieved.erase(state.expectedSeqNum);
 							state.expectedSeqNum++;
+						      // If we have remaining packets but not sequential, find the lowest seq number
+						}else {	
+							uint32_t lowestSeq = UINT32_MAX;
+							for(const auto& pair : state.packetsRecieved) {
+								if(static_cast<uint32_t>(pair.first) < lowestSeq) {
+									lowestSeq = pair.first;
+								}
+							}
+							
+							if(lowestSeq != UINT32_MAX) {
+								// We found a packet, but it's not the next expected one
+								// Write it anyway to ensure we don't lose data
+								std::cerr << "[WARN] Gap in sequence detected. Expected " << state.expectedSeqNum 
+										  << " but writing " << lowestSeq << " instead\n";
+								
+								UDPPacket& pkt = state.packetsRecieved[lowestSeq];
+								uint16_t pktSize = ntohs(pkt.payloadSize);
+								
+								if(pktSize > 0) {
+									outfile.write(pkt.data, pktSize);
+									outfile.flush();
+								}
+								
+								state.packetsRecieved.erase(lowestSeq);
+								state.expectedSeqNum = lowestSeq + 1;
+							} else {
+								// This shouldn't happen, but just in case
+								std::cerr << "[ERROR] No packets found but buffer not empty?\n";
+								break;
+							}
+						}
 					}
-					std::cout << "Buffer is empty" << "\n";
-					outfile.flush();
-				}	
+				std::cout << "Buffer is empty or processed all available packets\n";
+				outfile.close(); // Explicitly close the file when done
+				break; // Exit the loop after EOF
+   			 }
 			}
 		}
 	}

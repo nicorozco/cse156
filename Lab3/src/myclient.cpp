@@ -88,7 +88,6 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 			return -1;
 		}
 	}
-    std::cout << "RETRANSMIT: seq= " << expectedSeqNum << ", bytesRead=" << bytes_reRead << ", offset=" << offset << "\n";	
 	lostPacket.payloadSize = htons(static_cast<uint16_t>(bytes_reRead));
 	int totalSize = sizeof(lostPacket.sequenceNumber) + sizeof(lostPacket.payloadSize) + bytes_reRead;
 	auto* ipv4 = (struct sockaddr_in*)serverAddress;
@@ -223,7 +222,6 @@ int main (int argc, char* argv[]) {
 			long offset = file.tellg() - bytesRead;
 			sentPacketMeta[nextSeqNum] = std::make_pair(offset,static_cast<uint16_t>(bytesRead));
 			
-			std::cout << "ORIGINAL SEND: seq=" << nextSeqNum << ", bytesRead=" << bytesRead << ", offset=" << offset << "\n";
 			packet.payloadSize = htons(static_cast<uint16_t>(bytesRead));
 			packet.sequenceNumber = htonl(nextSeqNum);	
 			int totalSize = sizeof(packet.sequenceNumber) + sizeof(packet.payloadSize) + bytesRead;
