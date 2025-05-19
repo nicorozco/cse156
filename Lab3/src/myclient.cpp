@@ -258,7 +258,7 @@ int main (int argc, char* argv[]) {
 			if (elapsed >= 30) {
 					std::cerr << "Cannot detect server\n";
 					close(clientSocket);
-					return 3;
+					return 5;
 			}
 			retries++;
 				//check if the lowest sequence number not acknlowedge
