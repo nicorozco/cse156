@@ -248,7 +248,7 @@ int main (int argc, char* argv[]) {
 		FD_SET(clientSocket,&rset); //add the clientsocket to the set 
 		//set a timer utilize select to prevent hanging forever while waiting to recieved packeyt 
 		struct timeval timeout;
-		timeout.tv_sec = 2;
+		timeout.tv_sec = 10;
 		timeout.tv_usec = 0;
 		
 		int activity = select(clientSocket+1,&rset,NULL,NULL,&timeout);

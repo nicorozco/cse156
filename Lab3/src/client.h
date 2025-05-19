@@ -6,7 +6,7 @@
 #include <chrono> 
 #pragma pack(push,1)
 
-const uint32_t EOF_SEQ = UINT32_MAX;
+const uint32_t EOF_SEQ = 99999999;
 //structure for UDP packet
 struct __attribute__((packed)) UDPPacket {
 	uint32_t sequenceNumber;
