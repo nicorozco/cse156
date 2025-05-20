@@ -42,7 +42,7 @@ bool dropPacket(int lossRate){
 
 void echoLoop(int serverSocket,int lossRate){	
 	std::unordered_map<std::string,ClientState> clients;//create a map to hold the different clients 
-	char buffer[1472];
+	char buffer[32768];
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	struct sockaddr_in clientAddr;
 	socklen_t clientLen = sizeof(clientAddr);
@@ -74,12 +74,12 @@ void echoLoop(int serverSocket,int lossRate){
 				clients[key] = ClientState{}; 
 			}
 			ClientState& state = clients[key];
-			UDPPacket* recievedPacket = reinterpret_cast<UDPPacket*>(buffer);
+			UDPPacket* recievedPacket = (UDPPacket*)buffer;
 			uint16_t actualSize = ntohs(recievedPacket->payloadSize); 
 			seqNum = ntohl(recievedPacket->sequenceNumber); 
 			bool dataDropped = dropPacket(lossRate);
 			if(actualSize == 0){
-				std::cerr << "Zero payload detect at SeqNum= " << seqNum <<				", skipping write\n";
+				std::cerr << "Zero payload detect at SeqNum= " << seqNum << ", skipping write\n";
 				continue;
 			}	
 			if (dataDropped){ //if we random value generate falls within the loss rate it is lost
@@ -124,6 +124,7 @@ void echoLoop(int serverSocket,int lossRate){
 						std::cerr << "Invalid Payload Size:" << "on seqNum" << seqNum << "\n";
 						continue;
 					}
+
 					outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
 					outfile.flush();
 					state.expectedSeqNum++;						
