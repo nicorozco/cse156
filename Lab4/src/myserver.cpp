@@ -103,7 +103,7 @@ void echoLoop(int serverSocket,int lossRate){
 					pktCopy.payloadSize = recievedPacket->payloadSize;
 					memcpy(pktCopy.data, recievedPacket->data,actualSize);
 					
-					if(actualSize > MSS){
+					if(actualSize > 32768){
 						std::cerr << "Invalid Payload Size: " << actualSize << " on seqNum " << seqNum << "\n";
 						continue;
 					}
@@ -120,7 +120,7 @@ void echoLoop(int serverSocket,int lossRate){
 				}
 				
 				if(seqNum == state.expectedSeqNum){	
-					if (actualSize > MSS){
+					if (actualSize > 32768){
 						std::cerr << "Invalid Payload Size:" << "on seqNum" << seqNum << "\n";
 						continue;
 					}

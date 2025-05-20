@@ -11,10 +11,9 @@ const uint32_t EOF_SEQ = 99999999;
 struct __attribute__((packed)) UDPPacket {
 	uint32_t sequenceNumber;
 	uint16_t payloadSize;
-	char data[1466];
+	char data[];//utilize flexible array member 
 };
 #pragma pack(pop)
-constexpr size_t MSS = sizeof(UDPPacket{}.data);
 struct filePathPacket{
 	char filepath[256];
 };
