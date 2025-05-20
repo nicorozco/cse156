@@ -218,7 +218,6 @@ int main (int argc, char* argv[]) {
 
 	while(true){
 		//sending packets within window size 
-		//__________________________________________________________________________
 		while(nextSeqNum < baseSeqNum + WINDOW_SIZE){
 			
 			UDPPacket packet;
@@ -249,8 +248,7 @@ int main (int argc, char* argv[]) {
 			}
 			nextSeqNum++;
 		}
-		//_____________________________________________________________________________________________________________
-
+		
 		//process packets from server 
 		// ___________________________________________________________________________________________________________
 		//If we recieved no activity from the socket within 30 seconds server timed out 
@@ -279,19 +277,32 @@ int main (int argc, char* argv[]) {
 			std::cerr << "Select Error\n";
 			return -1;
 		}
-
 		// ________________________________________________________________________
 		//check if the lowest sequence number not acknlowedge, base sequence
-		
-		//processing Packets		
+		if(unackedPackets.count(baseSeqNum)){
+				unackedPackets[baseSeqNum]++;
+
+					if (unackedPackets[seq] >= MAX_RETRIES){
+						std::cerr << "Reached max retransmission limit\n";
+						return 4;
+					}
+					
+					int retrans = retransmit(seq,clientSocket, (struct sockaddr*)&serverAddress, file, sentPacketMeta);
+					if(retrans == -1){
+						std::cerr << "Error Transmitting Seq=" << seq << "\n";
+					}else{
+						std::cout << "Retransmitting seq= " << seq << ", attempt " << unackedPackets[seq] << "\n";
+					}
+		}
+
+
+		//processing ACKED Packets		
 		bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
-		
 		if(bytes_recieved > 0){
 			uint32_t net_seq;
 			memcpy(&net_seq,buffer,sizeof(uint32_t));
 			seqNum = ntohl(net_seq); //extract the sequence number
 			startTime = std::chrono::steady_clock::now();
-			//if the sequence number in the ack packet is sent by the server, we remove it from the unackedpacket and advance the window
 			if(unackedPackets.count(seqNum)){
 				baseWindow = baseSeqNum + WINDOW_SIZE;
 				std::cout << currentTimestamp() <<", ACK, "<< seqNum <<"," << baseSeqNum << "," << nextSeqNum <<"," << baseWindow << "\n"; 
@@ -302,42 +313,23 @@ int main (int argc, char* argv[]) {
 				}
 				retries = 0;
 			}
-			//check if the lowest unacked packet, the base is still in the unackedPacket, increase the number of retries 
-			if(unackedPackets.count(baseSeqNum)){
-					unackedPackets[baseSeqNum]++;
-					
-					// if the number of retries exceeds 5
-					if (unackedPackets[seq] >= MAX_RETRIES){
-						std::cerr << "Reached max retransmission limit\n";
-						return 4;
-					}
-					// retransmit the packet 
-					int retrans = retransmit(seq,clientSocket, (struct sockaddr*)&serverAddress, file, sentPacketMeta);
-					if(retrans == -1){
-						std::cerr << "Error Transmitting Seq=" << seq << "\n";
-					}else{
-						std::cout << "Retransmitting seq= " << seq << ", attempt " << unackedPackets[seq] << "\n";
-					}
-			}
-		// Reaching END of Fle
-		//__________________________________________________________________________________________________________________
 		}else if (bytes_recieved < 0){
 			perror("recvfrom failed");
 			return -1;
-		}	
-	
-	if(file.eof() && unackedPackets.empty()){ //if we reach the end of file and there are no packets in the map break out
-		//send EOF Packet
-		UDPPacket eofPacket;
-		memset(&eofPacket,0,sizeof(eofPacket));
-		eofPacket.sequenceNumber = htonl(EOF_SEQ);
-		eofPacket.payloadSize = htons(0);
-		int eofSize = sizeof(eofPacket.sequenceNumber) + sizeof(eofPacket.payloadSize);
-		sendto(clientSocket, &eofPacket, eofSize, 0,
-   (struct sockaddr*)&serverAddress, sizeof(serverAddress));
-		sleep(1);
-		std::cout << "All Packet send and no more data to send" << "\n";
-		break;
+		}
+		if(file.eof() && unackedPackets.empty()){ //if we reach the end of file and there are no packets in the map break out
+			//send EOF Packet
+			UDPPacket eofPacket;
+			memset(&eofPacket,0,sizeof(eofPacket));
+			eofPacket.sequenceNumber = htonl(EOF_SEQ);
+			eofPacket.payloadSize = htons(0);
+			int eofSize = sizeof(eofPacket.sequenceNumber) + sizeof(eofPacket.payloadSize);
+			sendto(clientSocket, &eofPacket, eofSize, 0,
+       (struct sockaddr*)&serverAddress, sizeof(serverAddress));
+			sleep(1);
+			std::cout << "All Packet send and no more data to send" << "\n";
+			break;
+		}
 	}
 	
 	std::cout << "Closing Connection" << "\n";
