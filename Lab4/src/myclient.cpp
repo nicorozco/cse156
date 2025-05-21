@@ -107,7 +107,6 @@ int main (int argc, char* argv[]) {
 	uint32_t seqNum = 0;
 	uint32_t baseWindow = 0;
 	int MSS = 0;
-	int retries = 0;
 	const int MAX_RETRIES = 5;
 	int bytes_recieved;
 	const int TIMEOUT_MS = 2000;
@@ -219,7 +218,7 @@ int main (int argc, char* argv[]) {
 			memset(packet,0,totalSize);
 			file.read(packet->data,MSS);
 			std::streamsize bytesRead = file.gcount();
-			if(bytesRead <= 0){
+			if(bytesRead == 0 && file.eof()){
 				free(packet); //free packet before break
 				break;
 			}else if (bytesRead < 34){
@@ -293,7 +292,10 @@ int main (int argc, char* argv[]) {
 							baseSeqNum++;//slide the baseSeqNum to slide the window
 					}
 				}
-			}
+			}else if (bytes_recieved < 0){
+				perror("recvfrom failed");
+				return -1;
+			}	
 		}
 
 		//check if the lowest unacked packet, the base is still in the unackedPacket, increase the number of retries 
@@ -321,20 +323,25 @@ int main (int argc, char* argv[]) {
 				}
 			}
 		}
-		else if (bytes_recieved < 0){
-			perror("recvfrom failed");
-			return -1;
-		}	
 	
 		if(file.eof() && unackedPackets.empty()){ //if we reach the end of file and there are no packets in the map break out
 			//send EOF Packet
-			UDPPacket eofPacket;
-			memset(&eofPacket,0,sizeof(eofPacket));
-			eofPacket.sequenceNumber = htonl(EOF_SEQ);
-			eofPacket.payloadSize = htons(0);
-			int eofSize = sizeof(eofPacket.sequenceNumber) + sizeof(eofPacket.payloadSize);
-			sendto(clientSocket, &eofPacket, eofSize, 0,
-	   (struct sockaddr*)&serverAddress, sizeof(serverAddress));
+			size_t eofSize = sizeof(UDPPacket);
+			UDPPacket* eofPacket = (UDPPacket*)malloc(eofSize);
+			if(!eofPacket){
+				perror("malloc for EOF packet failed");
+				return -1;
+			}
+			memset(eofPacket,0,eofSize);
+			eofPacket->sequenceNumber = htonl(EOF_SEQ);
+			eofPacket->payloadSize = htons(0);
+			ssize_t sent = sendto(clientSocket, eofPacket, eofSize, 0, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
+			if(sent < 0){
+				perror("sendto for EOF packet Failed");
+				free(eofPacket);
+				return -1;
+			}
+			free(eofPacket);
 			sleep(1);
 			std::cout << "All Packet send and no more data to send" << "\n";
 			break;
