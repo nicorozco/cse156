@@ -135,7 +135,7 @@ void echoLoop(int serverSocket,int lossRate){
 						continue;
 					}
 
-					outfile.write(recievedPacket->data,actualSize);//only write to the file if we have sent the ACK message 
+					outfile.write(recievedPacket->data, ntohs(recievedPacket->payloadSize));//only write to the file if we have sent the ACK message 
 					outfile.flush();
 					state.expectedSeqNum++;						
 					bool ackDropped = dropPacket(lossRate);
@@ -202,10 +202,8 @@ void echoLoop(int serverSocket,int lossRate){
 										  << " but writing " << lowestSeq << " instead\n";
 								
 								UDPPacket* pkt = state.packetsRecieved[lowestSeq];
-								uint16_t pktSize = ntohs(pkt->payloadSize);
-								
-								if(pktSize > 0) {
-									outfile.write(pkt->data, pktSize);
+								if(ntohs(pkt->payloadSize) > 0) {
+									outfile.write(pkt->data, ntohs(pkt->payloadSize));
 									outfile.flush();
 								}
 								

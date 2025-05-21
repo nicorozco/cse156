@@ -343,7 +343,6 @@ int main (int argc, char* argv[]) {
 				return -1;
 			}
 			free(eofPacket);
-			sleep(1);
 			std::cout << "All Packet send and no more data to send" << "\n";
 			break;
 		}
