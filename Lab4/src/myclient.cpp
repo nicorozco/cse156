@@ -40,12 +40,7 @@ bool isValidIPv4Format(const std::string& ip){
 	return std::regex_match(ip, ipv4Pattern);
 }
 int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* serverAddress,std::ifstream& file, const std::map<uint32_t, std::pair<long,uint16_t>>& metaMap){
-	
 	file.clear();
-
-	UDPPacket lostPacket; //create the packet
-	lostPacket.sequenceNumber = htonl(expectedSeqNum);//set the sequence number
-	
 	auto it = metaMap.find(expectedSeqNum);
 	if(it == metaMap.end()){
 		std::cerr << "Missing metadata for seq=" << expectedSeqNum <<"\n";
@@ -55,48 +50,42 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	uint16_t dataSize = it->second.second;
 	
 	file.seekg(0,std::ios::end);
-	std::streampos fileSize = file.tellg();	
-	
-	if (offset > fileSize){
+	if (offset > file.tellg()){
 		std::cerr << "Invalid offset: beyond file size. Closing.\n";
 		return 2;
 	}
 
 	file.seekg(offset, std::ios::beg); //utilize seekg() to point the fd to the data and use SEEK_SET to go from the beginning of the file
-	file.read(lostPacket.data,dataSize); //utilize read to read into the data
-
-	std::streamsize bytes_reRead = file.gcount();
-	
-	if (bytes_reRead <= 0){ // if we read bytes form the file and it's less than 0{
-		if(file.eof()){
-			//we have reached the end of file
-			std::cerr << "EOF Reached, no more data." << "\n";
-			return -1;
-		}else if(file.fail()){
-			//we failed to reach the file
-			std::cerr << "Read failed due to logical error" << "\n";
-			return -1;
-		}else if(file.bad()){
-			//server issue
-			std::cerr << "Severe read error"<< "\n";
-			return -1;
-		}else{
-			std::cerr <<"Failed to read missing data from file" << "\n";
-			return -1;
-		}
+	size_t totalSize = sizeof(UDPPacket) + dataSize;
+	UDPPacket* lostPacket = (UDPPacket*)malloc(totalSize);
+	if(!lostPacket){
+		perror("malloc failed");
+		return -1;
 	}
-	 if(bytes_reRead != dataSize) {
-			std::cerr << "Warning: Read " << bytes_reRead << " bytes but expected " << dataSize 
+	memset(lostPacket,0,totalSize);
+	lostPacket->sequenceNumber = htonl(expectedSeqNum);
+	file.read(lostPacket->data,dataSize);
+
+	std::streamsize bytesRead = file.gcount();
+
+	if (bytesRead <= 0){ // if we read bytes form the file and it's less than 0{
+		std::cerr << "Failed to re-read file at offset " << offset << "\n";
+        free(lostPacket);
+        return -1;
+	}
+	if(bytesRead != dataSize) {
+			std::cerr << "Warning: Read " << bytesRead << " bytes but expected " << dataSize 
 					  << " bytes for seq=" << expectedSeqNum << "\n";
 			// Continue but use the actual bytes read
     }	
-	lostPacket.payloadSize = htons(static_cast<uint16_t>(bytes_reRead));
-	int totalSize = sizeof(lostPacket.sequenceNumber) + sizeof(lostPacket.payloadSize) + bytes_reRead;
-	auto* ipv4 = (struct sockaddr_in*)serverAddress;
-	ssize_t sent = sendto(clientSocket,&lostPacket,totalSize, 0,(struct sockaddr*)ipv4,sizeof(struct sockaddr_in));
+	lostPacket->payloadSize = htons(static_cast<uint16_t>(bytesRead));
+	ssize_t sent = sendto(clientSocket,lostPacket,totalSize, 0,serverAddress,sizeof(struct sockaddr_in));
 	if(sent == -1){
 		perror("sendto failed");
+		free(lostPacket);
+		return -1;
 	}
+	free(lostPacket);
 	return 0;
 }		
 
@@ -309,27 +298,28 @@ int main (int argc, char* argv[]) {
 
 		//check if the lowest unacked packet, the base is still in the unackedPacket, increase the number of retries 
 		if(unackedPackets.count(baseSeqNum) && sentTimes.count(baseSeqNum)){
-				auto now = std::chrono::steady_clock::now();
-				auto waitTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - sentTimes[baseSeqNum]).count();
-				if (waitTime >= TIMEOUT_MS){
-					std::cout << "Packet Loss Detected" << "\n";
-					unackedPackets[baseSeqNum]++;	
-					//check if we hit max retries 	
-					if (unackedPackets[baseSeqNum] >= MAX_RETRIES){
-						std::cerr << "Reached max retransmission limit\n";
-						std::cout << unackedPackets[baseSeqNum] << "\n";
-						std::cout << MAX_RETRIES << "\n";
-						return 4;
-					}
-					int retrans = retransmit(baseSeqNum,clientSocket, (struct sockaddr*)&serverAddress, file, sentPacketMeta);
-
-					if(retrans == -1){
-						std::cerr << "Error Transmitting Seq=" << baseSeqNum << "\n";
-					}else{
-						std::cout << "Retransmitting seq= " << baseSeqNum << ", attempt " << unackedPackets[baseSeqNum] << "\n";
-						sentTimes[baseSeqNum] = now;
-					}
+			auto now = std::chrono::steady_clock::now();
+			auto waitTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - sentTimes[baseSeqNum]).count();
+			if (waitTime >= TIMEOUT_MS){
+				std::cout << "Packet Loss Detected" << "\n";
+				unackedPackets[baseSeqNum]++;	
+				//check if we hit max retries 	
+				if (unackedPackets[baseSeqNum] >= MAX_RETRIES){
+					std::cerr << "Reached max retransmission limit\n";
+					std::cout << unackedPackets[baseSeqNum] << "\n";
+					std::cout << MAX_RETRIES << "\n";
+					return 4;
 				}
+					
+				int retrans = retransmit(baseSeqNum,clientSocket, (struct sockaddr*)&serverAddress, file, sentPacketMeta);
+
+				if(retrans == -1){
+					std::cerr << "Error Transmitting Seq=" << baseSeqNum << "\n";
+				}else{
+					std::cout << "Retransmitting seq= " << baseSeqNum << ", attempt " << unackedPackets[baseSeqNum] << "\n";
+					sentTimes[baseSeqNum] = now;
+				}
+			}
 		}
 		else if (bytes_recieved < 0){
 			perror("recvfrom failed");
