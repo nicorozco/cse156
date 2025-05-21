@@ -140,6 +140,10 @@ int main (int argc, char* argv[]) {
 	int serverPort = std::stoi(Port);
 	int WINDOW_SIZE = std::stoi(windowSize);
 	MSS = std::stoi(mss);
+	if(MSS < 34){
+		std::cerr << "Required Minimum MSS is X+1\n";
+		return 1;
+	}
 
 	//after we have extracted the ip address we check if it's valid
 	if (isValidIPv4Format(serverIP) == false){
@@ -221,11 +225,8 @@ int main (int argc, char* argv[]) {
 			if(bytesRead == 0 && file.eof()){
 				free(packet); //free packet before break
 				break;
-			}else if (bytesRead < 34){
-				std::cerr << "Required Minimum MSS is X+1\n";
-				free(packet);
-				return 1;
 			}
+
 			long offset = file.tellg() - bytesRead;
 			sentPacketMeta[nextSeqNum] = std::make_pair(offset,static_cast<uint16_t>(bytesRead));
 			
