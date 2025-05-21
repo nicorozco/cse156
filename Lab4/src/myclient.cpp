@@ -97,7 +97,6 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	if(sent == -1){
 		perror("sendto failed");
 	}
-	std::cout << "Packet Loss Detected" << "\n";
 	return 0;
 }		
 
@@ -318,29 +317,28 @@ int main (int argc, char* argv[]) {
 			//check if the lowest unacked packet, the base is still in the unackedPacket, increase the number of retries 
 			if(unackedPackets.count(baseSeqNum) && sentTimes.count(baseSeqNum)){
 					auto now = std::chrono::steady_clock::now();
-				
-					unackedPackets[baseSeqNum]++;
-					auto waitTime = std::chrono::duration_cast<std::chrono::milliseconds>(
-        now - sentTimes[baseSeqNum]).count();
-					
-					// if the number of retries exceeds 5
-					if (unackedPackets[baseSeqNum] >= MAX_RETRIES){
-						std::cerr << "Reached max retransmission limit\n";
-						return 4;
-					}
-
+					auto waitTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - sentTimes[baseSeqNum]).count();
 					if (waitTime >= TIMEOUT_MS){
-
+						std::cout << "Packet Loss Detected" << "\n";
+						unackedPackets[baseSeqNum]++;	
+						//check if we hit max retries 	
+						if (unackedPackets[baseSeqNum] >= MAX_RETRIES){
+							std::cerr << "Reached max retransmission limit\n";
+							std::cout << unackedPackets[baseSeqNum] << "\n";
+							std::cout << MAX_RETRIES << "\n";
+							return 4;
+						}
 						int retrans = retransmit(baseSeqNum,clientSocket, (struct sockaddr*)&serverAddress, file, sentPacketMeta);
+
 						if(retrans == -1){
 							std::cerr << "Error Transmitting Seq=" << baseSeqNum << "\n";
 						}else{
 							std::cout << "Retransmitting seq= " << baseSeqNum << ", attempt " << unackedPackets[baseSeqNum] << "\n";
-
+							sentTimes[baseSeqNum] = now;
 						}
 					}
 					// retransmit the packet 
-			}
+				}
 		}
 		// Reaching END of Fle
 		//__________________________________________________________________________________________________________________
