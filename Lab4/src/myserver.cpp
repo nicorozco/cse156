@@ -100,17 +100,25 @@ void echoLoop(int serverSocket,int lossRate){
 				//_________________ Processing Out Of Order Packets ________________________________________
 				if (seqNum > state.expectedSeqNum){					
 					
-					UDPPacket pktCopy;
-					pktCopy.sequenceNumber = recievedPacket->sequenceNumber;
-					pktCopy.payloadSize = recievedPacket->payloadSize;
-					memcpy(pktCopy.data, recievedPacket->data,actualSize);
+					size_t totalSize = sizeof(UDPPacket) + actualSize;
+					UDPPacket* pktCopy = (UDPPacket*) malloc(totalSize);
+					if(!pktCopy){
+						std::cerr << "Memory allocation failed for SeqNum" << seqNum << "\n";
+						continue;
+					}
+					pktCopy->sequenceNumber = recievedPacket->sequenceNumber;
+					pktCopy->payloadSize = recievedPacket->payloadSize;
+					memcpy(pktCopy->data, recievedPacket->data,actualSize);
 					
 					if(actualSize > 32768){
 						std::cerr << "Invalid Payload Size: " << actualSize << " on seqNum " << seqNum << "\n";
+						free(pktCopy);
 						continue;
 					}
 					if(!state.packetsRecieved.count(seqNum)){
 						state.packetsRecieved[seqNum] = pktCopy;
+					}else{
+						free(pktCopy);
 					}
 						
 					ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);//ack the duplicate
@@ -146,17 +154,18 @@ void echoLoop(int serverSocket,int lossRate){
 				// __________________ Processing Buffered Packets _______________________
 				while(state.packetsRecieved.count(state.expectedSeqNum)){ // check if the next expectedSeqNum has been recieved 
 					std::cout << currentTimestamp() << ",DATA, " << state.expectedSeqNum << "\n";
-					UDPPacket& pkt = state.packetsRecieved[state.expectedSeqNum];	
-					uint16_t dataLen  = ntohs(pkt.payloadSize);
+					UDPPacket* pkt = state.packetsRecieved[state.expectedSeqNum];	
+					uint16_t dataLen  = ntohs(pkt->payloadSize);
 					if (dataLen == 0) {
 						std::cerr << "Zero payload in buffered packet at seqNum=" << state.expectedSeqNum << ", skipping\n";
 						state.packetsRecieved.erase(state.expectedSeqNum);
 						state.expectedSeqNum++;
 						continue;
 					}	 
-					outfile.write(pkt.data,dataLen);//only write to the file if we have sent the ACK message 
+					outfile.write(pkt->data,dataLen);
 					outfile.flush();
-					state.packetsRecieved.erase(state.expectedSeqNum);//erase the seq num from the map
+					free(pkt);
+					state.packetsRecieved.erase(state.expectedSeqNum);
 					state.expectedSeqNum++;//increase seqnum
 				}
 				//___________________________________________________________________________________________________________________	
@@ -165,16 +174,17 @@ void echoLoop(int serverSocket,int lossRate){
 					//process the buffer at the end 
 					while (!state.packetsRecieved.empty()) {
 						if(state.packetsRecieved.count(state.expectedSeqNum)){	
-							UDPPacket& pkt = state.packetsRecieved[state.expectedSeqNum];
-							uint16_t pktSize = ntohs(pkt.payloadSize);
+							UDPPacket* pkt = state.packetsRecieved[state.expectedSeqNum];
+							uint16_t pktSize = ntohs(pkt->payloadSize);
 							if (pktSize > 0) { 
 								std::cout << "[EOF WRITE] Seq=" << state.expectedSeqNum << ", Size=" << pktSize << "\n";
-								outfile.write(pkt.data, pktSize);
+								outfile.write(pkt->data, pktSize);
 								outfile.flush();
 							} else {
 								std::cerr << "[EOF SKIP] Zero-length packet at seqNum=" << state.expectedSeqNum << ", skipping\n";
 							}
 							state.packetsRecieved.erase(state.expectedSeqNum);
+							free(pkt);
 							state.expectedSeqNum++;
 						      // If we have remaining packets but not sequential, find the lowest seq number
 						}else {	
@@ -191,15 +201,16 @@ void echoLoop(int serverSocket,int lossRate){
 								std::cerr << "[WARN] Gap in sequence detected. Expected " << state.expectedSeqNum 
 										  << " but writing " << lowestSeq << " instead\n";
 								
-								UDPPacket& pkt = state.packetsRecieved[lowestSeq];
-								uint16_t pktSize = ntohs(pkt.payloadSize);
+								UDPPacket* pkt = state.packetsRecieved[lowestSeq];
+								uint16_t pktSize = ntohs(pkt->payloadSize);
 								
 								if(pktSize > 0) {
-									outfile.write(pkt.data, pktSize);
+									outfile.write(pkt->data, pktSize);
 									outfile.flush();
 								}
 								
 								state.packetsRecieved.erase(lowestSeq);
+								free(pkt);
 								state.expectedSeqNum = lowestSeq + 1;
 							} else {
 								// This shouldn't happen, but just in case
