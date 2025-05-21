@@ -217,7 +217,6 @@ int main (int argc, char* argv[]) {
 		perror("Error Sending Path to Client");
 	}
 	size_t totalSize = sizeof(UDPPacket) + MSS;
-
 	while(true){
 		//sending packets within window size 
 		//__________________________________________________________________________
@@ -229,7 +228,6 @@ int main (int argc, char* argv[]) {
 				return -1;
 			}
 			memset(packet,0,totalSize);
-			
 			file.read(packet->data,MSS);
 			std::streamsize bytesRead = file.gcount();
 			if(bytesRead <= 0){
@@ -252,17 +250,14 @@ int main (int argc, char* argv[]) {
 				free(packet);
 				return -1;
 			}
-			
 			if(!unackedPackets.count(nextSeqNum)){
 				unackedPackets[nextSeqNum] = 0;
 				sentTimes[nextSeqNum] = std::chrono::steady_clock::now();//input the time sent 
 			}
-			
 			nextSeqNum++;
 			free(packet);
 		}
 		//_____________________________________________________________________________________________________________
-
 		//process packets from server 
 		// ___________________________________________________________________________________________________________
 		//If we recieved no activity from the socket within 30 seconds server timed out 
@@ -271,50 +266,47 @@ int main (int argc, char* argv[]) {
 		FD_SET(clientSocket,&rset); //add the clientsocket to the set 
 		//set a timer utilize select to prevent hanging forever while waiting to recieved packeyt 
 		struct timeval timeout;
-		timeout.tv_sec = 30;
+		timeout.tv_sec = 1;
 		timeout.tv_usec = 0;
-		
 		int activity = select(clientSocket+1,&rset,NULL,NULL,&timeout);
-		
+		if (activity < 0){
+			std::cerr << "Select Error\n";
+			return -1;
+		}
+		auto now = std::chrono::steady_clock::now();
 		if(activity == 0){
-			std::cerr << "Timeout waiting for echo. Retry #" << retries << "\n";
-			
-			auto currentTime = std::chrono::steady_clock::now();
-			auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
+			auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
 			if (elapsed >= 30) {
 					std::cerr << "Server is Down\n";
 					close(clientSocket);
 					return 5;
 			}
 		}
-		if (activity < 0){
-			std::cerr << "Select Error\n";
-			return -1;
-		}
-
 		// ________________________________________________________________________
 		//check if the lowest sequence number not acknlowedge, base sequence
 		
 		//processing Packets		
-		bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
+		if(activity > 0 && FD_ISSET(clientSocket, &rset)){
+			bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
 		
-		if(bytes_recieved > 0){
-			uint32_t net_seq;
-			memcpy(&net_seq,buffer,sizeof(uint32_t));
-			seqNum = ntohl(net_seq); //extract the sequence number
-			startTime = std::chrono::steady_clock::now();
-			//if the sequence number in the ack packet is sent by the server, we remove it from the unackedpacket and advance the window
-			if(unackedPackets.count(seqNum)){
-				baseWindow = baseSeqNum + WINDOW_SIZE;
-				std::cout << currentTimestamp() <<", ACK, "<< seqNum <<"," << baseSeqNum << "," << nextSeqNum <<"," << baseWindow << "\n"; 
-				
-				unackedPackets.erase(seqNum);//if the sequence number is found remove it
-				while(!unackedPackets.count(baseSeqNum) && baseSeqNum < nextSeqNum) { //if we reach the ending of the unacked window
-						baseSeqNum++;//slide the baseSeqNum to slide the window
+			if(bytes_recieved > 0){
+				uint32_t net_seq;
+				memcpy(&net_seq,buffer,sizeof(uint32_t));
+				seqNum = ntohl(net_seq); //extract the sequence number
+				startTime = now; //reset global timeout
+				//if the sequence number in the ack packet is sent by the server, we remove it from the unackedpacket and advance the window
+				if(unackedPackets.count(seqNum)){
+					baseWindow = baseSeqNum + WINDOW_SIZE;
+					std::cout << currentTimestamp() <<", ACK, "<< seqNum <<"," << baseSeqNum << "," << nextSeqNum <<"," << baseWindow << "\n"; 		
+					unackedPackets.erase(seqNum);//if the sequence number is found remove it
+					sentTimes.erase(seqNum);
+					while(!unackedPackets.count(baseSeqNum) && baseSeqNum < nextSeqNum) { //if we reach the ending of the unacked window
+							baseSeqNum++;//slide the baseSeqNum to slide the window
+					}
 				}
-				retries = 0;
 			}
 		}
+
 		//check if the lowest unacked packet, the base is still in the unackedPacket, increase the number of retries 
 		if(unackedPackets.count(baseSeqNum) && sentTimes.count(baseSeqNum)){
 				auto now = std::chrono::steady_clock::now();
@@ -338,10 +330,7 @@ int main (int argc, char* argv[]) {
 						sentTimes[baseSeqNum] = now;
 					}
 				}
-				// retransmit the packet 
 		}
-		// Reaching END of Fle
-		//__________________________________________________________________________________________________________________
 		else if (bytes_recieved < 0){
 			perror("recvfrom failed");
 			return -1;
