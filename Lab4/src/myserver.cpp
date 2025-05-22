@@ -79,32 +79,7 @@ void echoLoop(int serverSocket,int lossRate){
 			UDPPacket* recievedPacket = (UDPPacket*)buffer;
 			uint16_t actualSize = ntohs(recievedPacket->payloadSize); 
 			seqNum = ntohl(recievedPacket->sequenceNumber); 
-			bool dataDropped = dropPacket(lossRate);
-			if(actualSize == 0 && seqNum == EOF_SEQ){
-				std::cout << currentTimestamp() << ", EOF RECEIVED\n";
-				//process the buffer at the end 
-				while (!state.packetsRecieved.empty()) {
-					auto it = state.packetsRecieved.find(state.expectedSeqNum);
-						if(it != state.packetsRecieved.end()){
-							UDPPacket* pkt = it->second;
-							uint16_t pktSize = ntohs(pkt->payloadSize);
-							if (pktSize > 0) { 
-								std::cout << "[EOF WRITE] Seq=" << state.expectedSeqNum << ", Size=" << pktSize << "\n";
-								outfile.write(pkt->data, pktSize);
-							} else {
-								std::cerr << "[EOF SKIP] Zero-length packet at seqNum=" << state.expectedSeqNum << ", skipping\n";
-							}
-							outfile.flush();
-							state.packetsRecieved.erase(it);
-							free(pkt);
-							state.expectedSeqNum++;
-						}
-						  // If we have remaining packets but not sequential, find the lowest seq number
-				std::cout << "Buffer is empty or processed all available packets\n";
-				outfile.close(); // Explicitly close the file when done
-				break; // Exit the loop after EOF
-				}
-			}	
+			bool dataDropped = dropPacket(lossRate);	
 			if (dataDropped){ //if we random value generate falls within the loss rate it is lost
 				std::cout << currentTimestamp()<< ", DROP DATA, " << seqNum << "\n";
 			}else{
@@ -151,6 +126,7 @@ void echoLoop(int serverSocket,int lossRate){
 					    std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
 					}
 				}
+
 				// ________________________ Processing In Order Packets ______________________
 				if(seqNum == state.expectedSeqNum){	
 					if (actualSize > 32768){
@@ -174,6 +150,7 @@ void echoLoop(int serverSocket,int lossRate){
 						}
 					}
 				}
+
 				// __________________ Processing Buffered Packets _______________________
 				while(state.packetsRecieved.count(state.expectedSeqNum)){ // check if the next expectedSeqNum has been recieved 
 					std::cout << "Processing Buffered Packets" << "\n";
@@ -192,10 +169,30 @@ void echoLoop(int serverSocket,int lossRate){
 					state.packetsRecieved.erase(state.expectedSeqNum);
 					state.expectedSeqNum++;//increase seqnum
 				}
+				//_____________________________End of File Reached_______________________
+				if(seqNum == EOF_SEQ){
+					std::cout << currentTimestamp() << ", EOF RECEIVED\n";
+					//process the buffer at the end 
+					while (!state.packetsRecieved.empty()) {
+						if(state.packetsRecieved.count(state.expectedSeqNum)){	
+							UDPPacket* pkt = state.packetsRecieved[state.expectedSeqNum];
+							uint16_t pktSize = ntohs(pkt->payloadSize);
+							std::cout << "[EOF WRITE] Seq=" << state.expectedSeqNum << ", Size=" << pktSize << "\n";
+							outfile.write(pkt->data, pktSize);
+							outfile.flush();
+							state.packetsRecieved.erase(state.expectedSeqNum);
+							free(pkt);
+							state.expectedSeqNum++;
+						}
+					}
+				std::cout << "Buffer is empty or processed all available packets\n";
+				outfile.close(); // Explicitly close the file when done 
+				}
 			}
 		}
 	}
 }
+
 bool isPortValid(int port){
  if ( port < 1024 || port > 65553){
 	return false;
