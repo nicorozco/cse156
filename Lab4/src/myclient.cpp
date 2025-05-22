@@ -325,8 +325,9 @@ int main (int argc, char* argv[]) {
 			}
 		}
 	
-		if(file.eof() && unackedPackets.empty()){ //if we reach the end of file and there are no packets in the map break out
+		if(file.peek() && unackedPackets.empty()){ //if we reach the end of file and there are no packets in the map break out
 			//send EOF Packet
+			std::cout << currentTimestamp() << ", EOF TRIGGERED — all packets sent and ACKed\n";
 			size_t eofSize = sizeof(UDPPacket);
 			UDPPacket* eofPacket = (UDPPacket*)malloc(eofSize);
 			if(!eofPacket){

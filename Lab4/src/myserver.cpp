@@ -80,9 +80,30 @@ void echoLoop(int serverSocket,int lossRate){
 			uint16_t actualSize = ntohs(recievedPacket->payloadSize); 
 			seqNum = ntohl(recievedPacket->sequenceNumber); 
 			bool dataDropped = dropPacket(lossRate);
-			if(actualSize == 0){
-				std::cerr << "Zero payload detect at SeqNum= " << seqNum << ", skipping write\n";
-				continue;
+			if(actualSize == 0 && seqNum == EOF_SEQ){
+				std::cout << currentTimestamp() << ", EOF RECEIVED\n";
+				//process the buffer at the end 
+				while (!state.packetsRecieved.empty()) {
+					auto it = state.packetsRecieved.find(state.expectedSeqNum);
+						if(it != state.packetsRecieved.end()){
+							UDPPacket* pkt = it->second;
+							uint16_t pktSize = ntohs(pkt->payloadSize);
+							if (pktSize > 0) { 
+								std::cout << "[EOF WRITE] Seq=" << state.expectedSeqNum << ", Size=" << pktSize << "\n";
+								outfile.write(pkt->data, pktSize);
+							} else {
+								std::cerr << "[EOF SKIP] Zero-length packet at seqNum=" << state.expectedSeqNum << ", skipping\n";
+							}
+							outfile.flush();
+							state.packetsRecieved.erase(it);
+							free(pkt);
+							state.expectedSeqNum++;
+						}
+						  // If we have remaining packets but not sequential, find the lowest seq number
+				std::cout << "Buffer is empty or processed all available packets\n";
+				outfile.close(); // Explicitly close the file when done
+				break; // Exit the loop after EOF
+				}
 			}	
 			if (dataDropped){ //if we random value generate falls within the loss rate it is lost
 				std::cout << currentTimestamp()<< ", DROP DATA, " << seqNum << "\n";
@@ -171,64 +192,10 @@ void echoLoop(int serverSocket,int lossRate){
 					state.packetsRecieved.erase(state.expectedSeqNum);
 					state.expectedSeqNum++;//increase seqnum
 				}
-				//___________________________________________________________________________________________________________________	
-				if(seqNum == EOF_SEQ){
-					std::cout << currentTimestamp() << ", EOF RECEIVED\n";
-					//process the buffer at the end 
-					while (!state.packetsRecieved.empty()) {
-						if(state.packetsRecieved.count(state.expectedSeqNum)){	
-							UDPPacket* pkt = state.packetsRecieved[state.expectedSeqNum];
-							uint16_t pktSize = ntohs(pkt->payloadSize);
-							if (pktSize > 0) { 
-								std::cout << "[EOF WRITE] Seq=" << state.expectedSeqNum << ", Size=" << pktSize << "\n";
-								outfile.write(pkt->data, pktSize);
-								outfile.flush();
-							} else {
-								std::cerr << "[EOF SKIP] Zero-length packet at seqNum=" << state.expectedSeqNum << ", skipping\n";
-							}
-							state.packetsRecieved.erase(state.expectedSeqNum);
-							free(pkt);
-							state.expectedSeqNum++;
-						      // If we have remaining packets but not sequential, find the lowest seq number
-						}else {	
-							uint32_t lowestSeq = UINT32_MAX;
-							for(const auto& pair : state.packetsRecieved) {
-								if(static_cast<uint32_t>(pair.first) < lowestSeq) {
-									lowestSeq = pair.first;
-								}
-							}
-							
-							if(lowestSeq != UINT32_MAX) {
-								// We found a packet, but it's not the next expected one
-								// Write it anyway to ensure we don't lose data
-								std::cerr << "[WARN] Gap in sequence detected. Expected " << state.expectedSeqNum 
-										  << " but writing " << lowestSeq << " instead\n";
-								
-								UDPPacket* pkt = state.packetsRecieved[lowestSeq];
-								if(ntohs(pkt->payloadSize) > 0) {
-									outfile.write(pkt->data, ntohs(pkt->payloadSize));
-									outfile.flush();
-								}
-								
-								state.packetsRecieved.erase(lowestSeq);
-								free(pkt);
-								state.expectedSeqNum = lowestSeq + 1;
-							} else {
-								// This shouldn't happen, but just in case
-								std::cerr << "[ERROR] No packets found but buffer not empty?\n";
-								break;
-							}
-						}
-					}
-				std::cout << "Buffer is empty or processed all available packets\n";
-				outfile.close(); // Explicitly close the file when done
-				break; // Exit the loop after EOF
-   			 }
 			}
 		}
 	}
 }
-
 bool isPortValid(int port){
  if ( port < 1024 || port > 65553){
 	return false;
