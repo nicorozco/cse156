@@ -63,6 +63,8 @@ void echoLoop(int serverSocket,int lossRate){
 		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
 	}	
 	while(true){
+		//clear buffer 
+		memset(buffer,0,sizeof(buffer));
 		bytesRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
 		if (bytesRecieved < 0){
 			std::cout << "Error Recieved Bytes" << "\n";
@@ -133,11 +135,11 @@ void echoLoop(int serverSocket,int lossRate){
 					if (actualSize > 32768){
 						std::cerr << "Invalid Payload Size:" << "on seqNum" << seqNum << "\n";
 						continue;
-					}
-
+					}	
 					outfile.write(recievedPacket->data, ntohs(recievedPacket->payloadSize));//only write to the file if we have sent the ACK message 
 					outfile.flush();
 					state.expectedSeqNum++;						
+					
 					bool ackDropped = dropPacket(lossRate);
 					if(ackDropped){
 						std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
@@ -153,6 +155,7 @@ void echoLoop(int serverSocket,int lossRate){
 				}
 				// __________________ Processing Buffered Packets _______________________
 				while(state.packetsRecieved.count(state.expectedSeqNum)){ // check if the next expectedSeqNum has been recieved 
+					std::cout << "Processing Buffered Packets" << "\n";
 					std::cout << currentTimestamp() << ",DATA, " << state.expectedSeqNum << "\n";
 					UDPPacket* pkt = state.packetsRecieved[state.expectedSeqNum];	
 					uint16_t dataLen  = ntohs(pkt->payloadSize);
