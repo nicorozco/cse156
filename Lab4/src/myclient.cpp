@@ -88,8 +88,7 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	free(lostPacket);
 	return 0;
 }		
-void fileProcessing(){
-	int WINDOW_SIZE = std::stoi(windowSize);
+int fileProcessing(int WINDOW_SIZE,int MSS,std::string infilePath){
 	std::map<uint32_t, std::pair<long, uint16_t>> sentPacketMeta;	
 	std::string serverIP;
 	std::string Port;
@@ -104,6 +103,7 @@ void fileProcessing(){
 	int bytes_recieved;
 	const int TIMEOUT_MS = 2000;
 	
+	//open file path	
 	// 2.) Specify the Server Address we utilize a structure for the address	
 	sockaddr_in serverAddress; 
 	memset(&serverAddress,0,sizeof(serverAddress));
@@ -115,6 +115,7 @@ void fileProcessing(){
 		close(clientSocket);
 		return -1;
 	}
+
 	serverAddress.sin_port = htons(serverPort); 
 	
 	// 2d.) set the IP Address
@@ -124,37 +125,24 @@ void fileProcessing(){
 		close(clientSocket);
 		return -1;
 	}
-	std::ifstream file(infilePath,std::ios::binary);
-	// check for error when opening file
-	if(!file.is_open()){
-		std::cerr << "Error: " << std::strerror(errno) << "\n";
-		close(clientSocket);
-		return -1;
-	}
-	file.seekg(0, std::ios::end); // go to end
-	if (file.tellg() == 0) {
-	    std::cerr << "File is empty.\n";
-	    return 0; // or any code you want to indicate "empty file"
-	}
-	file.seekg(0, std::ios::beg); // rewind to beginning if not empty
-
 	socklen_t addrlen = sizeof(serverAddress);
 	//reading data & sending packets
 	auto startTime = std::chrono::steady_clock::now();
 
-	//utilize a simple packet 
+	//___________________first send path file to server_____________________________  
 	filePathPacket pathPacket;
 	memset(&pathPacket,0,sizeof(pathPacket));
 	strncpy(pathPacket.filepath, outPath.c_str(),sizeof(pathPacket.filepath)-1);
 	pathPacket.filepath[sizeof(pathPacket.filepath)-1] = '\0';
 	//send to server
-
 	ssize_t pathSent = sendto(clientSocket,&pathPacket, sizeof(pathPacket),0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
 
 	if(pathSent < 0){
 		perror("Error Sending Path to Client");
 	}
 	size_t totalSize = sizeof(UDPPacket) + MSS;
+
+	//_____________Start Processing Packets_____________________
 	while(true){
 		//sending packets within window size 
 		//__________________________________________________________________________
@@ -194,7 +182,6 @@ void fileProcessing(){
 		}
 		//_____________________________________________________________________________________________________________
 		//process packets from server 
-		// ___________________________________________________________________________________________________________
 		//If we recieved no activity from the socket within 30 seconds server timed out 
 		fd_set rset; // create socket set
 		FD_ZERO(&rset);//clear the socket set
@@ -218,9 +205,6 @@ void fileProcessing(){
 			}
 		}
 		// ________________________________________________________________________
-		//check if the lowest sequence number not acknlowedge, base sequence
-		
-		//processing Packets		
 		if(activity > 0 && FD_ISSET(clientSocket, &rset)){
 			bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
 		
@@ -298,6 +282,8 @@ void fileProcessing(){
 	
 	std::cout << "Closing Connection" << "\n";
 	file.close();
+	//if server completed this successufly return 0
+	return 0; 
 }
 
 int main (int argc, char* argv[]) {
@@ -309,6 +295,7 @@ int main (int argc, char* argv[]) {
 	std::string outfilePath;
 	std::string line;
 	int MSS = 0;
+	int window;
 	int repFactor = 0;
 	if (argc < 7){
 		std::cerr << "Error: not enough arguments.\n";
@@ -318,8 +305,6 @@ int main (int argc, char* argv[]) {
 	if (argc == 7){ 
 		rep = arg[1]
 		serverConf = arg[2]
-		//serverIP = argv[1];
-		//Port = argv[2];
 		mss = argv[3];
 		windowSize = argv[4];
 		infilePath = argv[5];
@@ -338,21 +323,27 @@ int main (int argc, char* argv[]) {
             return 1;
         }
     }
-	//int serverPort = std::stoi(Port);
+	std::ifstream file(infilePath,std::ios::binary);
+	// check for error when opening file
+	if(!file.is_open()){
+		std::cerr << "Error: " << std::strerror(errno) << "\n";
+		close(clientSocket);
+		return -1;
+	}
+	file.seekg(0, std::ios::end); // go to end
+	if (file.tellg() == 0) {
+	    std::cerr << "File is empty.\n";
+	    return 0; // or any code you want to indicate "empty file"
+	}
+	
 	repFactor = std::stoi(rep);
 	MSS = std::stoi(mss);
+	window = std::stoi(windowSize);
 	if(MSS < 34){
 		std::cerr << "Required Minimum MSS is X+1\n";
 		return 1;
 	}
-
-	//after we have extracted the ip address we check if it's valid
-	/*if (isValidIPv4Format(serverIP) == false){
-		std::cout << serverIP << " is not a valid IPv4 format" << "\n";
-		return 11;
-	}
-	*/
-
+	
 	// 1.) Create a UDP Socket(file descriptor)	
 	int clientSocket = socket(AF_INET,SOCK_DGRAM,0);
 	//error has occured creating socket 
@@ -362,6 +353,8 @@ int main (int argc, char* argv[]) {
 	}	
 	
 	//utilize threads to call the packet processin functions 
+	fileProcessing(window,MSS,outfilePath);
+	
 	std::cout << "Closing Connection" << "\nz
 	close(clientSocket);
 	return 0;
