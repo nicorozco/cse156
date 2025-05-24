@@ -88,76 +88,22 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	free(lostPacket);
 	return 0;
 }		
-
-
-int main (int argc, char* argv[]) {
+void fileProcessing(){
+	int WINDOW_SIZE = std::stoi(windowSize);
 	std::map<uint32_t, std::pair<long, uint16_t>> sentPacketMeta;	
 	std::string serverIP;
 	std::string Port;
-	std::string windowSize;
-	std::string mss; 
-	std::string infilePath;
-	std::string outfilePath;
-	std::unordered_map<uint32_t, int> unackedPackets;
-	std::unordered_map<uint32_t, std::chrono::steady_clock::time_point> sentTimes; //map to track individual packet to retrasnmit 
-	char buffer[1472];
-	std::string line;
 	uint32_t nextSeqNum = 0;
 	uint32_t baseSeqNum = 0;
 	uint32_t seqNum = 0;
 	uint32_t baseWindow = 0;
-	int MSS = 0;
+	std::unordered_map<uint32_t, int> unackedPackets;
+	std::unordered_map<uint32_t, std::chrono::steady_clock::time_point> sentTimes; //map to track individual packet to retrasnmit 
+	char buffer[1472];
 	const int MAX_RETRIES = 5;
 	int bytes_recieved;
 	const int TIMEOUT_MS = 2000;
-	if (argc < 7){
-		std::cerr << "Error: not enough arguments.\n";
-		std::cerr << "Usage: ./myclient <sever_ip> <server port> <mss> <winsz> <infile path> <outfile path>" << "\n";
-	}
 	
-	if (argc == 7){ 
-		//if we have 4 arguments that means we should have the -h flag in the 3rd		
-		serverIP = argv[1];
-		Port = argv[2];
-		mss = argv[3];
-		windowSize = argv[4];
-		infilePath = argv[5];
-		outfilePath = argv[6];
-	} else {
-		std::cerr << "Error: Invalid Arguments" << "\n";
-	}
-	std::filesystem::path outPath(outfilePath);
-   	std::filesystem::path parentDir = outPath.parent_path();
-
-    if (!parentDir.empty() && !std::filesystem::exists(parentDir)) {
-        try {
-            std::filesystem::create_directories(parentDir);
-        } catch (const std::filesystem::filesystem_error& e) {
-            std::cerr << "Failed to create directory: " << e.what() << "\n";
-            return 1;
-        }
-    }
-	int serverPort = std::stoi(Port);
-	int WINDOW_SIZE = std::stoi(windowSize);
-	MSS = std::stoi(mss);
-	if(MSS < 34){
-		std::cerr << "Required Minimum MSS is X+1\n";
-		return 1;
-	}
-
-	//after we have extracted the ip address we check if it's valid
-	if (isValidIPv4Format(serverIP) == false){
-		std::cout << serverIP << " is not a valid IPv4 format" << "\n";
-		return 11;
-	}
-
-	// 1.) Create a UDP Socket(file descriptor)	
-	int clientSocket = socket(AF_INET,SOCK_DGRAM,0);
-	//error has occured creating socket 
-	if (clientSocket < 0) {
-		std::cerr << "Socket creating failed: " << strerror(errno) << "\n";
-		return 1;
-	}	
 	// 2.) Specify the Server Address we utilize a structure for the address	
 	sockaddr_in serverAddress; 
 	memset(&serverAddress,0,sizeof(serverAddress));
@@ -325,7 +271,7 @@ int main (int argc, char* argv[]) {
 			}
 		}
 	
-		if(file.peek() && unackedPackets.empty()){ //if we reach the end of file and there are no packets in the map break out
+		if(file.eof() && unackedPackets.empty()){ //if we reach the end of file and there are no packets in the map break out
 			//send EOF Packet
 			std::cout << currentTimestamp() << ", EOF TRIGGERED — all packets sent and ACKed\n";
 			size_t eofSize = sizeof(UDPPacket);
@@ -352,6 +298,71 @@ int main (int argc, char* argv[]) {
 	
 	std::cout << "Closing Connection" << "\n";
 	file.close();
+}
+
+int main (int argc, char* argv[]) {
+	std::string windowSize;
+	std::string rep;
+	std::string mss; 
+	std::string serverConf;
+	std::string infilePath;
+	std::string outfilePath;
+	std::string line;
+	int MSS = 0;
+	int repFactor = 0;
+	if (argc < 7){
+		std::cerr << "Error: not enough arguments.\n";
+		std::cerr << "Usage: ./myclient <sever_ip> <server port> <mss> <winsz> <infile path> <outfile path>" << "\n";
+	}
+	
+	if (argc == 7){ 
+		rep = arg[1]
+		serverConf = arg[2]
+		//serverIP = argv[1];
+		//Port = argv[2];
+		mss = argv[3];
+		windowSize = argv[4];
+		infilePath = argv[5];
+		outfilePath = argv[6];
+	} else {
+		std::cerr << "Error: Invalid Arguments" << "\n";
+	}
+	std::filesystem::path outPath(outfilePath);
+   	std::filesystem::path parentDir = outPath.parent_path();
+
+    if (!parentDir.empty() && !std::filesystem::exists(parentDir)) {
+        try {
+            std::filesystem::create_directories(parentDir);
+        } catch (const std::filesystem::filesystem_error& e) {
+            std::cerr << "Failed to create directory: " << e.what() << "\n";
+            return 1;
+        }
+    }
+	//int serverPort = std::stoi(Port);
+	repFactor = std::stoi(rep);
+	MSS = std::stoi(mss);
+	if(MSS < 34){
+		std::cerr << "Required Minimum MSS is X+1\n";
+		return 1;
+	}
+
+	//after we have extracted the ip address we check if it's valid
+	/*if (isValidIPv4Format(serverIP) == false){
+		std::cout << serverIP << " is not a valid IPv4 format" << "\n";
+		return 11;
+	}
+	*/
+
+	// 1.) Create a UDP Socket(file descriptor)	
+	int clientSocket = socket(AF_INET,SOCK_DGRAM,0);
+	//error has occured creating socket 
+	if (clientSocket < 0) {
+		std::cerr << "Socket creating failed: " << strerror(errno) << "\n";
+		return 1;
+	}	
+	
+	//utilize threads to call the packet processin functions 
+	std::cout << "Closing Connection" << "\nz
 	close(clientSocket);
 	return 0;
 }
