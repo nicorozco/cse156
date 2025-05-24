@@ -323,6 +323,7 @@ int main (int argc, char* argv[]) {
             return 1;
         }
     }
+
 	std::ifstream file(infilePath,std::ios::binary);
 	// check for error when opening file
 	if(!file.is_open()){
@@ -330,6 +331,7 @@ int main (int argc, char* argv[]) {
 		close(clientSocket);
 		return -1;
 	}
+
 	file.seekg(0, std::ios::end); // go to end
 	if (file.tellg() == 0) {
 	    std::cerr << "File is empty.\n";
@@ -353,7 +355,8 @@ int main (int argc, char* argv[]) {
 	}	
 	
 	//utilize threads to call the packet processin functions 
-	fileProcessing(window,MSS,outfilePath);
+	// for the # of replication factor extract the IP and Port and create a thread with that information
+	fileProcessing(window,MSS,outfilePath,port,serverIP);
 	
 	std::cout << "Closing Connection" << "\nz
 	close(clientSocket);
