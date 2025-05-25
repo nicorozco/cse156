@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 #include <chrono>
 #include <filesystem>
 #include <iterator>
@@ -88,7 +89,7 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 	free(lostPacket);
 	return 0;
 }		
-int fileProcessing(int WINDOW_SIZE,int MSS,std::string infilePath){
+int fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,int MSS,std::string infilePath){
 	std::map<uint32_t, std::pair<long, uint16_t>> sentPacketMeta;	
 	std::string serverIP;
 	std::string Port;
@@ -102,8 +103,13 @@ int fileProcessing(int WINDOW_SIZE,int MSS,std::string infilePath){
 	const int MAX_RETRIES = 5;
 	int bytes_recieved;
 	const int TIMEOUT_MS = 2000;
-	
-	//open file path	
+	std::cout << "Calling fileProcessing with " << serverIP << ":" << Port << "\n";
+	int clientSocket = socket(AF_INET,SOCK_DGRAM,0);
+	//error has occured creating socket 
+	if (clientSocket < 0) {
+		std::cerr << "Socket creating failed: " << strerror(errno) << "\n";
+		return 1;
+	}	
 	// 2.) Specify the Server Address we utilize a structure for the address	
 	sockaddr_in serverAddress; 
 	memset(&serverAddress,0,sizeof(serverAddress));
@@ -139,6 +145,7 @@ int fileProcessing(int WINDOW_SIZE,int MSS,std::string infilePath){
 
 	if(pathSent < 0){
 		perror("Error Sending Path to Client");
+		close(clientSocket);
 	}
 	size_t totalSize = sizeof(UDPPacket) + MSS;
 
@@ -194,6 +201,7 @@ int fileProcessing(int WINDOW_SIZE,int MSS,std::string infilePath){
 		if (activity < 0){
 			std::cerr << "Select Error\n";
 			return -1;
+			close(clientSocket);
 		}
 		auto now = std::chrono::steady_clock::now();
 		if(activity == 0){
@@ -282,6 +290,7 @@ int fileProcessing(int WINDOW_SIZE,int MSS,std::string infilePath){
 	
 	std::cout << "Closing Connection" << "\n";
 	file.close();
+	close(clientSocket);
 	//if server completed this successufly return 0
 	return 0; 
 }
@@ -297,14 +306,16 @@ int main (int argc, char* argv[]) {
 	int MSS = 0;
 	int window;
 	int repFactor = 0;
+	std::vector<std::thread> threads;
+
 	if (argc < 7){
 		std::cerr << "Error: not enough arguments.\n";
-		std::cerr << "Usage: ./myclient <sever_ip> <server port> <mss> <winsz> <infile path> <outfile path>" << "\n";
+		std::cerr << "Usage: ./myclient <severs_ip> <server port> <mss> <winsz> <infile path> <outfile path>" << "\n";
 	}
 	
 	if (argc == 7){ 
-		rep = arg[1]
-		serverConf = arg[2]
+		rep = argv[1];
+		serverConf = argv[2];
 		mss = argv[3];
 		windowSize = argv[4];
 		infilePath = argv[5];
@@ -325,10 +336,10 @@ int main (int argc, char* argv[]) {
     }
 
 	std::ifstream file(infilePath,std::ios::binary);
+	std::ifstream serverFile(serverConf);
 	// check for error when opening file
 	if(!file.is_open()){
 		std::cerr << "Error: " << std::strerror(errno) << "\n";
-		close(clientSocket);
 		return -1;
 	}
 
@@ -337,7 +348,17 @@ int main (int argc, char* argv[]) {
 	    std::cerr << "File is empty.\n";
 	    return 0; // or any code you want to indicate "empty file"
 	}
-	
+	// check for error when opening file
+	if(!serverFile.is_open()){
+		std::cerr << "Error: " << std::strerror(errno) << "\n";
+		return -1;
+	}
+
+	serverFile.seekg(0, std::ios::end); // go to end
+	if (serverFile.tellg() == 0) {
+	    std::cerr << "File is empty.\n";
+	    return 0; // or any code you want to indicate "empty file"
+	}
 	repFactor = std::stoi(rep);
 	MSS = std::stoi(mss);
 	window = std::stoi(windowSize);
@@ -345,20 +366,24 @@ int main (int argc, char* argv[]) {
 		std::cerr << "Required Minimum MSS is X+1\n";
 		return 1;
 	}
-	
-	// 1.) Create a UDP Socket(file descriptor)	
-	int clientSocket = socket(AF_INET,SOCK_DGRAM,0);
-	//error has occured creating socket 
-	if (clientSocket < 0) {
-		std::cerr << "Socket creating failed: " << strerror(errno) << "\n";
-		return 1;
-	}	
-	
 	//utilize threads to call the packet processin functions 
 	// for the # of replication factor extract the IP and Port and create a thread with that information
-	fileProcessing(window,MSS,outfilePath,port,serverIP);
-	
-	std::cout << "Closing Connection" << "\nz
-	close(clientSocket);
+	int count = 0 
+	while(count < repFactor && std::getline(configFile,line)){
+		std::istringstream iss(line);
+		std::string serverIP;
+		int port;
+		if(iss >> serverIP >> port){
+			threads.emplace_back(fileProcessing(window,MSS,outfilePath,port,serverIP));
+			count++;
+		}
+	}
+	//join all threads to ensure all instances are finished before exiting main
+	for(auto& t: threads){
+		t.join();
+	}
+
+	std::cout << "Closing Connection" << "\n";
+	serverFile.close();
 	return 0;
 }
