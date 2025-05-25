@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+#include <filesystem>
 #include <ctime>
 #include <iomanip>
 #include <cstring>
@@ -40,7 +41,7 @@ bool dropPacket(int lossRate){
 	return randVal < percLossRate;
 }
 
-void echoLoop(int serverSocket,int lossRate){	
+void echoLoop(int serverSocket,int lossRate,std::string rootFolderPath){	
 	std::unordered_map<std::string,ClientState> clients;//create a map to hold the different clients 
 	char buffer[32768];
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
@@ -57,8 +58,11 @@ void echoLoop(int serverSocket,int lossRate){
 	if (pathRecieved < 0){
 		perror("Error receiving filepath");
 	}
+
+	std::string fullPath = rootFolderPath + "/" + filePath;
 	//open file path 
-	std::ofstream outfile(filePath,std::ios::binary | std::ios::trunc);
+	std::filesystem::create_directories(std::filesystem::path(fullPath).parent_path());
+	std::ofstream outfile(fullPath,std::ios::binary | std::ios::trunc);
 	if(!outfile.is_open()){
 		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
 	}	
@@ -169,7 +173,7 @@ void echoLoop(int serverSocket,int lossRate){
 					state.packetsRecieved.erase(state.expectedSeqNum);
 					state.expectedSeqNum++;//increase seqnum
 				}
-				//_____________________________End of File Reached_______________________
+				//_________________________End of File Reached_______________________
 				if(seqNum == EOF_SEQ){
 					std::cout << currentTimestamp() << ", EOF RECEIVED\n";
 					//process the buffer at the end 
@@ -211,6 +215,8 @@ int main(int argc, char* argv[]){
 	srand(time(0));
 	std::string portStr;
 	std::string lossRateStr;
+	std::string folderPath;
+
 	int lossRate;
 	int port;
 	initRandom(); //seed random generator 
@@ -219,10 +225,9 @@ int main(int argc, char* argv[]){
 		std::cerr << "Please provide a port number and packet loss rate for the server";
 		return -1;
 	} else if (argc == 3) {
-
 		portStr = argv[1];
 		lossRateStr = argv[2];
-
+		folderPath = argv[3];
 	}
 	port = std::stoi(portStr);
 	lossRate = std::stoi(lossRateStr);
@@ -256,7 +261,7 @@ int main(int argc, char* argv[]){
 		close(serverSocket);
 		return 1;
 	}
-	echoLoop(serverSocket,lossRate);
+	echoLoop(serverSocket,lossRate,folderPath);
 	std::cout << "Finishing Recieving" << "\n";
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	//d.) recieved a packet
