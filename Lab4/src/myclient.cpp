@@ -47,7 +47,7 @@ int main (int argc, char* argv[]){
 
 	if (argc < 7){
 		std::cerr << "Error: not enough arguments.\n";
-		std::cerr << "Usage: ./myclient <severs_ip> <server port> <mss> <winsz> <infile path> <outfile path>" << "\n";
+		std::cerr << "Usage: ./myclient servn servaddr.conf mss winsz infile path outfile path" << "\n";
 	}
 	
 	if (argc == 7){ 

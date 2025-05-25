@@ -224,7 +224,7 @@ int main(int argc, char* argv[]){
 
 		std::cerr << "Please provide a port number and packet loss rate for the server";
 		return -1;
-	} else if (argc == 3) {
+	} else if (argc == 4) {
 		portStr = argv[1];
 		lossRateStr = argv[2];
 		folderPath = argv[3];
@@ -243,7 +243,6 @@ int main(int argc, char* argv[]){
 	}
 
 	//1.) create a UDP Server
-	//a.) create a UDP socket
 	int serverSocket = socket(AF_INET,SOCK_DGRAM,0);
 	if (serverSocket < 0){
 		perror("Socket creation failed");
