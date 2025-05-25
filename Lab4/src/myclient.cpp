@@ -91,8 +91,6 @@ int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* server
 }		
 int fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,int MSS,std::string infilePath){
 	std::map<uint32_t, std::pair<long, uint16_t>> sentPacketMeta;	
-	std::string serverIP;
-	std::string Port;
 	uint32_t nextSeqNum = 0;
 	uint32_t baseSeqNum = 0;
 	uint32_t seqNum = 0;
@@ -103,13 +101,26 @@ int fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,in
 	const int MAX_RETRIES = 5;
 	int bytes_recieved;
 	const int TIMEOUT_MS = 2000;
-	std::cout << "Calling fileProcessing with " << serverIP << ":" << Port << "\n";
+	std::cout << "Calling fileProcessing with " << serverIP << ":" << serverPort << "\n";
 	int clientSocket = socket(AF_INET,SOCK_DGRAM,0);
+	std::ifstream file(infilePath,std::ios::binary);
+	// check for error when opening file
+	if(!file.is_open()){
+		std::cerr << "Error: " << std::strerror(errno) << "\n";
+		return -1;
+	}
+	file.seekg(0, std::ios::end); // go to end
+	
+	if(file.tellg() == 0) {
+	    std::cerr << "File is empty.\n";
+	    return 0; // or any code you want to indicate "empty file"
+	}
 	//error has occured creating socket 
 	if (clientSocket < 0) {
 		std::cerr << "Socket creating failed: " << strerror(errno) << "\n";
 		return 1;
-	}	
+	}
+		
 	// 2.) Specify the Server Address we utilize a structure for the address	
 	sockaddr_in serverAddress; 
 	memset(&serverAddress,0,sizeof(serverAddress));
@@ -121,9 +132,7 @@ int fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,in
 		close(clientSocket);
 		return -1;
 	}
-
 	serverAddress.sin_port = htons(serverPort); 
-	
 	// 2d.) set the IP Address
 	if (inet_pton(AF_INET,serverIP.c_str(),&serverAddress.sin_addr) <= 0 ){
 		// check for errors: 1 means address was set succesfuly, anything less than 1 means error
@@ -334,26 +343,12 @@ int main (int argc, char* argv[]) {
             return 1;
         }
     }
-
-	std::ifstream file(infilePath,std::ios::binary);
 	std::ifstream serverFile(serverConf);
-	// check for error when opening file
-	if(!file.is_open()){
-		std::cerr << "Error: " << std::strerror(errno) << "\n";
-		return -1;
-	}
-
-	file.seekg(0, std::ios::end); // go to end
-	if (file.tellg() == 0) {
-	    std::cerr << "File is empty.\n";
-	    return 0; // or any code you want to indicate "empty file"
-	}
 	// check for error when opening file
 	if(!serverFile.is_open()){
 		std::cerr << "Error: " << std::strerror(errno) << "\n";
 		return -1;
 	}
-
 	serverFile.seekg(0, std::ios::end); // go to end
 	if (serverFile.tellg() == 0) {
 	    std::cerr << "File is empty.\n";
@@ -368,7 +363,7 @@ int main (int argc, char* argv[]) {
 	}
 	//utilize threads to call the packet processin functions 
 	// for the # of replication factor extract the IP and Port and create a thread with that information
-	int count = 0 
+	int count = 0; 
 	while(count < repFactor && std::getline(configFile,line)){
 		std::istringstream iss(line);
 		std::string serverIP;
