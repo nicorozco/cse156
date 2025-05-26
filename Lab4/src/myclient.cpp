@@ -71,6 +71,8 @@ int main (int argc, char* argv[]){
 	    std::cerr << "File is empty.\n";
 	    return 0; // or any code you want to indicate "empty file"
 	}
+	serverFile.clear();
+	serverFile.seekg(0,std::ios::beg);//reset to beginning of file
 	repFactor = std::stoi(rep);
 	MSS = std::stoi(mss);
 	window = std::stoi(windowSize);
@@ -79,8 +81,10 @@ int main (int argc, char* argv[]){
 		return 1;
 	}
 	//utilize threads to call the packet processin functions 
-	int count = 0; 
+	int count = 0;
+	std::cout << repFactor << "# of server to replicate" << "\n"; 
 	while(count < repFactor && std::getline(serverFile,line)){
+		std::cout << "thread loop" << "\n";
 		std::istringstream iss(line);
 		std::string serverIP;
 		int port;
