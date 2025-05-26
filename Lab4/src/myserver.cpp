@@ -41,7 +41,7 @@ bool dropPacket(int lossRate){
 	return randVal < percLossRate;
 }
 
-void echoLoop(int serverSocket,int lossRate,std::string rootFolderPath){	
+void echoLoop(int serverSocket,int lossRate,std::string rootFolder){	
 	std::unordered_map<std::string,ClientState> clients;//create a map to hold the different clients 
 	char buffer[32768];
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
@@ -58,10 +58,12 @@ void echoLoop(int serverSocket,int lossRate,std::string rootFolderPath){
 	if (pathRecieved < 0){
 		perror("Error receiving filepath");
 	}
+	//construct full path
+	std::filesystem::path fullPath = std::filesystem::path(rootFolder) /  filePath;
+	//ensure directories exist
 
-	std::string fullPath = rootFolderPath + "/" + filePath;
-	//open file path 
-	std::filesystem::create_directories(std::filesystem::path(fullPath).parent_path());
+	std::filesystem::create_directories(fullPath.parent_path());
+	//open file for writing 
 	std::ofstream outfile(fullPath,std::ios::binary | std::ios::trunc);
 	if(!outfile.is_open()){
 		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
@@ -220,8 +222,7 @@ int main(int argc, char* argv[]){
 	int lossRate;
 	int port;
 	initRandom(); //seed random generator 
-	if (argc < 3){
-
+	if (argc < 4){
 		std::cerr << "Please provide a port number and packet loss rate for the server";
 		return -1;
 	} else if (argc == 4) {
