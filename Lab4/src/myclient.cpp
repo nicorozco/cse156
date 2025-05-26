@@ -131,6 +131,7 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 	const int TIMEOUT_MS = 2000;
 	std::cout << "Calling fileProcessing with " << serverIP << ":" << serverPort << "\n";
 	int clientSocket = socket(AF_INET,SOCK_DGRAM,0);
+	
 	std::ifstream file(infilePath,std::ios::binary);
 	// check for error when opening file
 	if(!file.is_open()){
@@ -152,6 +153,8 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 	if(file.tellg() == 0) {
 	    std::cerr << "File is empty.\n";
 	}
+	file.clear();
+	file.seekg(0,std::ios::beg);//reset to beginning of file
 	//error has occured creating socket 
 	if (clientSocket < 0) {
 		std::cerr << "Socket creating failed: " << strerror(errno) << "\n";
