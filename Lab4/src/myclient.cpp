@@ -82,9 +82,7 @@ int main (int argc, char* argv[]){
 	}
 	//utilize threads to call the packet processin functions 
 	int count = 0;
-	std::cout << repFactor << "# of server to replicate" << "\n"; 
 	while(count < repFactor && std::getline(serverFile,line)){
-		std::cout << "thread loop" << "\n";
 		std::istringstream iss(line);
 		std::string serverIP;
 		int port;
@@ -256,7 +254,17 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 		// ________________________________________________________________________
 		if(activity > 0 && FD_ISSET(clientSocket, &rset)){
 			bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
-		
+			//extract rip and rport
+			char rip[INET_ADDRSTRLEN];
+			inet_ntop(AF_INET, &(serverAddress.sin_addr),rip,INET_ADDRSTRLEN);
+			int rport = ntohs(serverAddress.sin_port);
+			
+			//extracting lport
+			struct sockaddr_in localAddr;
+			socklen_t localLen = sizeof(localAddr);
+			getsockname(clientSocket, (struct sockaddr*)&localAddr, &localLen);
+			int lport = ntohs(localAddr.sin_port);
+	
 			if(bytes_recieved > 0){
 				uint32_t net_seq;
 				memcpy(&net_seq,buffer,sizeof(uint32_t));
@@ -265,7 +273,7 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 				//if the sequence number in the ack packet is sent by the server, we remove it from the unackedpacket and advance the window
 				if(unackedPackets.count(seqNum)){
 					baseWindow = baseSeqNum + WINDOW_SIZE;
-					std::cout << currentTimestamp() <<", ACK, "<< seqNum <<"," << baseSeqNum << "," << nextSeqNum <<"," << baseWindow << "\n"; 		
+					std::cout << currentTimestamp() <<"," << lport << "," << rip << "," << rport << " ACK, "<< seqNum <<"," << baseSeqNum << "," << nextSeqNum <<"," << baseWindow << "\n"; 		
 					unackedPackets.erase(seqNum);//if the sequence number is found remove it
 					sentTimes.erase(seqNum);
 					while(!unackedPackets.count(baseSeqNum) && baseSeqNum < nextSeqNum) { //if we reach the ending of the unacked window
