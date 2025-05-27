@@ -26,12 +26,10 @@
 #include <fstream>
 #include <unordered_set>
 #define TIMEOUT_SEC 30
-
 std::string currentTimestamp();
 bool isValidIPv4Format(const std::string& ip);	
 int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* serverAddress,std::ifstream& file, const std::map<uint32_t, std::pair<long,uint16_t>>& metaMap);	
 void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,int MSS,std::string infilePath,std::string outfilePath);
-
 int main (int argc, char* argv[]){
 	std::string windowSize;
 	std::string rep;
@@ -128,10 +126,9 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 	char buffer[1472];
 	const int MAX_RETRIES = 5;
 	int bytes_recieved;
-	const int TIMEOUT_MS = 2000;
-	std::cout << "Calling fileProcessing with " << serverIP << ":" << serverPort << "\n";
-	int clientSocket = socket(AF_INET,SOCK_DGRAM,0);
-	
+	const int TIMEOUT_MS = 3000;
+	int clientSocket = socket(AF_INET,SOCK_DGRAM,0);	
+	bool firstRecieved = false;
 	std::ifstream file(infilePath,std::ios::binary);
 	// check for error when opening file
 	if(!file.is_open()){
@@ -239,7 +236,7 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 		FD_SET(clientSocket,&rset); //add the clientsocket to the set 
 		//set a timer utilize select to prevent hanging forever while waiting to recieved packeyt 
 		struct timeval timeout;
-		timeout.tv_sec = 1;
+		timeout.tv_sec = 3;
 		timeout.tv_usec = 0;
 		int activity = select(clientSocket+1,&rset,NULL,NULL,&timeout);
 		if (activity < 0){
@@ -269,6 +266,7 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 			int lport = ntohs(localAddr.sin_port);
 	
 			if(bytes_recieved > 0){
+				firstRecieved = true;
 				uint32_t net_seq;
 				memcpy(&net_seq,buffer,sizeof(uint32_t));
 				seqNum = ntohl(net_seq); //extract the sequence number
@@ -292,7 +290,7 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 		if(unackedPackets.count(baseSeqNum) && sentTimes.count(baseSeqNum)){
 			auto now = std::chrono::steady_clock::now();
 			auto waitTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - sentTimes[baseSeqNum]).count();
-			if (waitTime >= TIMEOUT_MS){
+			if (waitTime >= TIMEOUT_MS && firstRecieved == false){
 				std::cout << "Packet Loss Detected" << "\n";
 				unackedPackets[baseSeqNum]++;	
 				//check if we hit max retries 	
