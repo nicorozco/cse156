@@ -13,7 +13,78 @@
 #include <ctime>
 #include <map>
 #include <fstream>
+
+ssize_t sendAck(int serverSocket,uint32_t seqNum,struct sockaddr_in* clientAddr,socklen_t clientLen);
+std::string currentTimestamp();
+void initRandom();
+bool dropPacket(int lossRate);
+bool isPortValid(int port);
+bool isLossValid(int loss);
+void echoLoop(int serverSocket,int lossRate,std::string rootFolder);	
+
+int main(int argc, char* argv[]){
+	srand(time(0));
+	std::string portStr;
+	std::string lossRateStr;
+	std::string folderPath;
+	int optval = 1;
+	int lossRate;
+	int port;
+	initRandom(); //seed random generator 
+	if (argc < 4){
+		std::cerr << "Please provide a port number and packet loss rate for the server";
+		return -1;
+	} else if (argc == 4) {
+		portStr = argv[1];
+		lossRateStr = argv[2];
+		folderPath = argv[3];
+	}
+	port = std::stoi(portStr);
+	lossRate = std::stoi(lossRateStr);
+
+	if (isPortValid(port) == false){
+		perror("Please enter a valid port");
+		return -1;
+	}
+
+	if(isLossValid(lossRate) == false){
+		std::cerr << "Please enter a valid loss percentage (0-100)\n";
+		return -1;
+	}
+
+	//1.) create a UDP Socket
+	int serverSocket = socket(AF_INET,SOCK_DGRAM,0);
+	if (serverSocket < 0){
+		perror("Socket creation failed");
+		return 1;
+	}
+	//2 Set the SO_REUSEADDR option
+	if(setsockopt(serverSocket,SOL_SOCKET, SO_REUSEADDR,&optval,sizeof(optval))<0){
+		perror("setsockopt failed\n");
+		close(serverSocket);
+		exit(EXIT_FAILURE);	
+	}
+	//b.) create a socket structure for the server 
+	struct sockaddr_in serverAddr;
+	serverAddr.sin_family = AF_INET;
+	serverAddr.sin_addr.s_addr = INADDR_ANY; //have the server listen on all interfaces 
+	serverAddr.sin_port = htons(port);
+	
+	//c.) Bind the port to server address structure (associate socket with IP address & Port Number)
+	if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0){
+		perror("Bind failed");
+		close(serverSocket);
+		return 1;
+	}
+	echoLoop(serverSocket,lossRate,folderPath);
+	std::cout << "Finishing Recieving" << "\n";
+	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
+	//d.) recieved a packet
+	close(serverSocket);
+	return 0;
+}
 ssize_t sendAck(int serverSocket,uint32_t seqNum,struct sockaddr_in* clientAddr,socklen_t clientLen){
+
 	ACKPacket ackPacket;
 	memset(&ackPacket,0,sizeof(ackPacket));
 	ackPacket.sequenceNumber = htonl(seqNum); //set the sequence number
@@ -30,17 +101,27 @@ std::string currentTimestamp(){
     oss << std::put_time(&utc_tm, "%Y-%m-%dT%H:%M:%SZ");
     return oss.str();
 }
-
 void initRandom(){
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
 }
-
 bool dropPacket(int lossRate){
 	double percLossRate = lossRate / 100.0;
 	double randVal = static_cast<double>(std::rand()) / static_cast<double>(RAND_MAX);
 	return randVal < percLossRate;
 }
+bool isPortValid(int port){
+ if ( port < 1024 || port > 65553){
+	return false;
+}
+	return true;
+}	
+bool isLossValid(int loss){
+if( loss < 0 || loss > 100){
+	return false;
 
+}
+	return true;
+}
 void echoLoop(int serverSocket,int lossRate,std::string rootFolder){	
 	std::unordered_map<std::string,ClientState> clients;//create a map to hold the different clients 
 	char buffer[32768];
@@ -197,74 +278,4 @@ void echoLoop(int serverSocket,int lossRate,std::string rootFolder){
 			}
 		}
 	}
-}
-
-bool isPortValid(int port){
- if ( port < 1024 || port > 65553){
-	return false;
-}
-	return true;
-}	
-bool isLossValid(int loss){
-if( loss < 0 || loss > 100){
-	return false;
-
-}
-	return true;
-}
-
-int main(int argc, char* argv[]){
-	srand(time(0));
-	std::string portStr;
-	std::string lossRateStr;
-	std::string folderPath;
-
-	int lossRate;
-	int port;
-	initRandom(); //seed random generator 
-	if (argc < 4){
-		std::cerr << "Please provide a port number and packet loss rate for the server";
-		return -1;
-	} else if (argc == 4) {
-		portStr = argv[1];
-		lossRateStr = argv[2];
-		folderPath = argv[3];
-	}
-	port = std::stoi(portStr);
-	lossRate = std::stoi(lossRateStr);
-
-	if (isPortValid(port) == false){
-		perror("Please enter a valid port");
-		return -1;
-	}
-
-	if(isLossValid(lossRate) == false){
-		std::cerr << "Please enter a valid loss percentage (0-100)\n";
-		return -1;
-	}
-
-	//1.) create a UDP Server
-	int serverSocket = socket(AF_INET,SOCK_DGRAM,0);
-	if (serverSocket < 0){
-		perror("Socket creation failed");
-		return 1;
-	}
-	//b.) create a socket structure for the server 
-	struct sockaddr_in serverAddr;
-	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_addr.s_addr = INADDR_ANY; //have the server listen on all interfaces 
-	serverAddr.sin_port = htons(port);
-	
-	//c.) Bind the port to server address structure (associate socket with IP address & Port Number)
-	if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0){
-		perror("Bind failed");
-		close(serverSocket);
-		return 1;
-	}
-	echoLoop(serverSocket,lossRate,folderPath);
-	std::cout << "Finishing Recieving" << "\n";
-	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
-	//d.) recieved a packet
-	close(serverSocket);
-	return 0;
 }
