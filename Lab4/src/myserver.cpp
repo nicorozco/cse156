@@ -281,9 +281,12 @@ void echoLoop(int serverSocket,int lossRate,std::string rootFolder, std::unorder
 							state.expectedSeqNum++;
 						}
 					}
-				std::cout << "Buffer is empty or processed all available packets\n";
-				outfile.close(); //close the file when done 
-				activeFiles.erase(fullPath.string());//remove file from active after done writing 
+					std::cout << "Buffer is empty or processed all available packets\n";
+					outfile.close(); //close the file when done 
+					state.expectedSeqNum = 0; //reset SeqNUm
+					state.packetsRecieved.clear(); //reset buffer
+					clients.erase(key); //drop state for the finished client
+					activeFiles.erase(fullPath.string());//remove file from active after done writing 
 				}
 			}
 		}
