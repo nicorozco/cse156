@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+#include <unordered_set>
 #include <filesystem>
 #include <ctime>
 #include <iomanip>
@@ -20,7 +21,7 @@ void initRandom();
 bool dropPacket(int lossRate);
 bool isPortValid(int port);
 bool isLossValid(int loss);
-void echoLoop(int serverSocket,int lossRate,std::string rootFolder,std::unordered_map<std::string, std::string>& activeFiles);	
+void echoLoop(int serverSocket,int lossRate,std::string rootFolder,std::unordered_set<std::string>& activeFiles);	
 
 int main(int argc, char* argv[]){
 	srand(time(0));
@@ -32,7 +33,7 @@ int main(int argc, char* argv[]){
 	int port;
 	initRandom(); //seed random generator 
 	//utilize a map to track of the files being written to, enforce file lock 
-	std::unordered_map<std::string, std::string> activeFiles;
+	std::unordered_set<std::string> activeFiles;
 	if (argc < 4){
 		std::cerr << "Please provide a port number and packet loss rate for the server";
 		return -1;
@@ -124,7 +125,7 @@ if( loss < 0 || loss > 100){
 }
 	return true;
 }
-void echoLoop(int serverSocket,int lossRate,std::string rootFolder, std::unordered_map<std::string,std::string>& activeFiles){	
+void echoLoop(int serverSocket,int lossRate,std::string rootFolder, std::unordered_set<std::string>& activeFiles){	
 	std::unordered_map<std::string,ClientState> clients;//create a map to hold the different clients 
 	char buffer[32768];
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
