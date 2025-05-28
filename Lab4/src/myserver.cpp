@@ -20,7 +20,7 @@ void initRandom();
 bool dropPacket(int lossRate);
 bool isPortValid(int port);
 bool isLossValid(int loss);
-void echoLoop(int serverSocket,int lossRate,std::string rootFolder);	
+void echoLoop(int serverSocket,int lossRate,std::string rootFolder,std::unordered_map<std::string, std::string>& activeFiles);	
 
 int main(int argc, char* argv[]){
 	srand(time(0));
@@ -31,6 +31,8 @@ int main(int argc, char* argv[]){
 	int lossRate;
 	int port;
 	initRandom(); //seed random generator 
+	//utilize a map to track of the files being written to, enforce file lock 
+	std::unordered_map<std::string, std::string> activeFiles;
 	if (argc < 4){
 		std::cerr << "Please provide a port number and packet loss rate for the server";
 		return -1;
@@ -76,7 +78,7 @@ int main(int argc, char* argv[]){
 		close(serverSocket);
 		return 1;
 	}
-	echoLoop(serverSocket,lossRate,folderPath);
+	echoLoop(serverSocket,lossRate,folderPath,activeFiles);
 	std::cout << "Finishing Recieving" << "\n";
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	//d.) recieved a packet
@@ -122,7 +124,7 @@ if( loss < 0 || loss > 100){
 }
 	return true;
 }
-void echoLoop(int serverSocket,int lossRate,std::string rootFolder){	
+void echoLoop(int serverSocket,int lossRate,std::string rootFolder, std::unordered_map<std::string,std::string>& activeFiles){	
 	std::unordered_map<std::string,ClientState> clients;//create a map to hold the different clients 
 	char buffer[32768];
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
@@ -142,7 +144,13 @@ void echoLoop(int serverSocket,int lossRate,std::string rootFolder){
 	//construct full path
 	std::filesystem::path fullPath = std::filesystem::path(rootFolder) /  filePath;
 	//ensure directories exist
-
+	if(activeFiles.count(fullPath.string()) > 0){
+		std::cerr << "File is currently in use: " << fullPath << "\n";
+    	const char* errorMsg = "ERROR: File is being written by another client.";
+    	sendto(serverSocket, errorMsg, strlen(errorMsg), 0, (struct sockaddr*)&clientAddr, clientLen);
+    	return; // Skip handling this client
+	}
+	activeFiles.insert(fullPath.string());//mark file as in-use
 	std::filesystem::create_directories(fullPath.parent_path());
 	//open file for writing 
 	std::ofstream outfile(fullPath,std::ios::binary | std::ios::trunc);
@@ -273,7 +281,8 @@ void echoLoop(int serverSocket,int lossRate,std::string rootFolder){
 						}
 					}
 				std::cout << "Buffer is empty or processed all available packets\n";
-				outfile.close(); // Explicitly close the file when done 
+				outfile.close(); //close the file when done 
+				activeFiles.erase(fullPath.string());//remove file from active after done writing 
 				}
 			}
 		}
