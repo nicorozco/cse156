@@ -23,7 +23,8 @@ struct ACKPacket{
 };
 struct ClientState {
 	uint32_t expectedSeqNum;//each client will have it's own expectedSeqNum
-	std::unordered_map<int,UDPPacket> packetsRecieved; //and it's own buffred packets 
+	std::unordered_map<int,UDPPacket*> packetsRecieved; //and it's own buffred packets 
+	bool finished = false;
 	std::chrono::steady_clock::time_point lastHeard;
 };
 
