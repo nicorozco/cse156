@@ -176,7 +176,6 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 	}
 	socklen_t addrlen = sizeof(serverAddress);
 	//reading data & sending packets
-	auto startTime = std::chrono::steady_clock::now();
 
 	//___________________first send path file to server_____________________________  
 	filePathPacket pathPacket;
@@ -189,7 +188,25 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 	if(pathSent < 0){
 		perror("Error Sending Path to Client");
 		close(clientSocket);
+	}	
+	
+	fd_set rset; // create socket set
+	FD_ZERO(&rset);//clear the socket set
+	FD_SET(clientSocket,&rset); //add the clientsocket to the set 
+	
+	//set a timer utilize select to prevent hanging forever while waiting to recieved packeyt 
+	struct timeval timeout;
+	timeout.tv_sec = 30;
+	timeout.tv_usec = 0;
+	int activity = select(clientSocket+1,&rset,NULL,NULL,&timeout);
+	if (activity == 0){
+ 		std::cerr << "Timeout: No response from server within 30 seconds. Exiting.\n";
+    	close(clientSocket);
+	}else if (activity < 0){
+		std::cerr << "Select Error\n";
+		close(clientSocket);
 	}
+
 	size_t totalSize = sizeof(UDPPacket) + MSS;
 
 	//_____________Start Processing Packets_____________________
@@ -231,26 +248,6 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 		//_____________________________________________________________________________________________________________
 		//process packets from server 
 		//If we recieved no activity from the socket within 30 seconds server timed out 
-		fd_set rset; // create socket set
-		FD_ZERO(&rset);//clear the socket set
-		FD_SET(clientSocket,&rset); //add the clientsocket to the set 
-		//set a timer utilize select to prevent hanging forever while waiting to recieved packeyt 
-		struct timeval timeout;
-		timeout.tv_sec = 3;
-		timeout.tv_usec = 0;
-		int activity = select(clientSocket+1,&rset,NULL,NULL,&timeout);
-		if (activity < 0){
-			std::cerr << "Select Error\n";
-			close(clientSocket);
-		}
-		auto now = std::chrono::steady_clock::now();
-		if(activity == 0){
-			auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
-			if (elapsed >= 30) {
-					std::cerr << "Server is Down\n";
-					close(clientSocket);
-			}
-		}
 		// ________________________________________________________________________
 		if(activity > 0 && FD_ISSET(clientSocket, &rset)){
 			bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
@@ -270,7 +267,6 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 				uint32_t net_seq;
 				memcpy(&net_seq,buffer,sizeof(uint32_t));
 				seqNum = ntohl(net_seq); //extract the sequence number
-				startTime = now; //reset global timeout
 				//if the sequence number in the ack packet is sent by the server, we remove it from the unackedpacket and advance the window
 				if(unackedPackets.count(seqNum)){
 					baseWindow = baseSeqNum + WINDOW_SIZE;
