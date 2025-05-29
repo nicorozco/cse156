@@ -101,7 +101,6 @@ int main(int argc, char* argv[]){
 		// First packet indicates new client
 		if (clients.find(key) == clients.end()) {
 			clients[key] = ClientState();  // set up client state		
-			ClientState& state = clients[key];
 			std::cout << "Handling client: " << key << std::endl;
 			//use thread to handle multiple clients 
 			std::thread t(handleClient, serverSocket, lossRate, folderPath, 
@@ -199,9 +198,11 @@ void handleClient(int serverSocket, int lossRate, std::string rootFolder,
 	const char* ackMsg = "PATH_RECEIVED";
 	sendto(serverSocket, ackMsg, strlen(ackMsg), 0,
        (struct sockaddr*)&clientAddr, clientLen);
-
+	std::string key = std::string(inet_ntoa(clientAddr.sin_addr)) + ":" + std::to_string(ntohs(clientAddr.sin_port));
+	ClientState& state = clients[key];
 	while(true){
 		//clear buffer 
+		std::cout << "Recieving Packets" << "\n";
 		memset(buffer,0,sizeof(buffer));
 		bytesRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
 		if (bytesRecieved < 0){
