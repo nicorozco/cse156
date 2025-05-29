@@ -39,7 +39,6 @@ int main(int argc, char* argv[]){
 	std::unordered_map<std::string,ClientState> clients;//create a map to hold the different clients 
 	std::unordered_map<std::string, std::thread> clientThreads;//map to handle threads
 	std::mutex clientsMutex;
-	char buffer[1472];
     struct sockaddr_in clientAddr;
 	if (argc < 4){
 		std::cerr << "Please provide a port number and packet loss rate for the server";
@@ -88,14 +87,6 @@ int main(int argc, char* argv[]){
 	}
 
 	while(true){
-		socklen_t clientLen = sizeof(clientAddr);
-
-		ssize_t bytes = recvfrom(serverSocket, buffer, sizeof(buffer), 0, (sockaddr*)&clientAddr, &clientLen);
-		if (bytes < 0) {
-			perror("recvfrom failed");
-			continue;
-		}
-
 		std::string key = std::string(inet_ntoa(clientAddr.sin_addr)) + ":" + std::to_string(ntohs(clientAddr.sin_port));
 
 		// First packet indicates new client
@@ -166,9 +157,16 @@ void handleClient(int serverSocket,int lossRate,std::string rootFolder, std::uno
 	//recieved intial packet
 	ssize_t	pathRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
 	filePathPacket* pathPacket = reinterpret_cast<filePathPacket*>(buffer);
+	
 	std::string filePath(pathPacket->filepath);
+	
 	if (pathRecieved < 0){
 		perror("Error receiving filepath");
+	}
+    if(filePath.empty()){
+		std::cerr << "ERROR: Received empty file path!" << std::endl;
+		std::cout << "Received raw file path: [" << pathPacket->filepath << "]" << std::endl;
+		return;
 	}
 	//construct full path
 	std::filesystem::path fullPath = std::filesystem::path(rootFolder) /  filePath;
@@ -182,6 +180,7 @@ void handleClient(int serverSocket,int lossRate,std::string rootFolder, std::uno
 	activeFiles.insert(fullPath.string());//mark file as in-use
 	std::filesystem::create_directories(fullPath.parent_path());
 	//open file for writing 
+	std::cout << "Attempting to open file: " << fullPath << std::endl;	
 	std::ofstream outfile(fullPath,std::ios::binary | std::ios::trunc);
 	if(!outfile.is_open()){
 		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
