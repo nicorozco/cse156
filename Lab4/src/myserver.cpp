@@ -184,7 +184,13 @@ void handleClient(int serverSocket,int lossRate,std::string rootFolder, std::uno
 	std::ofstream outfile(fullPath,std::ios::binary | std::ios::trunc);
 	if(!outfile.is_open()){
 		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
-	}	
+	}
+	std::cout << "File is Open, waiting for packets" << "\n";	
+	std::cout << "Sending Ack" << "\n";
+	const char* ackMsg = "PATH_RECEIVED";
+	sendto(serverSocket, ackMsg, strlen(ackMsg), 0,
+       (struct sockaddr*)&clientAddr, clientLen);
+
 	while(true){
 		//clear buffer 
 		memset(buffer,0,sizeof(buffer));
