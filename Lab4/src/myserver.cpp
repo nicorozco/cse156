@@ -168,7 +168,7 @@ void handleClient(int serverSocket, int lossRate, std::string rootFolder,
 	std::map<int, UDPPacket> packetBuffer;
 	char buffer[32768];
 	//pass intial packet 		
-	filePathPacket* pathPacket = reinterpret_cast<filePathPacket*>(buffer);
+	filePathPacket* pathPacket = reinterpret_cast<filePathPacket*>(initialBuffer);
 	std::string filePath(pathPacket->filepath);
 	
     if(filePath.empty()){
