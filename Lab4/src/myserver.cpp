@@ -217,6 +217,7 @@ void handleClient(int serverSocket, int lossRate, std::string rootFolder,
 			std::cout << "Error Recieved Bytes" << "\n";
 		}
 		if(bytesRecieved > 0){			
+			std::cout << "Recieving Bytes" << "\n";
 			UDPPacket* recievedPacket = (UDPPacket*)buffer;
 			uint16_t actualSize = ntohs(recievedPacket->payloadSize); 
 			seqNum = ntohl(recievedPacket->sequenceNumber); 
@@ -287,7 +288,7 @@ void handleClient(int serverSocket, int lossRate, std::string rootFolder,
 						if(sentBytes < 0){
 							perror("Error sending ACK Packet");
 						}else{
-							std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";	
+							std::cout << currentTimestamp() << localPort << (inet_ntoa(clientAddr.sin_addr)) << std::to_string(ntohs(clientAddr.sin_port)) << ", ACK, " << seqNum << "\n";
 						}
 					}
 				}

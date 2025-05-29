@@ -262,7 +262,8 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 		//If we recieved no activity from the socket within 30 seconds server timed out 
 		// ________________________________________________________________________
 		if(activity > 0 && FD_ISSET(clientSocket, &rset)){
-			bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 			
+			
+			bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 				
 			//extract rip and rport
 			char rip[INET_ADDRSTRLEN];
 			inet_ntop(AF_INET, &(serverAddress.sin_addr),rip,INET_ADDRSTRLEN);
@@ -275,7 +276,7 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 			int lport = ntohs(localAddr.sin_port);
 	
 			if(bytes_recieved > 0){
-				firstRecieved = true;
+				std::cout << "Recieving Bytes" << "\n";
 				uint32_t net_seq;
 				memcpy(&net_seq,buffer,sizeof(uint32_t));
 				seqNum = ntohl(net_seq); //extract the sequence number
