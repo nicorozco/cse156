@@ -1,5 +1,7 @@
 #include <iostream>
 #include <chrono>
+#include <thread>
+#include <mutex> 
 #include <unordered_set>
 #include <filesystem>
 #include <ctime>
@@ -21,7 +23,7 @@ void initRandom();
 bool dropPacket(int lossRate);
 bool isPortValid(int port);
 bool isLossValid(int loss);
-void echoLoop(int serverSocket,int lossRate,std::string rootFolder,std::unordered_set<std::string>& activeFiles);	
+void handleClient(int serverSocket,int lossRate,std::string rootFolder,std::unordered_set<std::string>& activeFiles,std::unordered_map<std::string, ClientState>& clients,std::mutex& clientsMutex);	
 
 int main(int argc, char* argv[]){
 	srand(time(0));
@@ -34,6 +36,11 @@ int main(int argc, char* argv[]){
 	initRandom(); //seed random generator 
 	//utilize a map to track of the files being written to, enforce file lock 
 	std::unordered_set<std::string> activeFiles;
+	std::unordered_map<std::string,ClientState> clients;//create a map to hold the different clients 
+	std::unordered_map<std::string, std::thread> clientThreads;//map to handle threads
+	std::mutex clientsMutex;
+	char buffer[1472];
+    struct sockaddr_in clientAddr;
 	if (argc < 4){
 		std::cerr << "Please provide a port number and packet loss rate for the server";
 		return -1;
@@ -79,13 +86,36 @@ int main(int argc, char* argv[]){
 		close(serverSocket);
 		return 1;
 	}
-	echoLoop(serverSocket,lossRate,folderPath,activeFiles);
+
+	while(true){
+		socklen_t clientLen = sizeof(clientAddr);
+
+		ssize_t bytes = recvfrom(serverSocket, buffer, sizeof(buffer), 0, (sockaddr*)&clientAddr, &clientLen);
+		if (bytes < 0) {
+			perror("recvfrom failed");
+			continue;
+		}
+
+		std::string key = std::string(inet_ntoa(clientAddr.sin_addr)) + ":" + std::to_string(ntohs(clientAddr.sin_port));
+
+		// First packet indicates new client
+		if (clients.find(key) == clients.end()) {
+			clients[key] = ClientState();  // set up client state
+			
+			//use thread to handle multiple clients 
+			std::thread t(handleClient, serverSocket, lossRate, folderPath, std::ref(activeFiles), std::ref(clients), std::ref(clientsMutex));
+			t.detach();
+		}
+
+	}
+
 	std::cout << "Finishing Recieving" << "\n";
 	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
 	//d.) recieved a packet
 	close(serverSocket);
 	return 0;
 }
+
 ssize_t sendAck(int serverSocket,uint32_t seqNum,struct sockaddr_in* clientAddr,socklen_t clientLen){
 
 	ACKPacket ackPacket;
@@ -125,15 +155,13 @@ if( loss < 0 || loss > 100){
 }
 	return true;
 }
-void echoLoop(int serverSocket,int lossRate,std::string rootFolder, std::unordered_set<std::string>& activeFiles){	
-	std::unordered_map<std::string,ClientState> clients;//create a map to hold the different clients 
-	char buffer[32768];
-	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
+void handleClient(int serverSocket,int lossRate,std::string rootFolder, std::unordered_set<std::string>& activeFiles,std::unordered_map<std::string, ClientState>& clients,std::mutex& clientsMutex){	
 	struct sockaddr_in clientAddr;
 	socklen_t clientLen = sizeof(clientAddr);
 	uint32_t seqNum = 0;
 	ssize_t bytesRecieved;
 	std::map<int, UDPPacket> packetBuffer;
+	char buffer[32768];
 	//implement logic to ensure we dont hang here from recfrom()	
 	//recieved intial packet
 	ssize_t	pathRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
