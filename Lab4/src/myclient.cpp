@@ -206,7 +206,17 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 		std::cerr << "Select Error\n";
 		close(clientSocket);
 	}
+	char response[128] = {};
+	socklen_t serverLen = sizeof(serverAddress);
+	ssize_t bytes = recvfrom(clientSocket, response, sizeof(response), 0,
+                         (struct sockaddr*)&serverAddress, &serverLen);
 
+	if (bytes < 0) {
+		perror("Timeout or error waiting for ACK from server");
+		close(clientSocket);
+		return;
+	}
+	std::cout << "Server ACK: " << response << "\n";
 	size_t totalSize = sizeof(UDPPacket) + MSS;
 
 	//_____________Start Processing Packets_____________________
