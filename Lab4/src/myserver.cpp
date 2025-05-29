@@ -167,6 +167,14 @@ void handleClient(int serverSocket, int lossRate, std::string rootFolder,
 	ssize_t bytesRecieved;
 	std::map<int, UDPPacket> packetBuffer;
 	char buffer[32768];
+	struct sockaddr_in localAddr;
+	socklen_t addrLen = sizeof(localAddr);
+
+	if((getsockname(serverSocket, (struct sockaddr*)&localAddr, &addrLen)) == -1){
+		perror("getsockname failed");
+	}
+	int localPort = ntohs(localAddr.sin_port);
+	
 	//pass intial packet 		
 	filePathPacket* pathPacket = reinterpret_cast<filePathPacket*>(initialBuffer);
 	std::string filePath(pathPacket->filepath);
@@ -224,7 +232,7 @@ void handleClient(int serverSocket, int lossRate, std::string rootFolder,
 					if (sentBytes < 0) {
 					    	perror("Error sending ACK Packet");
 						} else {
-					    	std::cout << currentTimestamp() <<  ", ACK, " << seqNum << "\n";
+					    	std::cout << currentTimestamp() << localPort << (inet_ntoa(clientAddr.sin_addr)) << std::to_string(ntohs(clientAddr.sin_port)) << ", ACK, " << seqNum << "\n";
 						}
 					continue;
 				}
@@ -256,7 +264,7 @@ void handleClient(int serverSocket, int lossRate, std::string rootFolder,
 					if (sentBytes < 0) {
 					    perror("Error sending ACK Packet");
 					} else {
-					    std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
+					    std::cout << currentTimestamp() << localPort << (inet_ntoa(clientAddr.sin_addr)) << std::to_string(ntohs(clientAddr.sin_port)) << ", ACK, " << seqNum << "\n";
 					}
 				}
 
