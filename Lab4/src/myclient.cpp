@@ -244,6 +244,7 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 			packet->payloadSize = htons(static_cast<uint16_t>(bytesRead));
 			packet->sequenceNumber = htonl(nextSeqNum);	
 			ssize_t sentBytes = sendto(clientSocket,packet,totalSize, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));				
+			std::cout << "Sending Packets" << "\n";
 			if(sentBytes < 0){
 				perror("sendto failed");
 				close(clientSocket);
