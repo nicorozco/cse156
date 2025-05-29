@@ -206,6 +206,7 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 		std::cerr << "Select Error\n";
 		close(clientSocket);
 	}
+	
 	char response[128] = {};
 	socklen_t serverLen = sizeof(serverAddress);
 	ssize_t bytes = recvfrom(clientSocket, response, sizeof(response), 0,

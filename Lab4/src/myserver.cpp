@@ -101,6 +101,7 @@ int main(int argc, char* argv[]){
 		// First packet indicates new client
 		if (clients.find(key) == clients.end()) {
 			clients[key] = ClientState();  // set up client state		
+			ClientState& state = clients[key];
 			std::cout << "Handling client: " << key << std::endl;
 			//use thread to handle multiple clients 
 			std::thread t(handleClient, serverSocket, lossRate, folderPath, 
@@ -206,13 +207,7 @@ void handleClient(int serverSocket, int lossRate, std::string rootFolder,
 		if (bytesRecieved < 0){
 			std::cout << "Error Recieved Bytes" << "\n";
 		}
-		if(bytesRecieved > 0){		
-			std::string key = std::string(inet_ntoa(clientAddr.sin_addr)) + ":" + std::to_string(ntohs(clientAddr.sin_port));
-			
-			if(clients.find(key) == clients.end()){
-				clients[key] = ClientState{}; 
-			}
-			ClientState& state = clients[key];
+		if(bytesRecieved > 0){			
 			UDPPacket* recievedPacket = (UDPPacket*)buffer;
 			uint16_t actualSize = ntohs(recievedPacket->payloadSize); 
 			seqNum = ntohl(recievedPacket->sequenceNumber); 
@@ -228,7 +223,7 @@ void handleClient(int serverSocket, int lossRate, std::string rootFolder,
 					if (sentBytes < 0) {
 					    	perror("Error sending ACK Packet");
 						} else {
-					    	std::cout << currentTimestamp() << ", ACK, " << seqNum << "\n";
+					    	std::cout << currentTimestamp() <<  ", ACK, " << seqNum << "\n";
 						}
 					continue;
 				}
