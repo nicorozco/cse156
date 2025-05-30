@@ -24,15 +24,11 @@ bool dropPacket(int lossRate);
 bool isPortValid(int port);
 bool isLossValid(int loss);
 void handleClient(int serverSocket, int lossRate, std::string rootFolder,
-                    std::unordered_set<std::string>& activeFiles,
-                    std::unordered_map<std::string, ClientState>& clients,
- 				    std::mutex& clientsMutex,
- 					sockaddr_in clientAddr, socklen_t clientLen,
-  					char initialBuffer[], ssize_t initialBytes);
-
+                  char* message, std::unordered_set<std::string>& activeFiles,
+                  std::mutex& clientsMutex,
+                  sockaddr_in clientAddr, socklen_t clientLen);
 int main(int argc, char* argv[]){
 	srand(time(0));
-	char buffer[1472];
 	std::string portStr;
 	std::string lossRateStr;
 	std::string folderPath;
@@ -42,11 +38,7 @@ int main(int argc, char* argv[]){
 	initRandom(); //seed random generator 
 	//utilize a map to track of the files being written to, enforce file lock 
 	std::unordered_set<std::string> activeFiles;
-	std::unordered_map<std::string,ClientState> clients;//create a map to hold the different clients 
-	std::unordered_map<std::string, std::thread> clientThreads;//map to handle threads
 	std::mutex clientsMutex;
-    struct sockaddr_in clientAddr;
-	socklen_t clientLen = sizeof(clientAddr);	
 	if (argc < 4){
 		std::cerr << "Please provide a port number and packet loss rate for the server";
 		return -1;
@@ -112,8 +104,10 @@ int main(int argc, char* argv[]){
 		sockaddr_in* clientAddrCopy = new sockaddr_in(clientAddr);
 
 		// Spawn a thread to handle the message
-		std::thread t([=]() {
-			handleClient(serverSocket, message, bytesReceived, clientAddrCopy, clientLen);
+		std::thread t([=, &activeFiles, &clientsMutex]() {
+    handleClient(serverSocket, lossRate, folderPath,
+                 message, activeFiles, clientsMutex,
+                 *clientAddrCopy, clientLen);
 			delete[] message;
 			delete clientAddrCopy;
 		});
@@ -123,10 +117,9 @@ int main(int argc, char* argv[]){
 	return 0;
 }
 void handleClient(int serverSocket, int lossRate, std::string rootFolder,
-                  std::unordered_set<std::string>& activeFiles,
+                  char* message, std::unordered_set<std::string>& activeFiles,
                   std::mutex& clientsMutex,
-                  sockaddr_in clientAddr, socklen_t clientLen,
-                  char initialBuffer[], ssize_t initialBytes){
+                  sockaddr_in clientAddr, socklen_t clientLen){
 
 	uint32_t seqNum = 0;
 	ssize_t bytesRecieved;
@@ -142,15 +135,15 @@ void handleClient(int serverSocket, int lossRate, std::string rootFolder,
 	}
 	int localPort = ntohs(localAddr.sin_port);
 	
-	//pass intial packet 		
-	filePathPacket* pathPacket = reinterpret_cast<filePathPacket*>(initialBuffer);
-	std::string filePath(pathPacket->filepath);
-	
-    if(filePath.empty()){
+	//extract the path from the initial message  		
+	filePathPacket* pathPacket = reinterpret_cast<filePathPacket*>(message);
+    std::string filePath(pathPacket->filepath);
+	if(filePath.empty()){
 		std::cerr << "ERROR: Received empty file path!" << std::endl;
 		std::cout << "Received raw file path: [" << pathPacket->filepath << "]" << std::endl;
 		return;
 	}
+
 	// _________________ Path _________________________
 	//construct full path
 	std::filesystem::path fullPath = std::filesystem::path(rootFolder) /  filePath;
@@ -296,7 +289,6 @@ void handleClient(int serverSocket, int lossRate, std::string rootFolder,
 					outfile.close(); //close the file when done 
 					expectedSeqNum = 0; //reset SeqNUm
 					packetsRecieved.clear(); //reset buffer
-					clients.erase(key); //drop state for the finished client
 					activeFiles.erase(fullPath.string());//remove file from active after done writing 
 				}
 			}

@@ -188,7 +188,8 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 	if(pathSent < 0){
 		perror("Error Sending Path to Client");
 		close(clientSocket);
-	}	
+	}
+	sleep(3);	
 	size_t totalSize = sizeof(UDPPacket) + MSS;
 	fd_set rset;
 		//_____________Start Processing Packets_____________________
