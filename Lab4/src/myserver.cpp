@@ -1,7 +1,5 @@
 #include <iostream>
 #include <chrono>
-#include <thread>
-#include <mutex> 
 #include <unordered_set>
 #include <filesystem>
 #include <ctime>
@@ -23,10 +21,8 @@ void initRandom();
 bool dropPacket(int lossRate);
 bool isPortValid(int port);
 bool isLossValid(int loss);
-void handleClient(int serverSocket, int lossRate, std::string rootFolder,
-                  char* message, std::unordered_set<std::string>& activeFiles,
-                  std::mutex& clientsMutex,
-                  sockaddr_in clientAddr, socklen_t clientLen);
+void echoLoop(int serverSocket,int lossRate,std::string rootFolder,std::unordered_set<std::string>& activeFiles, int localPort);	
+
 int main(int argc, char* argv[]){
 	srand(time(0));
 	std::string portStr;
@@ -35,10 +31,10 @@ int main(int argc, char* argv[]){
 	int optval = 1;
 	int lossRate;
 	int port;
+	int localPort = 0;
 	initRandom(); //seed random generator 
 	//utilize a map to track of the files being written to, enforce file lock 
 	std::unordered_set<std::string> activeFiles;
-	std::mutex clientsMutex;
 	if (argc < 4){
 		std::cerr << "Please provide a port number and packet loss rate for the server";
 		return -1;
@@ -74,6 +70,7 @@ int main(int argc, char* argv[]){
 	}
 	//b.) create a socket structure for the server 
 	struct sockaddr_in serverAddr;
+	std::memset(&serverAddr, 0, sizeof(serverAddr));
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_addr.s_addr = INADDR_ANY; //have the server listen on all interfaces 
 	serverAddr.sin_port = htons(port);
@@ -84,219 +81,21 @@ int main(int argc, char* argv[]){
 		close(serverSocket);
 		return 1;
 	}
-	while (true) {
-		char buffer[1472];
-		sockaddr_in clientAddr;
-		socklen_t clientLen = sizeof(clientAddr);
-
-		// Block until a message arrives
-		ssize_t bytesReceived = recvfrom(serverSocket, buffer, sizeof(buffer), 0, (sockaddr*)&clientAddr, &clientLen);
-		if (bytesReceived < 0) {
-			perror("recvfrom failed");
-			continue;
-		}
-
-		// Copy buffer content into a separate heap-allocated buffer
-		char* message = new char[bytesReceived];
-		memcpy(message, buffer, bytesReceived);
-
-		// Copy address for thread use
-		sockaddr_in* clientAddrCopy = new sockaddr_in(clientAddr);
-
-		// Spawn a thread to handle the message
-		std::thread t([=, &activeFiles, &clientsMutex]() {
-    handleClient(serverSocket, lossRate, folderPath,
-                 message, activeFiles, clientsMutex,
-                 *clientAddrCopy, clientLen);
-			delete[] message;
-			delete clientAddrCopy;
-		});
-		t.detach(); // Detach to allow independent execution
-	}
+	//extract port assigned by os
+	sockaddr_in actualAddr{};
+    socklen_t addrLen = sizeof(actualAddr);	
+	if (getsockname(serverSocket, (struct sockaddr*)&actualAddr, &addrLen) == -1) {
+        perror("getsockname() failed");
+    } else {
+        localPort = ntohs(actualAddr.sin_port);
+  	}
+	echoLoop(serverSocket,lossRate,folderPath,activeFiles,localPort);
+	std::cout << "Finishing Recieving" << "\n";
+	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
+	//d.) recieved a packet
 	close(serverSocket);
 	return 0;
 }
-void handleClient(int serverSocket, int lossRate, std::string rootFolder,
-                  char* message, std::unordered_set<std::string>& activeFiles,
-                  std::mutex& clientsMutex,
-                  sockaddr_in clientAddr, socklen_t clientLen){
-
-	uint32_t seqNum = 0;
-	ssize_t bytesRecieved;
-	uint32_t expectedSeqNum;
-	std::unordered_map<int, UDPPacket*> packetsRecieved;//buffer for recieved packets 
-	char buffer[32768];
-
-	struct sockaddr_in localAddr; //to get the local port 
-	socklen_t addrLen = sizeof(localAddr);
-
-	if((getsockname(serverSocket, (struct sockaddr*)&localAddr, &addrLen)) == -1){
-		perror("getsockname failed");
-	}
-	int localPort = ntohs(localAddr.sin_port);
-	
-	//extract the path from the initial message  		
-	filePathPacket* pathPacket = reinterpret_cast<filePathPacket*>(message);
-    std::string filePath(pathPacket->filepath);
-	if(filePath.empty()){
-		std::cerr << "ERROR: Received empty file path!" << std::endl;
-		std::cout << "Received raw file path: [" << pathPacket->filepath << "]" << std::endl;
-		return;
-	}
-
-	// _________________ Path _________________________
-	//construct full path
-	std::filesystem::path fullPath = std::filesystem::path(rootFolder) /  filePath;
-	//ensure directories exist
-	if(activeFiles.count(fullPath.string()) > 0){
-		std::cerr << "File is currently in use: " << fullPath << "\n";
-    	const char* errorMsg = "ERROR: File is being written by another client.";
-    	sendto(serverSocket, errorMsg, strlen(errorMsg), 0, (struct sockaddr*)&clientAddr, clientLen);
-    	return; // Skip handling this client
-	}
-	activeFiles.insert(fullPath.string());//mark file as in-use
-	std::filesystem::create_directories(fullPath.parent_path());
-	//open file for writing 
-	std::cout << "Attempting to open file: " << fullPath << std::endl;	
-	std::ofstream outfile(fullPath,std::ios::binary | std::ios::trunc);
-	if(!outfile.is_open()){
-		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
-	}
-	std::cout << "File is Open, waiting for packets" << "\n";	
-	std::cout << "Sending Ack" << "\n";
-
-	// __________________________________________Processing Packes________________________________________________
-	while(true){
-		//clear buffer 
-		std::cout << "Recieving Packets" << "\n";
-		memset(buffer,0,sizeof(buffer));
-		bytesRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
-		if (bytesRecieved < 0){
-			std::cout << "Error Recieved Bytes" << "\n";
-		}
-		if(bytesRecieved > 0){			
-			std::cout << "Recieving Bytes" << "\n";
-			UDPPacket* recievedPacket = (UDPPacket*)buffer;
-			uint16_t actualSize = ntohs(recievedPacket->payloadSize); 
-			seqNum = ntohl(recievedPacket->sequenceNumber); 
-			bool dataDropped = dropPacket(lossRate);	
-			if (dataDropped){ //if we random value generate falls within the loss rate it is lost
-				std::cout << currentTimestamp()<< ", DROP DATA, " << seqNum << "\n";
-			}else{
-				std::cout << currentTimestamp() << ", DATA," << seqNum << "\n";
-				//________________ Processing Duplicate Packets _______________________________
-				if (seqNum < expectedSeqNum){
-				    std::cout << currentTimestamp() << ", DUPLICATE, " << seqNum << "\n";
-					ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);//ack the duplica			
-					if (sentBytes < 0) {
-					    	perror("Error sending ACK Packet");
-						} else {
-					    	std::cout << currentTimestamp() << localPort << (inet_ntoa(clientAddr.sin_addr)) << std::to_string(ntohs(clientAddr.sin_port)) << ", ACK, " << seqNum << "\n";
-						}
-					continue;
-				}
-				//_________________ Processing Out Of Order Packets ________________________________________
-				if (seqNum > expectedSeqNum){					
-					
-					size_t totalSize = sizeof(UDPPacket) + actualSize;
-					UDPPacket* pktCopy = (UDPPacket*) malloc(totalSize);
-					if(!pktCopy){
-						std::cerr << "Memory allocation failed for SeqNum" << seqNum << "\n";
-						continue;
-					}
-					pktCopy->sequenceNumber = recievedPacket->sequenceNumber;
-					pktCopy->payloadSize = recievedPacket->payloadSize;
-					memcpy(pktCopy->data, recievedPacket->data,actualSize);
-					
-					if(actualSize > 32768){
-						std::cerr << "Invalid Payload Size: " << actualSize << " on seqNum " << seqNum << "\n";
-						free(pktCopy);
-						continue;
-					}
-					if(!packetsRecieved.count(seqNum)){
-						packetsRecieved[seqNum] = pktCopy;
-					}else{
-						free(pktCopy);
-					}
-						
-					ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);//ack the duplicate
-					if (sentBytes < 0) {
-					    perror("Error sending ACK Packet");
-					} else {
-					    std::cout << currentTimestamp() << localPort << (inet_ntoa(clientAddr.sin_addr)) << std::to_string(ntohs(clientAddr.sin_port)) << ", ACK, " << seqNum << "\n";
-					}
-				}
-
-				// ________________________ Processing In Order Packets ______________________
-				if(seqNum == expectedSeqNum){	
-					if (actualSize > 32768){
-						std::cerr << "Invalid Payload Size:" << "on seqNum" << seqNum << "\n";
-						continue;
-					}	
-					outfile.write(recievedPacket->data, ntohs(recievedPacket->payloadSize));//only write to the file if we have sent the ACK message 
-					outfile.flush();
-					expectedSeqNum++;						
-					
-					bool ackDropped = dropPacket(lossRate);
-					if(ackDropped){
-						std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
-					}else{
-						//send an ack packet
-						ssize_t sentBytes = sendAck(serverSocket,seqNum,&clientAddr,clientLen);
-						if(sentBytes < 0){
-							perror("Error sending ACK Packet");
-						}else{
-							std::cout << currentTimestamp() << localPort << (inet_ntoa(clientAddr.sin_addr)) << std::to_string(ntohs(clientAddr.sin_port)) << ", ACK, " << seqNum << "\n";
-						}
-					}
-				}
-
-				// __________________ Processing Buffered Packets _______________________
-				while(packetsRecieved.count(expectedSeqNum)){ // check if the next expectedSeqNum has been recieved 
-					std::cout << "Processing Buffered Packets" << "\n";
-					std::cout << currentTimestamp() << ",DATA, " << expectedSeqNum << "\n";
-					UDPPacket* pkt = packetsRecieved[expectedSeqNum];	
-					uint16_t dataLen  = ntohs(pkt->payloadSize);
-					if (dataLen == 0) {
-						std::cerr << "Zero payload in buffered packet at seqNum=" << expectedSeqNum << ", skipping\n";
-						packetsRecieved.erase(expectedSeqNum);
-						expectedSeqNum++;
-						continue;
-					}	 
-					outfile.write(pkt->data,dataLen);
-					outfile.flush();
-					free(pkt);
-					packetsRecieved.erase(expectedSeqNum);
-					expectedSeqNum++;//increase seqnum
-				}
-				//_________________________End of File Reached_______________________
-				if(seqNum == EOF_SEQ){
-					std::cout << currentTimestamp() << ", EOF RECEIVED\n";
-					//process the buffer at the end 
-					while (!packetsRecieved.empty()) {
-						if(packetsRecieved.count(expectedSeqNum)){	
-							UDPPacket* pkt = packetsRecieved[expectedSeqNum];
-							uint16_t pktSize = ntohs(pkt->payloadSize);
-							std::cout << "[EOF WRITE] Seq=" << expectedSeqNum << ", Size=" << pktSize << "\n";
-							outfile.write(pkt->data, pktSize);
-							outfile.flush();
-							packetsRecieved.erase(expectedSeqNum);
-							free(pkt);
-							expectedSeqNum++;
-						}
-					}
-					std::cout << "Buffer is empty or processed all available packets\n";
-					outfile.close(); //close the file when done 
-					expectedSeqNum = 0; //reset SeqNUm
-					packetsRecieved.clear(); //reset buffer
-					activeFiles.erase(fullPath.string());//remove file from active after done writing 
-				}
-			}
-		}
-	}
-}
-
-
 ssize_t sendAck(int serverSocket,uint32_t seqNum,struct sockaddr_in* clientAddr,socklen_t clientLen){
 
 	ACKPacket ackPacket;
@@ -335,4 +134,183 @@ if( loss < 0 || loss > 100){
 
 }
 	return true;
+}
+void echoLoop(int serverSocket,int lossRate,std::string rootFolder, std::unordered_set<std::string>& activeFiles, int localPort){	
+	std::unordered_map<std::string,ClientState> clients;//create a map to hold the different clients 
+	char buffer[32768];
+	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
+	struct sockaddr_in clientAddr;
+	socklen_t clientLen = sizeof(clientAddr);
+	uint32_t seqNum = 0;
+	ssize_t bytesRecieved;
+	std::map<int, UDPPacket> packetBuffer;
+    // Extracting Local Port 
+
+	//implement logic to ensure we dont hang here from recfrom()	
+	
+	//recieved intial packet
+	ssize_t	pathRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
+	filePathPacket* pathPacket = reinterpret_cast<filePathPacket*>(buffer);
+	std::string filePath(pathPacket->filepath);
+	if (pathRecieved < 0){
+		perror("Error receiving filepath");
+	}
+
+	//construct full path
+	std::filesystem::path fullPath = std::filesystem::path(rootFolder) /  filePath;
+	//ensure directories exist
+	if(activeFiles.count(fullPath.string()) > 0){
+		std::cerr << "File is currently in use: " << fullPath << "\n";
+    	const char* errorMsg = "ERROR: File is being written by another client.";
+    	sendto(serverSocket, errorMsg, strlen(errorMsg), 0, (struct sockaddr*)&clientAddr, clientLen);
+    	return; // Skip handling this client
+	}
+	activeFiles.insert(fullPath.string());//mark file as in-use
+	std::filesystem::create_directories(fullPath.parent_path());
+	//open file for writing 
+	std::ofstream outfile(fullPath,std::ios::binary | std::ios::trunc);
+	if(!outfile.is_open()){
+		std::cerr << "Failed to open file for writing" << std::strerror(errno) << "\n";
+	}	
+	char clientIP[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &(clientAddr.sin_addr), clientIP, INET_ADDRSTRLEN);
+    int clientPort = ntohs(clientAddr.sin_port);
+    std::cout << "Client IP: " << clientIP << "\n";
+    std::cout << "Client Port: " << clientPort << "\n";
+
+	while(true){
+		//clear buffer 
+		memset(buffer,0,sizeof(buffer));
+		bytesRecieved = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
+		if (bytesRecieved < 0){
+			std::cout << "Error Recieved Bytes" << "\n";
+		}
+		if(bytesRecieved > 0){		
+			std::string key = std::string(inet_ntoa(clientAddr.sin_addr)) + ":" + std::to_string(ntohs(clientAddr.sin_port));
+			char clientIP[INET_ADDRSTRLEN];
+        	inet_ntop(AF_INET, &(clientAddr.sin_addr), clientIP, INET_ADDRSTRLEN);
+        	int clientPort = ntohs(clientAddr.sin_port);
+			if(clients.find(key) == clients.end()){
+				clients[key] = ClientState{}; 
+			}
+			ClientState& state = clients[key];
+			UDPPacket* recievedPacket = (UDPPacket*)buffer;
+			uint16_t actualSize = ntohs(recievedPacket->payloadSize); 
+			seqNum = ntohl(recievedPacket->sequenceNumber); 
+			bool dataDropped = dropPacket(lossRate);	
+			if (dataDropped){ //if we random value generate falls within the loss rate it is lost
+				std::cout << currentTimestamp()<< ", DROP DATA, " << seqNum << "\n";
+			}else{
+				std::cout << currentTimestamp() << ", DATA," << seqNum << "\n";
+				//________________ Processing Duplicate Packets _______________________________
+				if (seqNum < state.expectedSeqNum){
+				    std::cout << currentTimestamp() << ", DUPLICATE, " << seqNum << "\n";
+					ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);//ack the duplica			
+					if (sentBytes < 0) {
+					    	perror("Error sending ACK Packet");
+						} else {
+					    	std::cout << currentTimestamp() <<","<< localPort<<","<< clientIP << ","<< clientPort << ", ACK, " << seqNum << "\n";
+						}
+					continue;
+				}
+				//_________________ Processing Out Of Order Packets ________________________________________
+				if (seqNum > state.expectedSeqNum){					
+					
+					size_t totalSize = sizeof(UDPPacket) + actualSize;
+					UDPPacket* pktCopy = (UDPPacket*) malloc(totalSize);
+					if(!pktCopy){
+						std::cerr << "Memory allocation failed for SeqNum" << seqNum << "\n";
+						continue;
+					}
+					pktCopy->sequenceNumber = recievedPacket->sequenceNumber;
+					pktCopy->payloadSize = recievedPacket->payloadSize;
+					memcpy(pktCopy->data, recievedPacket->data,actualSize);
+					
+					if(actualSize > 32768){
+						std::cerr << "Invalid Payload Size: " << actualSize << " on seqNum " << seqNum << "\n";
+						free(pktCopy);
+						continue;
+					}
+					if(!state.packetsRecieved.count(seqNum)){
+						state.packetsRecieved[seqNum] = pktCopy;
+					}else{
+						free(pktCopy);
+					}
+						
+					ssize_t sentBytes = sendAck(serverSocket, seqNum, &clientAddr, clientLen);//ack the duplicate
+					if (sentBytes < 0) {
+					    perror("Error sending ACK Packet");
+					} else {
+						std::cout << currentTimestamp() <<","<< localPort<<","<< clientIP << ","<< clientPort << ", ACK, " << seqNum << "\n";
+					}
+				}
+
+				// ________________________ Processing In Order Packets ______________________
+				if(seqNum == state.expectedSeqNum){	
+					if (actualSize > 32768){
+						std::cerr << "Invalid Payload Size:" << "on seqNum" << seqNum << "\n";
+						continue;
+					}	
+					outfile.write(recievedPacket->data, ntohs(recievedPacket->payloadSize));//only write to the file if we have sent the ACK message 
+					outfile.flush();
+					state.expectedSeqNum++;						
+					
+					bool ackDropped = dropPacket(lossRate);
+					if(ackDropped){
+						std::cout << currentTimestamp() <<", DROP ACK, " << seqNum << "\n";
+					}else{
+						//send an ack packet
+						ssize_t sentBytes = sendAck(serverSocket,seqNum,&clientAddr,clientLen);
+						if(sentBytes < 0){
+							perror("Error sending ACK Packet");
+						}else{
+					    	std::cout << currentTimestamp() <<","<< localPort<<","<< clientIP << ","<< clientPort << ", ACK, " << seqNum << "\n";
+						}
+					}
+				}
+
+				// __________________ Processing Buffered Packets _______________________
+				while(state.packetsRecieved.count(state.expectedSeqNum)){ // check if the next expectedSeqNum has been recieved 
+					std::cout << "Processing Buffered Packets" << "\n";
+					std::cout << currentTimestamp() << ",DATA, " << state.expectedSeqNum << "\n";
+					UDPPacket* pkt = state.packetsRecieved[state.expectedSeqNum];	
+					uint16_t dataLen  = ntohs(pkt->payloadSize);
+					if (dataLen == 0) {
+						std::cerr << "Zero payload in buffered packet at seqNum=" << state.expectedSeqNum << ", skipping\n";
+						state.packetsRecieved.erase(state.expectedSeqNum);
+						state.expectedSeqNum++;
+						continue;
+					}	 
+					outfile.write(pkt->data,dataLen);
+					outfile.flush();
+					free(pkt);
+					state.packetsRecieved.erase(state.expectedSeqNum);
+					state.expectedSeqNum++;//increase seqnum
+				}
+				//_________________________End of File Reached_______________________
+				if(seqNum == EOF_SEQ){
+					std::cout << currentTimestamp() << ", EOF RECEIVED\n";
+					//process the buffer at the end 
+					while (!state.packetsRecieved.empty()) {
+						if(state.packetsRecieved.count(state.expectedSeqNum)){	
+							UDPPacket* pkt = state.packetsRecieved[state.expectedSeqNum];
+							uint16_t pktSize = ntohs(pkt->payloadSize);
+							std::cout << "[EOF WRITE] Seq=" << state.expectedSeqNum << ", Size=" << pktSize << "\n";
+							outfile.write(pkt->data, pktSize);
+							outfile.flush();
+							state.packetsRecieved.erase(state.expectedSeqNum);
+							free(pkt);
+							state.expectedSeqNum++;
+						}
+					}
+					std::cout << "Buffer is empty or processed all available packets\n";
+					outfile.close(); //close the file when done 
+					state.expectedSeqNum = 0; //reset SeqNUm
+					state.packetsRecieved.clear(); //reset buffer
+					clients.erase(key); //drop state for the finished client
+					activeFiles.erase(fullPath.string());//remove file from active after done writing 
+				}
+			}
+		}
+	}
 }
