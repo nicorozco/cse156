@@ -26,6 +26,7 @@
 #include <fstream>
 #include <unordered_set>
 #define TIMEOUT_SEC 30
+sockaddr_in serverAddress;// Global Storage of Server
 std::string currentTimestamp();
 bool isValidIPv4Format(const std::string& ip);	
 int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* serverAddress,std::ifstream& file, const std::map<uint32_t, std::pair<long,uint16_t>>& metaMap);	
@@ -126,7 +127,7 @@ int fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,in
 	char buffer[1472];
 	const int MAX_RETRIES = 5;
 	int bytes_recieved;
-	char rip[INET_ADDRSTRLEN];
+	char rip[INET_ADDRSTRLEN] = {0};
 	const int TIMEOUT_MS = 3000;
 	int clientSocket = socket(AF_INET,SOCK_DGRAM,0);	
 	bool firstRecieved = false;
@@ -159,7 +160,6 @@ int fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,in
 	}
 		
 	// 2.) Specify the Server Address we utilize a structure for the address	
-	sockaddr_in serverAddress; 
 	memset(&serverAddress,0,sizeof(serverAddress));
 	serverAddress.sin_family = AF_INET;
 	
@@ -216,7 +216,6 @@ int fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,in
 			packet->payloadSize = htons(static_cast<uint16_t>(bytesRead));
 			packet->sequenceNumber = htonl(nextSeqNum);	
 			ssize_t sentBytes = sendto(clientSocket,packet,totalSize, 0,(struct sockaddr*)&serverAddress,sizeof(serverAddress));				
-			std::cout << "Sending Packets" << "\n";
 			if(sentBytes < 0){
 				perror("sendto failed");
 				close(clientSocket);
@@ -282,9 +281,9 @@ int fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,in
 				unackedPackets[baseSeqNum]++;	
 				//check if we hit max retries 	
 				if (unackedPackets[baseSeqNum] >= MAX_RETRIES){
-					std::cerr << "Reached max re-transmission limit IP: " << rip << "\n";	
-					std::cout << unackedPackets[baseSeqNum] << "\n";
-					std::cout << MAX_RETRIES << "\n";
+					char ipstr[INET_ADDRSTRLEN];
+					inet_ntop(AF_INET, &(serverAddress.sin_addr), ipstr, INET_ADDRSTRLEN);
+					std::cerr << "Reached max re-transmission limit IP: " << ipstr << "\n";	
 					return 4;
 				}
 					
