@@ -29,7 +29,7 @@
 std::string currentTimestamp();
 bool isValidIPv4Format(const std::string& ip);	
 int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* serverAddress,std::ifstream& file, const std::map<uint32_t, std::pair<long,uint16_t>>& metaMap);	
-void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,int MSS,std::string infilePath,std::string outfilePath);
+int fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,int MSS,std::string infilePath,std::string outfilePath);
 int main (int argc, char* argv[]){
 	std::string windowSize;
 	std::string rep;
@@ -115,7 +115,7 @@ std::string currentTimestamp(){
     return oss.str();
 }
 
-void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,int MSS,std::string infilePath,std::string outfilePath){
+int fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,int MSS,std::string infilePath,std::string outfilePath){
 	std::map<uint32_t, std::pair<long, uint16_t>> sentPacketMeta;	
 	uint32_t nextSeqNum = 0;
 	uint32_t baseSeqNum = 0;
@@ -126,6 +126,7 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 	char buffer[1472];
 	const int MAX_RETRIES = 5;
 	int bytes_recieved;
+	char rip[INET_ADDRSTRLEN];
 	const int TIMEOUT_MS = 3000;
 	int clientSocket = socket(AF_INET,SOCK_DGRAM,0);	
 	bool firstRecieved = false;
@@ -244,7 +245,6 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 			
 			bytes_recieved = recvfrom(clientSocket,buffer,sizeof(buffer),0, (struct sockaddr*)&serverAddress, &addrlen);//call recieved to read the data 				
 			//extract rip and rport
-			char rip[INET_ADDRSTRLEN];
 			inet_ntop(AF_INET, &(serverAddress.sin_addr),rip,INET_ADDRSTRLEN);
 			int rport = ntohs(serverAddress.sin_port);
 			
@@ -255,7 +255,6 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 			int lport = ntohs(localAddr.sin_port);
 	
 			if(bytes_recieved > 0){
-				std::cout << "Recieving Bytes" << "\n";
 				uint32_t net_seq;
 				memcpy(&net_seq,buffer,sizeof(uint32_t));
 				seqNum = ntohl(net_seq); //extract the sequence number
@@ -283,10 +282,10 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 				unackedPackets[baseSeqNum]++;	
 				//check if we hit max retries 	
 				if (unackedPackets[baseSeqNum] >= MAX_RETRIES){
-					std::cerr << "Reached max retransmission limit\n";
+					std::cerr << "Reached max re-transmission limit IP: " << rip << "\n";	
 					std::cout << unackedPackets[baseSeqNum] << "\n";
 					std::cout << MAX_RETRIES << "\n";
-					break;
+					return 4;
 				}
 					
 				int retrans = retransmit(baseSeqNum,clientSocket, (struct sockaddr*)&serverAddress, file, sentPacketMeta);
@@ -325,6 +324,7 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 	std::cout << "Closing Connection" << "\n";
 	file.close();
 	close(clientSocket);
+	return 0;
 }
 
 int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* serverAddress,std::ifstream& file, const std::map<uint32_t, std::pair<long,uint16_t>>& metaMap){
