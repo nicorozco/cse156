@@ -21,18 +21,29 @@ void initRandom();
 bool dropPacket(int lossRate);
 bool isPortValid(int port);
 bool isLossValid(int loss);
-void echoLoop(int serverSocket,int lossRate,std::string rootFolder,std::unordered_set<std::string>& activeFiles, int localPort);	
-
 int main(int argc, char* argv[]){
 	srand(time(0));
 	std::string portStr;
 	std::string lossRateStr;
-	std::string folderPath;
+	std::string rootFolder;
 	int optval = 1;
 	int lossRate;
-	int port;
+	int port = 0;
 	int localPort = 0;
 	initRandom(); //seed random generator 
+	std::unordered_map<std::string,ClientState> clients;//create a map to hold the different clients 
+	char buffer[32768];
+	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
+	struct sockaddr_in clientAddr;
+	socklen_t clientLen = sizeof(clientAddr);
+	uint32_t seqNum = 0;
+	ssize_t bytesRecieved;
+	std::map<int, UDPPacket> packetBuffer;
+	//b.) create a socket structure for the server 
+	struct sockaddr_in serverAddr;
+	serverAddr.sin_family = AF_INET;
+	serverAddr.sin_addr.s_addr = INADDR_ANY; //have the server listen on all interfaces 
+	std::memset(&serverAddr, 0, sizeof(serverAddr));
 	//utilize a map to track of the files being written to, enforce file lock 
 	std::unordered_set<std::string> activeFiles;
 	if (argc < 4){
@@ -41,7 +52,7 @@ int main(int argc, char* argv[]){
 	} else if (argc == 4) {
 		portStr = argv[1];
 		lossRateStr = argv[2];
-		folderPath = argv[3];
+		rootFolder = argv[3];
 	}
 	port = std::stoi(portStr);
 	lossRate = std::stoi(lossRateStr);
@@ -55,7 +66,7 @@ int main(int argc, char* argv[]){
 		std::cerr << "Please enter a valid loss percentage (0-100)\n";
 		return -1;
 	}
-
+	serverAddr.sin_port = htons(port);
 	//1.) create a UDP Socket
 	int serverSocket = socket(AF_INET,SOCK_DGRAM,0);
 	if (serverSocket < 0){
@@ -68,12 +79,6 @@ int main(int argc, char* argv[]){
 		close(serverSocket);
 		exit(EXIT_FAILURE);	
 	}
-	//b.) create a socket structure for the server 
-	struct sockaddr_in serverAddr;
-	std::memset(&serverAddr, 0, sizeof(serverAddr));
-	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_addr.s_addr = INADDR_ANY; //have the server listen on all interfaces 
-	serverAddr.sin_port = htons(port);
 	
 	//c.) Bind the port to server address structure (associate socket with IP address & Port Number)
 	if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0){
@@ -88,62 +93,7 @@ int main(int argc, char* argv[]){
         perror("getsockname() failed");
     } else {
         localPort = ntohs(actualAddr.sin_port);
-  	}
-	echoLoop(serverSocket,lossRate,folderPath,activeFiles,localPort);
-	std::cout << "Finishing Recieving" << "\n";
-	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
-	//d.) recieved a packet
-	close(serverSocket);
-	return 0;
-}
-ssize_t sendAck(int serverSocket,uint32_t seqNum,struct sockaddr_in* clientAddr,socklen_t clientLen){
-
-	ACKPacket ackPacket;
-	memset(&ackPacket,0,sizeof(ackPacket));
-	ackPacket.sequenceNumber = htonl(seqNum); //set the sequence number
-	int size = sizeof(uint32_t); //how muhc data to send 
-	ssize_t sentBytes = sendto(serverSocket,&ackPacket,size,0,(struct sockaddr*)clientAddr,clientLen);//send an "ACK" message to the client which is just sending the sequence number
-	return sentBytes;
-}
-std::string currentTimestamp(){
-    auto now = std::chrono::system_clock::now();
-    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
-    std::tm utc_tm = *std::gmtime(&now_c);
-
-    std::ostringstream oss;
-    oss << std::put_time(&utc_tm, "%Y-%m-%dT%H:%M:%SZ");
-    return oss.str();
-}
-void initRandom(){
-	std::srand(static_cast<unsigned int>(std::time(nullptr)));
-}
-bool dropPacket(int lossRate){
-	double percLossRate = lossRate / 100.0;
-	double randVal = static_cast<double>(std::rand()) / static_cast<double>(RAND_MAX);
-	return randVal < percLossRate;
-}
-bool isPortValid(int port){
- if ( port < 1024 || port > 65553){
-	return false;
-}
-	return true;
-}	
-bool isLossValid(int loss){
-if( loss < 0 || loss > 100){
-	return false;
-
-}
-	return true;
-}
-void echoLoop(int serverSocket,int lossRate,std::string rootFolder, std::unordered_set<std::string>& activeFiles, int localPort){	
-	std::unordered_map<std::string,ClientState> clients;//create a map to hold the different clients 
-	char buffer[32768];
-	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
-	struct sockaddr_in clientAddr;
-	socklen_t clientLen = sizeof(clientAddr);
-	uint32_t seqNum = 0;
-	ssize_t bytesRecieved;
-	std::map<int, UDPPacket> packetBuffer;
+  	}	
     // Extracting Local Port 
 
 	//implement logic to ensure we dont hang here from recfrom()	
@@ -163,7 +113,6 @@ void echoLoop(int serverSocket,int lossRate,std::string rootFolder, std::unorder
 		std::cerr << "File is currently in use: " << fullPath << "\n";
     	const char* errorMsg = "ERROR: File is being written by another client.";
     	sendto(serverSocket, errorMsg, strlen(errorMsg), 0, (struct sockaddr*)&clientAddr, clientLen);
-    	return; // Skip handling this client
 	}
 	activeFiles.insert(fullPath.string());//mark file as in-use
 	std::filesystem::create_directories(fullPath.parent_path());
@@ -313,4 +262,49 @@ void echoLoop(int serverSocket,int lossRate,std::string rootFolder, std::unorder
 			}
 		}
 	}
+	std::cout << "Finishing Recieving" << "\n";
+	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
+	//d.) recieved a packet
+	close(serverSocket);
+	return 0;
+}
+
+ssize_t sendAck(int serverSocket,uint32_t seqNum,struct sockaddr_in* clientAddr,socklen_t clientLen){
+
+	ACKPacket ackPacket;
+	memset(&ackPacket,0,sizeof(ackPacket));
+	ackPacket.sequenceNumber = htonl(seqNum); //set the sequence number
+	int size = sizeof(uint32_t); //how muhc data to send 
+	ssize_t sentBytes = sendto(serverSocket,&ackPacket,size,0,(struct sockaddr*)clientAddr,clientLen);//send an "ACK" message to the client which is just sending the sequence number
+	return sentBytes;
+}
+std::string currentTimestamp(){
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+    std::tm utc_tm = *std::gmtime(&now_c);
+
+    std::ostringstream oss;
+    oss << std::put_time(&utc_tm, "%Y-%m-%dT%H:%M:%SZ");
+    return oss.str();
+}
+void initRandom(){
+	std::srand(static_cast<unsigned int>(std::time(nullptr)));
+}
+bool dropPacket(int lossRate){
+	double percLossRate = lossRate / 100.0;
+	double randVal = static_cast<double>(std::rand()) / static_cast<double>(RAND_MAX);
+	return randVal < percLossRate;
+}
+bool isPortValid(int port){
+ if ( port < 1024 || port > 65553){
+	return false;
+}
+	return true;
+}	
+bool isLossValid(int loss){
+if( loss < 0 || loss > 100){
+	return false;
+
+}
+	return true;
 }
