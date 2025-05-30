@@ -130,6 +130,17 @@ int fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,in
 	char rip[INET_ADDRSTRLEN] = {0};
 	const int TIMEOUT_MS = 3000;
 	int clientSocket = socket(AF_INET,SOCK_DGRAM,0);	
+ 	if (clientSocket < 0) {
+        perror("socket failed");
+        close(clientSocket);
+    }
+
+    //bind to port 0 for OS-assigned ephemeral port
+    sockaddr_in localAddr{};
+    localAddr.sin_family = AF_INET;
+    localAddr.sin_addr.s_addr = INADDR_ANY;
+    localAddr.sin_port = 0;
+    bind(clientSocket, (sockaddr*)&localAddr, sizeof(localAddr));	
 	bool firstRecieved = false;
 	std::ifstream file(infilePath,std::ios::binary);
 	// check for error when opening file
