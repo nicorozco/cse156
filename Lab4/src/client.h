@@ -3,7 +3,8 @@
 #include <unordered_map>
 #include <cstdint>
 #include <iostream>
-#include <chrono> 
+#include <chrono>
+#include <fstream> 
 #pragma pack(push,1)
 
 const uint32_t EOF_SEQ = 99999999;
@@ -22,10 +23,10 @@ struct ACKPacket{
 	uint32_t sequenceNumber;
 };
 struct ClientState {
-	uint32_t expectedSeqNum;//each client will have it's own expectedSeqNum
+	uint32_t expectedSeqNum = 0;//each client will have it's own expectedSeqNum
 	std::unordered_map<int,UDPPacket*> packetsRecieved; //and it's own buffred packets 
-	bool finished = false;
-	std::chrono::steady_clock::time_point lastHeard;
+	std::ofstream outfile;
+	std::filesystem::path fullPath;
 };
 
 bool isValidIPv4Format(const std::string& ip);
