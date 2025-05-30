@@ -189,7 +189,6 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 		perror("Error Sending Path to Client");
 		close(clientSocket);
 	}
-	sleep(3);	
 	size_t totalSize = sizeof(UDPPacket) + MSS;
 	fd_set rset;
 		//_____________Start Processing Packets_____________________
@@ -234,8 +233,8 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 		FD_ZERO(&rset);
 		FD_SET(clientSocket, &rset);
 		struct timeval timeout;
-		timeout.tv_sec = 0;
-		timeout.tv_usec = 3000;
+		timeout.tv_sec = 3;
+		timeout.tv_usec = 0;
 		int activity = select(clientSocket + 1, &rset, NULL, NULL, &timeout);
 		//_____________________________________________________________________________________________________________
 		//process packets from server 
@@ -287,6 +286,7 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 					std::cerr << "Reached max retransmission limit\n";
 					std::cout << unackedPackets[baseSeqNum] << "\n";
 					std::cout << MAX_RETRIES << "\n";
+					break;
 				}
 					
 				int retrans = retransmit(baseSeqNum,clientSocket, (struct sockaddr*)&serverAddress, file, sentPacketMeta);
