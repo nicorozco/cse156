@@ -92,73 +92,38 @@ int main(int argc, char* argv[]){
 		close(serverSocket);
 		return 1;
 	}
+	while (true) {
+		char buffer[1472];
+		sockaddr_in clientAddr;
+		socklen_t clientLen = sizeof(clientAddr);
 
-	while(true){
-		//process the first packet sent by the client, pass the file path to the function 		
-		ssize_t	bytes = recvfrom(serverSocket, buffer, sizeof(buffer),0,(struct sockaddr*)&clientAddr, &clientLen);
-		std::string key = std::string(inet_ntoa(clientAddr.sin_addr)) + ":" + std::to_string(ntohs(clientAddr.sin_port));
-
-		// First packet indicates new client
-		if (clients.find(key) == clients.end()) {
-			clients[key] = ClientState();  // set up client state		
-			std::cout << "Handling client: " << key << std::endl;
-			//use thread to handle multiple clients 
-			std::thread t(handleClient, serverSocket, lossRate, folderPath, 
-                  std::ref(activeFiles), std::ref(clients), std::ref(clientsMutex),
-                  clientAddr, clientLen, buffer, bytes); // <- pass initial data!
-			t.detach();
+		// Block until a message arrives
+		ssize_t bytesReceived = recvfrom(serverSocket, buffer, sizeof(buffer), 0, (sockaddr*)&clientAddr, &clientLen);
+		if (bytesReceived < 0) {
+			perror("recvfrom failed");
+			continue;
 		}
 
-	}
+		// Copy buffer content into a separate heap-allocated buffer
+		char* message = new char[bytesReceived];
+		memcpy(message, buffer, bytesReceived);
 
-	// To continusly listen for packet will need a while loop but for now just doing basic function of recieving packet
-	//d.) recieved a packet
+		// Copy address for thread use
+		sockaddr_in* clientAddrCopy = new sockaddr_in(clientAddr);
+
+		// Spawn a thread to handle the message
+		std::thread t([=]() {
+			handleClient(serverSocket, message, bytesReceived, clientAddrCopy, clientLen);
+			delete[] message;
+			delete clientAddrCopy;
+		});
+		t.detach(); // Detach to allow independent execution
+	}
 	close(serverSocket);
 	return 0;
 }
-
-ssize_t sendAck(int serverSocket,uint32_t seqNum,struct sockaddr_in* clientAddr,socklen_t clientLen){
-
-	ACKPacket ackPacket;
-	memset(&ackPacket,0,sizeof(ackPacket));
-	ackPacket.sequenceNumber = htonl(seqNum); //set the sequence number
-	int size = sizeof(uint32_t); //how muhc data to send 
-	ssize_t sentBytes = sendto(serverSocket,&ackPacket,size,0,(struct sockaddr*)clientAddr,clientLen);//send an "ACK" message to the client which is just sending the sequence number
-	return sentBytes;
-}
-std::string currentTimestamp(){
-    auto now = std::chrono::system_clock::now();
-    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
-    std::tm utc_tm = *std::gmtime(&now_c);
-
-    std::ostringstream oss;
-    oss << std::put_time(&utc_tm, "%Y-%m-%dT%H:%M:%SZ");
-    return oss.str();
-}
-void initRandom(){
-	std::srand(static_cast<unsigned int>(std::time(nullptr)));
-}
-bool dropPacket(int lossRate){
-	double percLossRate = lossRate / 100.0;
-	double randVal = static_cast<double>(std::rand()) / static_cast<double>(RAND_MAX);
-	return randVal < percLossRate;
-}
-bool isPortValid(int port){
- if ( port < 1024 || port > 65553){
-	return false;
-}
-	return true;
-}	
-bool isLossValid(int loss){
-if( loss < 0 || loss > 100){
-	return false;
-
-}
-	return true;
-}
 void handleClient(int serverSocket, int lossRate, std::string rootFolder,
                   std::unordered_set<std::string>& activeFiles,
-                  std::unordered_map<std::string, ClientState>& clients,
                   std::mutex& clientsMutex,
                   sockaddr_in clientAddr, socklen_t clientLen,
                   char initialBuffer[], ssize_t initialBytes){
@@ -166,9 +131,10 @@ void handleClient(int serverSocket, int lossRate, std::string rootFolder,
 	uint32_t seqNum = 0;
 	ssize_t bytesRecieved;
 	uint32_t expectedSeqNum;
-	std::unordered_map<int, UDPPacket*> packetsRecieved;
+	std::unordered_map<int, UDPPacket*> packetsRecieved;//buffer for recieved packets 
 	char buffer[32768];
-	struct sockaddr_in localAddr;
+
+	struct sockaddr_in localAddr; //to get the local port 
 	socklen_t addrLen = sizeof(localAddr);
 
 	if((getsockname(serverSocket, (struct sockaddr*)&localAddr, &addrLen)) == -1){
@@ -185,6 +151,7 @@ void handleClient(int serverSocket, int lossRate, std::string rootFolder,
 		std::cout << "Received raw file path: [" << pathPacket->filepath << "]" << std::endl;
 		return;
 	}
+	// _________________ Path _________________________
 	//construct full path
 	std::filesystem::path fullPath = std::filesystem::path(rootFolder) /  filePath;
 	//ensure directories exist
@@ -204,10 +171,8 @@ void handleClient(int serverSocket, int lossRate, std::string rootFolder,
 	}
 	std::cout << "File is Open, waiting for packets" << "\n";	
 	std::cout << "Sending Ack" << "\n";
-	const char* ackMsg = "PATH_RECEIVED";
-	sendto(serverSocket, ackMsg, strlen(ackMsg), 0,
-       (struct sockaddr*)&clientAddr, clientLen);
-	std::string key = std::string(inet_ntoa(clientAddr.sin_addr)) + ":" + std::to_string(ntohs(clientAddr.sin_port));
+
+	// __________________________________________Processing Packes________________________________________________
 	while(true){
 		//clear buffer 
 		std::cout << "Recieving Packets" << "\n";
@@ -337,4 +302,45 @@ void handleClient(int serverSocket, int lossRate, std::string rootFolder,
 			}
 		}
 	}
+}
+
+
+ssize_t sendAck(int serverSocket,uint32_t seqNum,struct sockaddr_in* clientAddr,socklen_t clientLen){
+
+	ACKPacket ackPacket;
+	memset(&ackPacket,0,sizeof(ackPacket));
+	ackPacket.sequenceNumber = htonl(seqNum); //set the sequence number
+	int size = sizeof(uint32_t); //how muhc data to send 
+	ssize_t sentBytes = sendto(serverSocket,&ackPacket,size,0,(struct sockaddr*)clientAddr,clientLen);//send an "ACK" message to the client which is just sending the sequence number
+	return sentBytes;
+}
+std::string currentTimestamp(){
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+    std::tm utc_tm = *std::gmtime(&now_c);
+
+    std::ostringstream oss;
+    oss << std::put_time(&utc_tm, "%Y-%m-%dT%H:%M:%SZ");
+    return oss.str();
+}
+void initRandom(){
+	std::srand(static_cast<unsigned int>(std::time(nullptr)));
+}
+bool dropPacket(int lossRate){
+	double percLossRate = lossRate / 100.0;
+	double randVal = static_cast<double>(std::rand()) / static_cast<double>(RAND_MAX);
+	return randVal < percLossRate;
+}
+bool isPortValid(int port){
+ if ( port < 1024 || port > 65553){
+	return false;
+}
+	return true;
+}	
+bool isLossValid(int loss){
+if( loss < 0 || loss > 100){
+	return false;
+
+}
+	return true;
 }
