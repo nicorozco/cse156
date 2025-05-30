@@ -189,24 +189,7 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 		perror("Error Sending Path to Client");
 		close(clientSocket);
 	}	
-	
-	fd_set rset; // create socket set
-	FD_ZERO(&rset);//clear the socket set
-	FD_SET(clientSocket,&rset); //add the clientsocket to the set 
-	
-	//set a timer utilize select to prevent hanging forever while waiting to recieved packeyt 
-	struct timeval timeout;
-	timeout.tv_sec = 30;
-	timeout.tv_usec = 0;
-	int activity = select(clientSocket+1,&rset,NULL,NULL,&timeout);
-	if (activity == 0){
- 		std::cerr << "Timeout: No response from server within 30 seconds. Exiting.\n";
-    	close(clientSocket);
-	}else if (activity < 0){
-		std::cerr << "Select Error\n";
-		close(clientSocket);
-	}
-	
+	// processing response from the server 	
 	char response[128] = {};
 	socklen_t serverLen = sizeof(serverAddress);
 	ssize_t bytes = recvfrom(clientSocket, response, sizeof(response), 0,
@@ -219,6 +202,7 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 	}
 	std::cout << "Server ACK: " << response << "\n";
 	size_t totalSize = sizeof(UDPPacket) + MSS;
+	fd_set rset;
 	if (strcmp(response, "PATH_RECEIVED") == 0){
 		//_____________Start Processing Packets_____________________
 		while(true){
@@ -257,6 +241,14 @@ void fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,i
 				nextSeqNum++;
 				free(packet);
 			}
+
+
+			FD_ZERO(&rset);
+			FD_SET(clientSocket, &rset);
+			struct timeval timeout;
+			timeout.tv_sec = 0;
+			timeout.tv_usec = 3000;
+    		int activity = select(clientSocket + 1, &rset, NULL, NULL, &timeout);
 			//_____________________________________________________________________________________________________________
 			//process packets from server 
 			//If we recieved no activity from the socket within 30 seconds server timed out 
