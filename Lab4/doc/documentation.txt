@@ -1,0 +1,20 @@
+Usage:
+  Note: Ensure to first have the appropriate servers running before calling the client program 
+ -Client
+  - within the bin file utilize the following command to start up the client
+  -./myclient numberofserver serverConfigFile mssPerPacket windowsize infilePath outfilePath
+ -Server 
+   - within the bin file utilize the following command to start up the client
+   -./myserver serverPort dropPercentage rootFolderPath
+
+Internal Design:
+Client Design:
+- The client follows the similar functionality of Lab 3 in processing files however instead of calling the function once, we open the configuration file and create a thread for each of the file (ip,port) into a thread.
+- The thread then handles the necessary retransmission and acknowledgements for that standalone server
+
+Server Design:
+- The server follows similar design to Lab 3, however the client utilizes a unorder_map to keep track of the client sending/recieving packets by creating a "key" which is a combination of the port and ip address, to ensure the correct packets are sent to the appropriate client 
+
+Shortcomings:
+- Server is unable to achieve 100% file reassembly to original file
+- Unable to achieve sending the message to writing to same file 
