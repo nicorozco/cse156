@@ -325,13 +325,12 @@ int fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,in
 				perror("sendto for EOF packet Failed");
 				free(eofPacket);
 			}
-			free(eofPacket);
 			std::cout << "All Packet send and no more data to send" << "\n";
 			break;
 		}
 	}
 	
-	std::cout << "Closing Connection" << "\n";
+	std::cout << "Thread Finished" << "\n";
 	file.close();
 	close(clientSocket);
 	return 0;
