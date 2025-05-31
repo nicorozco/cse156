@@ -26,7 +26,6 @@
 #include <fstream>
 #include <unordered_set>
 #define TIMEOUT_SEC 30
-sockaddr_in serverAddress;// Global Storage of Server
 std::string currentTimestamp();
 bool isValidIPv4Format(const std::string& ip);	
 int retransmit(int expectedSeqNum,int clientSocket,const struct sockaddr* serverAddress,std::ifstream& file, const std::map<uint32_t, std::pair<long,uint16_t>>& metaMap);	
@@ -119,6 +118,7 @@ std::string currentTimestamp(){
 int fileProcessing(const std::string serverIP,int serverPort, int WINDOW_SIZE,int MSS,std::string infilePath,std::string outfilePath){
 	std::map<uint32_t, std::pair<long, uint16_t>> sentPacketMeta;	
 	uint32_t nextSeqNum = 0;
+	sockaddr_in serverAddress;// Global Storage of Server
 	uint32_t baseSeqNum = 0;
 	uint32_t seqNum = 0;
 	uint32_t baseWindow = 0;
