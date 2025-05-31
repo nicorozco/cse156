@@ -4,7 +4,7 @@ Student ID: 1874497
 Files:
  - src:
 	-myclient.cpp
-	 - Implementation of creating threads for each server within the server.conf file to handle packets for each server 
+	Implementation of creating threads for each server within the server.conf file to handle packets for each server 
 	-myserver.cpp
 	- Implementation of server that handles reliability and in order packet formattingi
  - bin:
