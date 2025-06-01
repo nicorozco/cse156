@@ -7,7 +7,7 @@ SRCDIR = src
 
 #Executable names 
 PROXY = $(BINDIR)/myproxy
-TARGET = $(CLIENT) 
+TARGET = $(PROXY) 
 
 #Source Files
 SRCS = $(SRCDIR)/myproxy.cpp
