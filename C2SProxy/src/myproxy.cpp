@@ -43,9 +43,8 @@ socklen_t addrlen = sizeof(client_addr);
 		return 6;
 	}
 	//set up TCP Socket
-	int server_fd, client_fd;
+	int server_fd;
     struct sockaddr_in address;
-    char buffer[1024] = {0};
 
     // 1. Create socket
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -91,21 +90,28 @@ socklen_t addrlen = sizeof(client_addr);
 }
 
 void handleRequest(int client_fd){
-//recieved message from client_fd 
-// parse HTTP message
-// check if GET/HEAD
-// if GET or HEAD
-// 	check if the destination is within the fordbidden list 
-	// if within the forbiden list 
-	// send 403 forbidden message
+char buffer[1024] = {0};
+ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
+    
+	if (bytes < 0) {
+    	std::cerr << "Error Recieving from Client" << "\n";
+		close(client_fd);
+	}
+	// parse HTTP message
+	
+	// check if GET/HEAD
+	// if GET or HEAD
+	// 	check if the destination is within the fordbidden list 
+		// if within the forbiden list 
+		// send 403 forbidden message
 
-	// if not in the fodbiden list 
-		// resolve domain name utilize dns function 
-			// if unable to resolve the domain name:
-				// "Return 502 Bad Gateway Message back to client 
-			// if able to resolve:
-				// send HTTP Request Message through SSL
-					// add header to HTTP Request
-					// 	
+		// if not in the fodbiden list 
+			// resolve domain name utilize dns function 
+				// if unable to resolve the domain name:
+					// "Return 502 Bad Gateway Message back to client 
+				// if able to resolve:
+					// send HTTP Request Message through SSL
+						// add header to HTTP Request
+						// 	
 
 }
