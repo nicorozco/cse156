@@ -15,7 +15,7 @@
 #include <mutex>
 std::mutex log_mutex;
 void logMessage(const std::string& message, int clientIP);
-void handleRequest(int client_fd);
+void handleRequest(const std::string& filename,int client_fd);
 std::string currentTimestamp();
 std::string getClientIP(struct sockaddr_in clientAddr);
 
@@ -42,15 +42,6 @@ socklen_t addrlen = sizeof(clientAddr);
         }
     }
 	
-	//open logfile
-	std::ofstream log_file(logFile,std::ios::app);
-
-	if(!log_file.is_open()){
-		if (!log_file.is_open()) {
-			std::cerr << "Failed to open access.log for writing." << std::endl;
-			exit(1);
-		}
-	}
 
     // Debug output to check parsed values
     //std::cout << "Listen Port: " << listenPort << "\n";
@@ -108,7 +99,7 @@ socklen_t addrlen = sizeof(clientAddr);
 	return 0;
 }
 
-void handleRequest(int client_fd,struct sockaddr_in clientAddr){
+void handleRequest(const std::string& filename,int client_fd,struct sockaddr_in clientAddr){
 char buffer[1024] = {0};
 ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
     
@@ -116,6 +107,15 @@ ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
     	std::cerr << "Error Recieving from Client" << "\n";
 		close(client_fd);
 	}
+	//open logfile
+	std::ofstream file(logFile,std::ios::app);
+
+	if (!log_file.is_open()) {
+		std::cerr << "Failed to open access.log for writing." << std::endl;
+		return;
+	}
+	
+
 	// parse HTTP message
 	std::string request(buffer,bytes);
 
@@ -174,7 +174,7 @@ ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
 
 }
 
-void logMessage(std::string request_line, int clientIP){
+void logMessage(const std::string& filename std::string request_line, int clientIP){
 	std::string method,path,version;
 	std::istringstream request_line_stream(request_line);
 	std::lock_guard<std::mutex> lock(log_mutex);
