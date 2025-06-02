@@ -14,6 +14,7 @@ std::mutex log_mutex;
 void logMessage(const std::string& message);
 void handleRequest(int client_fd);
 std::string currentTimestamp();
+std::string getClientIP(struct sockaddr_in clientAddr);
 
 int main(int argc, char* argv[]){
 std::string listenPort;
@@ -89,12 +90,12 @@ socklen_t addrlen = sizeof(client_addr);
 			continue;
 		}
 		//use thread to handle this request 
-    	std::thread(handleRequest, client_fd).detach();  // non-blocking
+    	std::thread(handleRequest, client_fd,clientAddr).detach();  // non-blocking
 	}
 	return 0;
 }
 
-void handleRequest(int client_fd,){
+void handleRequest(int client_fd,struct sockaddr_in clientAddr){
 char buffer[1024] = {0};
 ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
     
@@ -111,18 +112,38 @@ ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
 		close(client_fd);
 		return;
 	}
+
+	//extract client ip 
+	std::string clientIP = getClientIP(clientAddr);
 	std::string headers = request.substr(0,header_end);
 	std::string body = request.substr(header_end + 4);
-	
+
+
     //extract the request line
 	size_t line_end = header.find("\r\n");
 	std::string request_line = headers.substr(0,line_end);
-	std::istringstream request_line_stream(request_line);
-	std::string method,path,version
-	request_line_stream >> method >> path >> version;
+	
+	//parse individual header
+	std::unordered_map<std::string, std::string> header_map;
+	size_t current = line_end + 2;
+	while (current < headers.size()) {
+		size_t next = headers.find("\r\n", current);
+		if (next == std::string::npos) break;
+
+		std::string line = headers.substr(current, next - current);
+		size_t colon = line.find(": ");
+		if (colon != std::string::npos) {
+			std::string key = line.substr(0, colon);
+			std::string value = line.substr(colon + 2);
+			header_map[key] = value;
+		}
+
+		current = next + 2;
+	}
+	
 
 	//print to log file 
-	logMessage( 
+	logMessage(request_line,clientIP)
 	// check if GET/HEAD
 	// if GET or HEAD
 	// 	check if the destination is within the fordbidden list 
@@ -140,11 +161,14 @@ ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
 
 }
 
-void logMessage(const std::string& message){
+void logMessage(std::string request_line, int clientIP){
+	std::string method,path,version;
+	std::istringstream request_line_stream(request_line);
 	std::lock_guard<std::mutex> lock(log_mutex);
-	log_file << message << std::end;
-	
+	request_line_stream >> method >> path >> version;
+	log_file << currentTimestamp() << clientIP << "\n";
 }
+
 std::string currentTimestamp(){
     auto now = std::chrono::system_clock::now();
     std::time_t now_c = std::chrono::system_clock::to_time_t(now);
@@ -153,4 +177,10 @@ std::string currentTimestamp(){
     std::ostringstream oss;
     oss << std::put_time(&utc_tm, "%Y-%m-%dT%H:%M:%SZ");
     return oss.str();
+}
+
+std::string getClientIP(struct sockaddr_in clientAddr){
+	char ipStr[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET,&(clientAddr.sin_addr), ipStr, INET_ADDRSTRLEN);
+	return std::string(ipStr);
 }
