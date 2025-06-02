@@ -7,11 +7,12 @@
 #include <sys/socket.h>    
 #include <netinet/in.h>    
 #include <arpa/inet.h>     
+#include <unordered_map>
 #include <thread>         
 #include <fstream>
 #include <mutex>
 std::mutex log_mutex;
-void logMessage(const std::string& message);
+void logMessage(const std::string& message, int clientIP);
 void handleRequest(int client_fd);
 std::string currentTimestamp();
 std::string getClientIP(struct sockaddr_in clientAddr);
@@ -21,8 +22,8 @@ std::string listenPort;
 std::string forbiddenFile;
 std::string logFile;
 int port;
-struct sockaddr_in client_addr;
-socklen_t addrlen = sizeof(client_addr);
+struct sockaddr_in clientAddr;
+socklen_t addrlen = sizeof(clientAddr);
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -38,6 +39,16 @@ socklen_t addrlen = sizeof(client_addr);
             return 1;
         }
     }
+	
+	//open logfile
+	std::ofstream log_file(logFile,std::ios::app);
+
+	if(!log_file.is_open()){
+		if (!log_file.is_open()) {
+			std::cerr << "Failed to open access.log for writing." << std::endl;
+			exit(1);
+		}
+	}
 
     // Debug output to check parsed values
     //std::cout << "Listen Port: " << listenPort << "\n";
@@ -83,7 +94,7 @@ socklen_t addrlen = sizeof(client_addr);
 	while (true) {
 
 		//create fd for connection made 
-		int client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &addrlen);
+		int client_fd = accept(server_fd, (struct sockaddr*)&clientAddr, &addrlen);
 		
 		if (client_fd < 0) {
 			perror("accept failed");
@@ -114,13 +125,13 @@ ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
 	}
 
 	//extract client ip 
-	std::string clientIP = getClientIP(clientAddr);
+	int clientIP = std::stoi(getClientIP(clientAddr));
 	std::string headers = request.substr(0,header_end);
 	std::string body = request.substr(header_end + 4);
 
 
     //extract the request line
-	size_t line_end = header.find("\r\n");
+	size_t line_end = headers.find("\r\n");
 	std::string request_line = headers.substr(0,line_end);
 	
 	//parse individual header
@@ -143,7 +154,7 @@ ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
 	
 
 	//print to log file 
-	logMessage(request_line,clientIP)
+	logMessage(request_line,clientIP);
 	// check if GET/HEAD
 	// if GET or HEAD
 	// 	check if the destination is within the fordbidden list 
