@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <sstream>
+#include <iomanip>
 #include <string>
 #include <iostream>
 #include <iostream>        
