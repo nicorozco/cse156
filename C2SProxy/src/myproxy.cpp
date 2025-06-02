@@ -14,7 +14,6 @@
 #include <fstream>
 #include <mutex>
 std::mutex log_mutex;
-void logMessage(const std::string& message, int clientIP);
 void handleRequest(const std::string& filename,int client_fd);
 std::string currentTimestamp();
 std::string getClientIP(struct sockaddr_in clientAddr);
@@ -102,15 +101,17 @@ socklen_t addrlen = sizeof(clientAddr);
 void handleRequest(const std::string& filename,int client_fd,struct sockaddr_in clientAddr){
 char buffer[1024] = {0};
 ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
-    
+std::string method,path,version;
+std::lock_guard<std::mutex> lock(log_mutex);
+
 	if (bytes < 0) {
     	std::cerr << "Error Recieving from Client" << "\n";
 		close(client_fd);
 	}
 	//open logfile
-	std::ofstream file(logFile,std::ios::app);
+	std::ofstream file(filename,std::ios::app);
 
-	if (!log_file.is_open()) {
+	if (!file.is_open()) {
 		std::cerr << "Failed to open access.log for writing." << std::endl;
 		return;
 	}
@@ -118,6 +119,18 @@ ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
 
 	// parse HTTP message
 	std::string request(buffer,bytes);
+	size_t line_end = request.find("\r\n);
+	if (line_end == std::string::npos) {
+    	std::cerr << "Malformed HTTP request: no line break\n";
+    	close(client_fd);
+    	return;
+	}
+
+	std::string request_line = request.substr(0, line_end);
+
+	// 2. Now safely parse the request line
+	std::istringstream request_line_stream(request_line);
+	request_line_stream >> method >> path >> version;
 
 	size_t header_end = request.find("\r\n\r\n");
 	if (header_end == std::string::npos){
@@ -156,7 +169,7 @@ ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
 	
 
 	//print to log file 
-	logMessage(request_line,clientIP);
+	filename << currentTimestamp() << clientIP << "\n";
 	// check if GET/HEAD
 	// if GET or HEAD
 	// 	check if the destination is within the fordbidden list 
@@ -173,15 +186,6 @@ ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
 						// 	
 
 }
-
-void logMessage(const std::string& filename std::string request_line, int clientIP){
-	std::string method,path,version;
-	std::istringstream request_line_stream(request_line);
-	std::lock_guard<std::mutex> lock(log_mutex);
-	request_line_stream >> method >> path >> version;
-	log_file << currentTimestamp() << clientIP << "\n";
-}
-
 std::string currentTimestamp(){
     auto now = std::chrono::system_clock::now();
     std::time_t now_c = std::chrono::system_clock::to_time_t(now);
