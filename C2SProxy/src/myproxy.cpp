@@ -14,8 +14,8 @@
 #include <fstream>
 #include <mutex>
 std::mutex log_mutex;
-void handleRequest(const std::string& filename,int client_fd);
 std::string currentTimestamp();
+void handleRequest(const std::string& filename,int client_fd,struct sockaddr_in clientAddr);
 std::string getClientIP(struct sockaddr_in clientAddr);
 
 int main(int argc, char* argv[]){
@@ -93,7 +93,7 @@ socklen_t addrlen = sizeof(clientAddr);
 			continue;
 		}
 		//use thread to handle this request 
-    	std::thread(handleRequest, client_fd,clientAddr).detach();  // non-blocking
+    	std::thread(handleRequest, forbiddenFile, client_fd,clientAddr).detach();  // non-blocking
 	}
 	return 0;
 }
@@ -119,7 +119,12 @@ std::lock_guard<std::mutex> lock(log_mutex);
 
 	// parse HTTP message
 	std::string request(buffer,bytes);
-	size_t line_end = request.find("\r\n);
+	size_t headers_end = request.find("\r\n\r\n");
+	std::string headers = request.substr(0,headers_end);	
+	size_t line_end = headers.find("\r\n");
+	//extract client ip 
+	int clientIP = std::stoi(getClientIP(clientAddr));
+	std::string body = request.substr(headers_end + 4);
 	if (line_end == std::string::npos) {
     	std::cerr << "Malformed HTTP request: no line break\n";
     	close(client_fd);
@@ -132,23 +137,11 @@ std::lock_guard<std::mutex> lock(log_mutex);
 	std::istringstream request_line_stream(request_line);
 	request_line_stream >> method >> path >> version;
 
-	size_t header_end = request.find("\r\n\r\n");
-	if (header_end == std::string::npos){
+	if (headers_end == std::string::npos){
 		std::cerr << "Malformed HTTP Request\n";
 		close(client_fd);
 		return;
 	}
-
-	//extract client ip 
-	int clientIP = std::stoi(getClientIP(clientAddr));
-	std::string headers = request.substr(0,header_end);
-	std::string body = request.substr(header_end + 4);
-
-
-    //extract the request line
-	size_t line_end = headers.find("\r\n");
-	std::string request_line = headers.substr(0,line_end);
-	
 	//parse individual header
 	std::unordered_map<std::string, std::string> header_map;
 	size_t current = line_end + 2;
@@ -169,7 +162,7 @@ std::lock_guard<std::mutex> lock(log_mutex);
 	
 
 	//print to log file 
-	filename << currentTimestamp() << clientIP << "\n";
+	file << currentTimestamp() << clientIP << "\n";
 	// check if GET/HEAD
 	// if GET or HEAD
 	// 	check if the destination is within the fordbidden list 
