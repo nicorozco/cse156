@@ -8,7 +8,12 @@
 #include <netinet/in.h>    
 #include <arpa/inet.h>     
 #include <thread>         
+#include <fstream>
+#include <mutex>
+std::mutex log_mutex;
+void logMessage(const std::string& message);
 void handleRequest(int client_fd);
+std::string currentTimestamp();
 
 int main(int argc, char* argv[]){
 std::string listenPort;
@@ -89,7 +94,7 @@ socklen_t addrlen = sizeof(client_addr);
 	return 0;
 }
 
-void handleRequest(int client_fd){
+void handleRequest(int client_fd,){
 char buffer[1024] = {0};
 ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
     
@@ -98,7 +103,26 @@ ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
 		close(client_fd);
 	}
 	// parse HTTP message
+	std::string request(buffer,bytes);
+
+	size_t header_end = request.find("\r\n\r\n");
+	if (header_end == std::string::npos){
+		std::cerr << "Malformed HTTP Request\n";
+		close(client_fd);
+		return;
+	}
+	std::string headers = request.substr(0,header_end);
+	std::string body = request.substr(header_end + 4);
 	
+    //extract the request line
+	size_t line_end = header.find("\r\n");
+	std::string request_line = headers.substr(0,line_end);
+	std::istringstream request_line_stream(request_line);
+	std::string method,path,version
+	request_line_stream >> method >> path >> version;
+
+	//print to log file 
+	logMessage( 
 	// check if GET/HEAD
 	// if GET or HEAD
 	// 	check if the destination is within the fordbidden list 
@@ -114,4 +138,19 @@ ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
 						// add header to HTTP Request
 						// 	
 
+}
+
+void logMessage(const std::string& message){
+	std::lock_guard<std::mutex> lock(log_mutex);
+	log_file << message << std::end;
+	
+}
+std::string currentTimestamp(){
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+    std::tm utc_tm = *std::gmtime(&now_c);
+
+    std::ostringstream oss;
+    oss << std::put_time(&utc_tm, "%Y-%m-%dT%H:%M:%SZ");
+    return oss.str();
 }
