@@ -76,7 +76,7 @@ int main (int argc, char* argv[]) {
 	if (argc == 5){ 
 		//if we have 4 arguments that means we should have the -h flag in the 3rd
 		
-		std::string flag = argv[5];
+		std::string flag = argv[4];
 		std::transform(flag.begin(),flag.end(),flag.begin(), ::tolower);
 		
 		if (flag  == "-h") {
