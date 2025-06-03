@@ -14,22 +14,15 @@
 #include <cstring>       // for memset()
 #include <errno.h>       // for errno
 #include <cstdlib> // for stoi()
+bool isValidHost(const std::string& host) {
+    // IPv4 address regex
+    std::regex ipv4Regex(R"(^(\d{1,3}\.){3}\d{1,3}$)");
 
-bool isValidIPv4Format(const std::string& ip){
+    // Hostname regex (e.g., www.example.com)
+    std::regex hostnameRegex(R"(^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$)");
 
-	std::regex ipv4Pattern(R"(^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$)");
-	return std::regex_match(ip, ipv4Pattern); 
+    return std::regex_match(host, ipv4Regex) || std::regex_match(host, hostnameRegex);
 }
-bool isValidHost(const std::string& hostname){
-	//function to allow DNS valid hostnames
-	if (hostname.length() > 253){
-		return false;
-	}
-
-	std::regex pattern(R"(^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$)");
-	return std::regex_match(hostname, pattern);
-}
-
 bool isValidPath(const std::string& path){
 	if(path.length() > 2000){
 		return false;
@@ -136,10 +129,6 @@ int main (int argc, char* argv[]) {
 	std::cout << "path: " << path << "\n";		
 	
 	//after we have extracted the ip address we check if it's valid
-	if (isValidIPv4Format(proxyIP) == false){
-		std::cout << ip << " is not a valid IPv4 format" << "\n";
-		return 11;
-	}
 	if (isValidHost(hostname) == false){
 		std::cout << hostname << " is not a valid host name format" << "\n";	
 		return 11;

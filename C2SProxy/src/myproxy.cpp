@@ -28,9 +28,9 @@ bool isForbidden(const std::string& hostname, const std::unordered_set<std::stri
 void sendHttpResponse(int clientSocket, int statusCode, const std::string& reasonPhrase, const std::string& body);
 std::string resolveHostnameToIP(const std::string& hostname);
 std::string reverseDNSLookup(const std::string& ip); 
-bool isValidIP(const std::string& ip);
 bool isValidHost(const std::string& hostname);
 void printForbiddenSet(const std::unordered_set<std::string>& forbiddenSet);
+bool isValidIP(const std::string& ip);
 //_______________________________________________ Main ____________________________________________
 
 int main(int argc, char* argv[]){
@@ -203,7 +203,7 @@ std::lock_guard<std::mutex> lock(log_mutex);
 		// make sure the hostname is valid before checking if it's in the fordbidden list 
 		//std::cout << "Valid HostName " << isValidHost(hostname) << "\n";
 		//std::cout << "Valid Host IP "<< isValidIP(hostname) << "\n";
-		if((isValidHost(hostname) == true) || (isValidIP(hostname) == true)){
+		if(isValidHost(hostname) == true){
 			//if within the forbiden list 
 			std::cout << "Web Host is Fordbidden "<< isForbidden(hostname, forbiddenSet) << "\n";
 			if(isForbidden(hostname, forbiddenSet)){
@@ -213,31 +213,24 @@ std::lock_guard<std::mutex> lock(log_mutex);
 				return;
 			}else{
 				//if the host name is a string resolve to get IP
-				//use regex to ensure the hostname is a valid hostname and ip
-				if (isValidHost(hostname)){
+				if(!isValidIP(hostname)){
 					std::string hostIP = resolveHostnameToIP(hostname);
-					//resolve domain name utilize dns function 
 					if(hostIP.empty()){ 	
 					// if unable to resolve the domain name:
-					//"Return 502 Bad Gateway Message back to client 
 						sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Bad Gateway.\n");
 						return;
 					}
 					std::cout << "Resolved Host to IP " << hostIP << "\n"; 
-				}
-				//else we could have an IP as the host name  
-				if(isValidIP(hostname)){
-					//resolve the ip
+				}else{
+					//it's an IP and we need to resolve the hostname
 					std::string hostResolved= reverseDNSLookup(hostname);
 					// if unable to resolve:
 					if(hostResolved.empty()){
 						sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Bad Gateway.\n");
                         return;
-					}else{
-						// send HTTP Request Message through SSL
-						// add header to HTTP Request
 					}
 				}
+			// Note steps, setting connection to host
 			}
 		}
 	}else{
@@ -343,28 +336,22 @@ std::string reverseDNSLookup(const std::string& ip) {
 
     return std::string(host);
 }
-bool isValidIP(const std::string& ip){
+bool isValidHost(const std::string& host) {
+    // IPv4 address regex
+    std::regex ipv4Regex(R"(^(\d{1,3}\.){3}\d{1,3}$)");
 
-	std::regex ipv4Pattern(R"(^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$)");
-	return std::regex_match(ip, ipv4Pattern); 
-}
-bool isValidHost(const std::string& hostname){
-	//function to allow DNS valid hostnames
-	if (hostname.length() > 253){
-		return false;
-	}
-	std::regex pattern(R"(^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$)");
-	return std::regex_match(hostname, pattern);
-}
+    // Hostname regex (e.g., www.example.com)
+    std::regex hostnameRegex(R"(^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$)");
 
+    return std::regex_match(host, ipv4Regex) || std::regex_match(host, hostnameRegex);
+}
 void printForbiddenSet(const std::unordered_set<std::string>& forbiddenSet) {
     std::cout << "Forbidden Set Contents:\n";
     for (const std::string& entry : forbiddenSet) {
         std::cout << " - " << entry << '\n';
     }
 }
-
-
-
-
-
+bool isValidIP(const std::string& ip) {
+    std::regex ipv4Regex(R"(^(\d{1,3}\.){3}\d{1,3}$)");
+    return std::regex_match(ip, ipv4Regex);
+}
