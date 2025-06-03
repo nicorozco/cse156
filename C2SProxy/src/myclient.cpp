@@ -94,8 +94,10 @@ int main (int argc, char* argv[]) {
 		//no -h option given
 	 	proxyIP = argv[1];
 		proxyPortStr = argv[2];
-		hostname = argv[3];
-	 	url = argv[4];	
+		hostname = argv[3];	
+		std::cout << proxyIP << "\n";
+		std::cout << proxyPortStr << "\n";
+		std::cout << hostname << "\n";
 	} else {
 		std::cerr << "Error: Invalid Arguments" << "\n";
 		return 11;
@@ -111,6 +113,13 @@ int main (int argc, char* argv[]) {
 	}else {
 		path = url.substr(slashPos); // from slash to end
 	}
+	if (slashPos != std::string::npos) {
+		hostname = url.substr(0, slashPos);     // → "www.example.com"
+		path = url.substr(slashPos);            // → "/index.html"
+	} else {
+		hostname = url;                         // → "www.example.com"
+		path = "/";                                 // default path
+	}	
 
 	if(colonPos != std::string::npos && colonPos < slashPos){
 		//Format is: ip:port/path
@@ -126,21 +135,18 @@ int main (int argc, char* argv[]) {
 	} else {
 		//Format is: ip/path
 		ip = url.substr(0,slashPos);
-
 	}
 	
 	//after we have extracted the ip address we check if it's valid
-	if (isValidIPv4Format(ip) == false){
+	if (isValidIPv4Format(proxyIP) == false){
 		std::cout << ip << " is not a valid IPv4 format" << "\n";
 		return 11;
 	}
 	if (isValidHost(hostname) == false){
-
 		std::cout << hostname << " is not a valid host name format" << "\n";	
 		return 11;
 	}
 	if (isValidPath(path) == false){
-
 		std::cout << path << " is not a valid path format" << "\n";
 		return 11;
 	}
