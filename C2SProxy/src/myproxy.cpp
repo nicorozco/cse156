@@ -34,6 +34,7 @@ std::string reverseDNSLookup(const std::string& ip);
 bool isValidHost(const std::string& hostname);
 void printForbiddenSet(const std::unordered_set<std::string>& forbiddenSet);
 bool isValidIP(const std::string& ip);
+int createTCPConnection(const std::string& ip, int port);
 //_______________________________________________ Main ____________________________________________
 
 int main(int argc, char* argv[]){
@@ -234,7 +235,14 @@ std::lock_guard<std::mutex> lock(log_mutex);
                         return;
 					}
 				}
-			// Note steps, setting connection to host
+				//now that we have extracted the ip, create a TCP Connection with the server 
+				int serverConnect = createTCPConnection(const std::string& ip, int port)
+				//if unable to connec to server
+				if(serverConnect < 0){
+					//send error message to client
+					sendHttpResponse(client_fd, 504, "Gateway Timeout", "504- Gateway Timedout.\n");
+				}
+				//Note steps, setting connection to host
 			}
 		}
 	}else{
@@ -363,4 +371,32 @@ void initialize_ssl() {
     SSL_library_init();              // Initializes OpenSSL
     SSL_load_error_strings();       // Error strings for error messages
     OpenSSL_add_all_algorithms();   // Load encryption algorithms
+}
+int createTCPConnection(const std::string& ip, int port) {
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);  // TCP socket
+    if (sockfd < 0) {
+        perror("Socket creation failed");
+        return -1;
+    }
+
+    struct sockaddr_in serverAddr;
+    std::memset(&serverAddr, 0, sizeof(serverAddr));
+
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(port);  // Convert port to network byte order
+
+    if (inet_pton(AF_INET, ip.c_str(), &serverAddr.sin_addr) <= 0) {
+        perror("Invalid address / Address not supported");
+        close(sockfd);
+        return -1;
+    }
+
+    if (connect(sockfd, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
+        perror("Connection to server failed");
+        close(sockfd);
+        return -1;
+    }
+
+    std::cout << "Connected to " << ip << ":" << port << "\n";
+    return sockfd;
 }
