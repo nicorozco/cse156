@@ -143,6 +143,8 @@ std::string method,path,version;
 std::lock_guard<std::mutex> lock(log_mutex);
 int destPort = 443;
 std::string hostIP;
+std::string hostname;
+std::string hostHeader;
 	if (bytes < 0) {
     	std::cerr << "Error Recieving from Client" << "\n";
 		close(client_fd);
@@ -204,8 +206,6 @@ std::string hostIP;
 		std::cout << "Request method is GET or HEAD\n";	
 		// if GET or HEAD
 		//extract host:
-		std::string hostname;
-		std::string hostHeader;
 		if (header_map.find("Host") != header_map.end()) {
 			hostHeader = header_map["Host"];
 		} else {
@@ -305,7 +305,7 @@ std::string hostIP;
 				request << "GET " << path << " HTTP/1.1\r\n";
 
 				// Required headers
-				request << "Host: " << host << "\r\n";
+				request << "Host: " << hostname << "\r\n";
 				request << "User-Agent: ProxyClient/1.0\r\n";
 				request << "Connection: close\r\n";
 
