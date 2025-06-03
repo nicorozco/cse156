@@ -27,7 +27,7 @@ bool isForbidden(const std::string& hostname, const std::unordered_set<std::stri
 void sendHttpResponse(int clientSocket, int statusCode, const std::string& reasonPhrase, const std::string& body);
 int resolveHostnameToIP(const std::string& hostname);
 std::string reverseDNSLookup(const std::string& ip); 
-bool isValidIPv4Format(const std::string& ip);
+bool isValidIP(const std::string& ip);
 bool isValidHost(const std::string& hostname);
 //_______________________________________________ Main ____________________________________________
 
@@ -118,7 +118,6 @@ socklen_t addrlen = sizeof(clientAddr);
 }
 
 //______________________________________________ Functions Definition  _________________________________________
-std::mutex log_mutex;
 void handleRequest(std::string filename,const std::unordered_set<std::string>& forbiddenSet, int client_fd,struct sockaddr_in clientAddr){
 char buffer[1024] = {0};
 ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
@@ -202,7 +201,7 @@ std::lock_guard<std::mutex> lock(log_mutex);
 		// 	check if the destination is within the fordbidden list 
 		// note host name can be an IP address, if it's an IP Address make sure it's a valid IP 
 		// make sure the hostname is valid before checking if it's in the fordbidden list 
-		if(isValidHost(hostname)) || isValidIP(hostname){
+		if((isValidHost(hostname) == true) || (isValidIP(hostname) == true)){
 			//if within the forbiden list 
 			if(isForbidden(hostname, forbiddenSet)){
 				// send 403 forbidden message
@@ -214,7 +213,7 @@ std::lock_guard<std::mutex> lock(log_mutex);
 				if (isValidHost(hostname)){
 					int hostIP = resolveHostnameToIP(hostname);
 					//resolve domain name utilize dns function 
-					if(host == 0){ 	
+					if(hostIP == 0){ 	
 					// if unable to resolve the domain name:
 					//"Return 502 Bad Gateway Message back to client 
 						sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Bad Gateway.\n");
@@ -222,9 +221,9 @@ std::lock_guard<std::mutex> lock(log_mutex);
 					}
 				}
 				//else we could have an IP as the host name  
-				if(isValidIP(hostname){
+				if(isValidIP(hostname)){
 					//resolve the ip
-					std::string hostResolved= reverseDNSLookup(hostname)
+					std::string hostResolved= reverseDNSLookup(hostname);
 					// if unable to resolve:
 					if(hostResolved.empty()){
 						sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Bad Gateway.\n");
@@ -331,7 +330,7 @@ std::string reverseDNSLookup(const std::string& ip) {
 
     return std::string(host);
 }
-bool isValidIPv4Format(const std::string& ip){
+bool isValidIP(const std::string& ip){
 
 	std::regex ipv4Pattern(R"(^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$)");
 	return std::regex_match(ip, ipv4Pattern); 
