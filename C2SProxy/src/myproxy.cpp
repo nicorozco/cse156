@@ -326,8 +326,27 @@ std::string hostHeader;
 					std::cerr << "Failed to send request\n";
 				} else {
 					std::cout << "Sent " << bytesSent << " bytes to server.\n";
+				}
+				char buffer[4096];
+				//read response from server
+				while (true) {
+					int bytesRead = SSL_read(ssl, buffer, sizeof(buffer) - 1);
+					if (bytesRead > 0) {
+						buffer[bytesRead] = '\0';  // Null-terminate
+						std::cout << buffer;       // Output response to stdout or forward to client
+					} else if (bytesRead == 0) {
+						std::cout << "\n[Server closed the connection]\n";
+						break;
+					} else {
+						int err = SSL_get_error(ssl, bytesRead);
+						if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE) {
+							continue;  // Retry
+						} else {
+							std::cerr << "SSL_read error: " << ERR_reason_error_string(ERR_get_error()) << "\n";
+							break;
+						}
+					}
 				}		
-	
 			}
 		}
 	}else{
