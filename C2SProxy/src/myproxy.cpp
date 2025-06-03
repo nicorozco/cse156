@@ -18,7 +18,7 @@ std::mutex log_mutex;
 std::string currentTimestamp();
 void handleRequest(const std::string& filename,int client_fd,struct sockaddr_in clientAddr);
 std::string getClientIP(struct sockaddr_in clientAddr);
-
+void sendHttpResponse(int clientSocket, int statusCode, const std::string& reasonPhrase, const std::string& body);
 int main(int argc, char* argv[]){
 std::string listenPort;
 std::string forbiddenFile;
@@ -177,9 +177,9 @@ std::lock_guard<std::mutex> lock(log_mutex);
 						// send HTTP Request Message through SSL
 							// add header to HTTP Request
 							// 	
-
 	}else{
 		std::cout << "Unsupported HTTP method\n";
+		sendHttpResponse(client_fd, 501, "Not Implemented", "501 - Not Implemented\n");
 	}
 }
 std::string currentTimestamp(){
@@ -196,4 +196,20 @@ std::string getClientIP(struct sockaddr_in clientAddr){
 	char ipStr[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET,&(clientAddr.sin_addr), ipStr, INET_ADDRSTRLEN);
 	return std::string(ipStr);
+}
+void sendHttpResponse(int clientSocket, int statusCode, const std::string& reasonPhrase, const std::string& body) {
+    std::string statusLine = "HTTP/1.1 " + std::to_string(statusCode) + " " + reasonPhrase + "\r\n";
+
+    std::string headers;
+    headers += "Content-Type: text/plain\r\n";
+    headers += "Content-Length: " + std::to_string(body.size()) + "\r\n";
+    headers += "Connection: close\r\n";
+    headers += "\r\n";
+
+    std::string fullResponse = statusLine + headers + body;
+
+    ssize_t sent = write(clientSocket, fullResponse.c_str(), fullResponse.size());
+    if (sent < 0) {
+        perror("Failed to send HTTP response");
+    }
 }
