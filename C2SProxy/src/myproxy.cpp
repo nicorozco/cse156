@@ -25,6 +25,7 @@
 std::mutex log_mutex;
 void initialize_ssl();
 std::string currentTimestamp();
+std::string getLocalIP(int connectedSockFD);
 void handleRequest(std::string filename,const std::unordered_set<std::string>& forbiddenSet,int client_fd,struct sockaddr_in clientAddr,SSL_CTX* ctx);
 std::string getClientIP(struct sockaddr_in clientAddr);
 std::unordered_set<std::string> loadForbiddenHosts(const std::string& filename);
@@ -274,6 +275,11 @@ std::string hostIP;
 					sendHttpResponse(client_fd, 504, "Gateway Timeout", "504- Gateway Timedout.\n");
 					return;
 				}
+				std::string proxyIP = getLocalIP(server_fd);
+				if(proxyIP.empty()){
+					std::cerr << "Error retrieving server IP" << "\n";
+				}
+				std::string XHeader = "X-Forwarded-For: " + clientIP + std::string(", ") + proxyIP + "\r\n";
 				//connection is set up 
 				// Setting up SSL
 				// 1.) Create SSL Object for specific connection
@@ -292,6 +298,36 @@ std::string hostIP;
 				//start reading & writing in SSL
 				//SSL_write() securely send data from server
 				//SSL_read() securely recieved data from server
+				
+				std::ostringstream request;
+
+				// Request line
+				request << "GET " << path << " HTTP/1.1\r\n";
+
+				// Required headers
+				request << "Host: " << host << "\r\n";
+				request << "User-Agent: ProxyClient/1.0\r\n";
+				request << "Connection: close\r\n";
+
+				// Add the X-Forwarded-For header
+				request << "X-Forwarded-For: " << clientIP << ", " << proxyIP << "\r\n";
+
+				// End of headers
+				request << "\r\n";
+
+				// Convert to string
+				std::string requestStr = request.str();
+
+				// Send it via SSL
+				int bytesSent = SSL_write(ssl, requestStr.c_str(), requestStr.length());
+				
+				if (bytesSent <= 0) {
+					ERR_print_errors_fp(stderr);
+					std::cerr << "Failed to send request\n";
+				} else {
+					std::cout << "Sent " << bytesSent << " bytes to server.\n";
+				}		
+	
 			}
 		}
 	}else{
@@ -449,3 +485,17 @@ int createTCPConnection(const std::string& ip, int port) {
     std::cout << "Connected to " << ip << ":" << port << "\n";
     return sockfd;
 }
+std::string getLocalIP(int connectedSockFD) {
+    struct sockaddr_in localAddr;
+    socklen_t addrLen = sizeof(localAddr);
+    char ipStr[INET_ADDRSTRLEN];
+
+    if (getsockname(connectedSockFD, (struct sockaddr*)&localAddr, &addrLen) == 0) {
+        inet_ntop(AF_INET, &localAddr.sin_addr, ipStr, sizeof(ipStr));
+        return std::string(ipStr);
+    } else {
+        perror("getsockname failed");
+        return "";
+    }
+}
+
