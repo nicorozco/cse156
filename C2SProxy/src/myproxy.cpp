@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <typeinfo>
 #include <sstream>
 #include <iomanip>
 #include <netdb.h>
@@ -16,7 +17,7 @@
 #include <fstream>
 #include <mutex>
 #include <regex>
-
+//______________________________________________ Functions Decleration  _________________________________________
 std::mutex log_mutex;
 std::string currentTimestamp();
 void handleRequest(std::string filename,const std::unordered_set<std::string>& forbiddenSet,int client_fd,struct sockaddr_in clientAddr);
@@ -26,7 +27,9 @@ bool isForbidden(const std::string& hostname, const std::unordered_set<std::stri
 void sendHttpResponse(int clientSocket, int statusCode, const std::string& reasonPhrase, const std::string& body);
 int resolveHostnameToIP(const std::string& hostname);
 std::string reverseDNSLookup(const std::string& ip); 
-
+bool isValidIPv4Format(const std::string& ip);
+bool isValidHost(const std::string& hostname);
+//_______________________________________________ Main ____________________________________________
 
 int main(int argc, char* argv[]){
 std::string listenPort;
@@ -114,6 +117,8 @@ socklen_t addrlen = sizeof(clientAddr);
 	return 0;
 }
 
+//______________________________________________ Functions Definition  _________________________________________
+std::mutex log_mutex;
 void handleRequest(std::string filename,const std::unordered_set<std::string>& forbiddenSet, int client_fd,struct sockaddr_in clientAddr){
 char buffer[1024] = {0};
 ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
@@ -201,17 +206,25 @@ std::lock_guard<std::mutex> lock(log_mutex);
 			sendHttpResponse(client_fd, 403, "Forbidden", "403 Forbidden: Access Denied.\n");
 			return;
 		}else{
-				//if the host name is a string resolve
-				int hostIP = resolveHostnameToIP(hostname);
-				// resolve domain name utilize dns function 
+				//if the host name is a string resolve to get IP
+				//use regex to ensure the hostname is a valid hostname and ip
+				if (typeid(hostname).name() == typeid(std::string).name()){ 
+					int hostIP = resolveHostnameToIP(hostname);
+					//resolve domain name utilize dns function 
+					if(host == 0){ 	
 					// if unable to resolve the domain name:
 						// "Return 502 Bad Gateway Message back to client 
+						sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Bad Gateway.\n");
+						return;
+					} 
+				}else{
 				//if the host name is a IP, find the host to be able to send the request 
 
-					sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Bad Gateway.\n");
 					// if able to resolve:
 						// send HTTP Request Message through SSL
-							// add header to HTTP Request
+						// add header to HTTP Request
+				}
+		
 		}
 	}else{
 		std::cout << "Unsupported HTTP method\n";
@@ -308,4 +321,23 @@ std::string reverseDNSLookup(const std::string& ip) {
 
     return std::string(host);
 }
+bool isValidIPv4Format(const std::string& ip){
+
+	std::regex ipv4Pattern(R"(^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$)");
+	return std::regex_match(ip, ipv4Pattern); 
+}
+bool isValidHost(const std::string& hostname){
+	//function to allow DNS valid hostnames
+	if (hostname.length() > 253){
+		return false;
+	}
+	std::regex pattern(R"(^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$)");
+	return std::regex_match(hostname, pattern);
+}
+
+
+
+
+
+
 
