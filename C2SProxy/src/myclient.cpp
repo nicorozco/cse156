@@ -83,8 +83,7 @@ int main (int argc, char* argv[]) {
 			hOption = true;	
 			proxyIP = argv[1];
 			proxyPortStr = argv[2];
-			hostname = argv[3];
-			url = argv[4];	
+			url = argv[3];	
 		}else{
 			std::cerr << "Error: '-h' flag must be in the correct position (the last argument)."<< "\n";
 			return 11;
@@ -94,10 +93,10 @@ int main (int argc, char* argv[]) {
 		//no -h option given
 	 	proxyIP = argv[1];
 		proxyPortStr = argv[2];
-		hostname = argv[3];	
+		url = argv[3];	
 		std::cout << proxyIP << "\n";
 		std::cout << proxyPortStr << "\n";
-		std::cout << hostname << "\n";
+		std::cout << url << "\n";
 	} else {
 		std::cerr << "Error: Invalid Arguments" << "\n";
 		return 11;
@@ -107,35 +106,34 @@ int main (int argc, char* argv[]) {
 	//split the url into multiple parts 
     colonPos = url.find(':');
     slashPos = url.find('/');
-	
-	if (slashPos == std::string::npos){
-		path = "/";
-	}else {
-		path = url.substr(slashPos); // from slash to end
-	}
+
 	if (slashPos != std::string::npos) {
-		hostname = url.substr(0, slashPos);     // → "www.example.com"
-		path = url.substr(slashPos);            // → "/index.html"
+		path = url.substr(slashPos); // from slash to end
 	} else {
-		hostname = url;                         // → "www.example.com"
-		path = "/";                                 // default path
-	}	
+		path = "/";
+	}
 
-	if(colonPos != std::string::npos && colonPos < slashPos){
-		//Format is: ip:port/path
-		ip = url.substr(0, colonPos);
-		std::string portStr = url.substr(colonPos+1,slashPos - colonPos - 1);
-		if(!std::all_of(portStr.begin(),portStr.end(),::isdigit)){
+	// Handle format: host:port/path
+	if (colonPos != std::string::npos && (slashPos == std::string::npos || colonPos < slashPos)) {
+		hostname = url.substr(0, colonPos);  // text before ':'
+		std::string portStr = (slashPos != std::string::npos)
+								? url.substr(colonPos + 1, slashPos - colonPos - 1)
+								: url.substr(colonPos + 1);
 
-			std::cerr << "Error: Port containts non-numeric characters\n";
-			return 6;
+		if (!std::all_of(portStr.begin(), portStr.end(), ::isdigit)) {
+			std::cerr << "Error: Port contains non-numeric characters\n";
+			return 1;
 		}
 		port = std::stoi(portStr);
-
 	} else {
-		//Format is: ip/path
-		ip = url.substr(0,slashPos);
+		hostname = (slashPos != std::string::npos) ? url.substr(0, slashPos) : url;
 	}
+	// DEBUG print to confirm parsing
+	std::cout << "proxyIP: " << proxyIP << "\n";
+	std::cout << "proxyPort: " << proxyPort << "\n";
+	std::cout << "hostname: " << hostname << "\n";
+	std::cout << "destPort: " << port << "\n";
+	std::cout << "path: " << path << "\n";		
 	
 	//after we have extracted the ip address we check if it's valid
 	if (isValidIPv4Format(proxyIP) == false){
