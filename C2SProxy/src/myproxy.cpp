@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <cstring>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <typeinfo>
@@ -129,7 +130,8 @@ char buffer[1024] = {0};
 ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
 std::string method,path,version;
 std::lock_guard<std::mutex> lock(log_mutex);
-
+int destPort = 443;
+std::string hostIP;
 	if (bytes < 0) {
     	std::cerr << "Error Recieving from Client" << "\n";
 		close(client_fd);
@@ -192,16 +194,35 @@ std::lock_guard<std::mutex> lock(log_mutex);
 		// if GET or HEAD
 		//extract host:
 		std::string hostname;
-		auto it = header_map.find("Host");
-		
-		if (it != header_map.end()) {
-			hostname = it->second;
-			std::cout << "Client requested host: " << hostname << "\n";
+		std::string hostHeader;
+		if (header_map.find("Host") != header_map.end()) {
+			hostHeader = header_map["Host"];
 		} else {
 			std::cerr << "Host header not found!\n";
-			// Optionally respond with 400 Bad Request
+			sendHttpResponse(client_fd, 400, "Bad Request", "400 Bad Request: Host header missing.\n");
+			close(client_fd);
+			return;
 		}
-		std::cout << "HostName" << hostname << "\n";
+
+		// Extract hostname and optional port
+		size_t colonPos = hostHeader.find(':');
+		if (colonPos != std::string::npos) {
+			hostname = hostHeader.substr(0, colonPos);
+			std::string portStr = hostHeader.substr(colonPos + 1);
+			try {
+				destPort = std::stoi(portStr);
+			} catch (...) {
+				std::cerr << "Invalid port in Host header: " << portStr << "\n";
+				sendHttpResponse(client_fd, 400, "Bad Request", "400 Bad Request: Invalid port.\n");
+				close(client_fd);
+				return;
+			}
+		} else {
+			hostname = hostHeader; // no port specified
+		}
+
+		std::cout << "Hostname: " << hostname << "\n";
+		std::cout << "Port: " << destPort << "\n";	
 		
 		// 	check if the destination is within the fordbidden list 
 		// note host name can be an IP address, if it's an IP Address make sure it's a valid IP 
@@ -219,7 +240,7 @@ std::lock_guard<std::mutex> lock(log_mutex);
 			}else{
 				//if the host name is a string resolve to get IP
 				if(!isValidIP(hostname)){
-					std::string hostIP = resolveHostnameToIP(hostname);
+					hostIP = resolveHostnameToIP(hostname);
 					if(hostIP.empty()){ 	
 					// if unable to resolve the domain name:
 						sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Bad Gateway.\n");
@@ -236,11 +257,12 @@ std::lock_guard<std::mutex> lock(log_mutex);
 					}
 				}
 				//now that we have extracted the ip, create a TCP Connection with the server 
-				int serverConnect = createTCPConnection(const std::string& ip, int port)
+				int serverConnect = createTCPConnection(hostIP, destPort);
 				//if unable to connec to server
 				if(serverConnect < 0){
 					//send error message to client
 					sendHttpResponse(client_fd, 504, "Gateway Timeout", "504- Gateway Timedout.\n");
+					return;
 				}
 				//Note steps, setting connection to host
 			}
