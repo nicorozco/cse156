@@ -25,7 +25,7 @@
 std::mutex log_mutex;
 void initialize_ssl();
 std::string currentTimestamp();
-void handleRequest(std::string filename,const std::unordered_set<std::string>& forbiddenSet,int client_fd,struct sockaddr_in clientAddr);
+void handleRequest(std::string filename,const std::unordered_set<std::string>& forbiddenSet,int client_fd,struct sockaddr_in clientAddr,SSL_CTX* ctx);
 std::string getClientIP(struct sockaddr_in clientAddr);
 std::unordered_set<std::string> loadForbiddenHosts(const std::string& filename);
 bool isForbidden(const std::string& hostname, const std::unordered_set<std::string>& forbidden);
@@ -127,14 +127,15 @@ if (!ctx) {
 			logFile,
 			std::ref(forbiddenSet), 
 			client_fd,
-			clientAddr)
+			clientAddr,
+			ctx)
 			.detach();  // non-blocking
 	}
 	return 0;
 }
 
 //______________________________________________ Functions Definition  _________________________________________
-void handleRequest(std::string filename,const std::unordered_set<std::string>& forbiddenSet, int client_fd,struct sockaddr_in clientAddr){
+void handleRequest(std::string filename,const std::unordered_set<std::string>& forbiddenSet, int client_fd,struct sockaddr_in clientAddr,SSL_CTX* ctx){
 char buffer[1024] = {0};
 ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
 std::string method,path,version;
