@@ -281,13 +281,17 @@ std::string hostIP;
 				//2.) Bind SSL Object to socket
 				SSL_set_fd(ssl,server_fd);
 				//3.) Perform SSL Handshake
-				if(SSL_accept(ssl) <= 0){
+				if(SSL_connect(ssl) <= 0){
 					ERR_print_errors_fp(stderr);
-				}else{
-					//start reading & writing in SSL
-					//SSL_write() securely send data from server
-					//SSL_read() securely recieved data from server
+					close(server_fd);
+					SSL_free(ssl);
+					return;
 				}
+				//write http request to server
+				std::cout << "SSL Connection Established" << "\n";
+				//start reading & writing in SSL
+				//SSL_write() securely send data from server
+				//SSL_read() securely recieved data from server
 			}
 		}
 	}else{
