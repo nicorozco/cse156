@@ -13,6 +13,7 @@
 #include <thread>         
 #include <fstream>
 #include <mutex>
+#include <regex>
 std::mutex log_mutex;
 std::string currentTimestamp();
 void handleRequest(const std::string& filename,int client_fd,struct sockaddr_in clientAddr);
@@ -115,8 +116,6 @@ std::lock_guard<std::mutex> lock(log_mutex);
 		std::cerr << "Failed to open access.log for writing." << std::endl;
 		return;
 	}
-	
-
 	// parse HTTP message
 	std::string request(buffer,bytes);
 	size_t headers_end = request.find("\r\n\r\n");
@@ -130,9 +129,7 @@ std::lock_guard<std::mutex> lock(log_mutex);
     	close(client_fd);
     	return;
 	}
-
 	std::string request_line = request.substr(0, line_end);
-
 	// 2. Now safely parse the request line
 	std::istringstream request_line_stream(request_line);
 	request_line_stream >> method >> path >> version;
@@ -160,24 +157,30 @@ std::lock_guard<std::mutex> lock(log_mutex);
 		current = next + 2;
 	}
 	
-
 	//print to log file 
 	file << currentTimestamp() << clientIP << "\n";
-	// check if GET/HEAD
-	// if GET or HEAD
-	// 	check if the destination is within the fordbidden list 
-		// if within the forbiden list 
-		// send 403 forbidden message
+	std::regex method_regex(R"(^\s*(GET|HEAD)\s*$)", std::regex_constants::icase);
+	std::cout << "Method" << method << "\n";
+	if (std::regex_search(method, method_regex)) {
+		// Valid method: GET or HEAD
+		std::cout << "Request method is GET or HEAD\n";	
+		// if GET or HEAD
+		// 	check if the destination is within the fordbidden list 
+			// if within the forbiden list 
+			// send 403 forbidden message
 
-		// if not in the fodbiden list 
-			// resolve domain name utilize dns function 
-				// if unable to resolve the domain name:
-					// "Return 502 Bad Gateway Message back to client 
-				// if able to resolve:
-					// send HTTP Request Message through SSL
-						// add header to HTTP Request
-						// 	
+			// if not in the fodbiden list 
+				// resolve domain name utilize dns function 
+					// if unable to resolve the domain name:
+						// "Return 502 Bad Gateway Message back to client 
+					// if able to resolve:
+						// send HTTP Request Message through SSL
+							// add header to HTTP Request
+							// 	
 
+	}else{
+		std::cout << "Unsupported HTTP method\n";
+	}
 }
 std::string currentTimestamp(){
     auto now = std::chrono::system_clock::now();
