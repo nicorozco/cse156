@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <sstream>
 #include <iomanip>
+#include <netdb.h>
 #include <string>
 #include <iostream>
 #include <iostream>        
@@ -23,6 +24,9 @@ std::string getClientIP(struct sockaddr_in clientAddr);
 std::unordered_set<std::string> loadForbiddenHosts(const std::string& filename);
 bool isForbidden(const std::string& hostname, const std::unordered_set<std::string>& forbidden);
 void sendHttpResponse(int clientSocket, int statusCode, const std::string& reasonPhrase, const std::string& body);
+std::string resolveHostnameToIP(const std::string& hostname);
+std::string reverseDNSLookup(const std::string& ip); 
+
 
 int main(int argc, char* argv[]){
 std::string listenPort;
@@ -181,6 +185,7 @@ std::lock_guard<std::mutex> lock(log_mutex);
 		//extract host:
 		std::string hostname;
 		auto it = header_map.find("Host");
+		
 		if (it != header_map.end()) {
 			hostname = it->second;
 			std::cout << "Client requested host: " << hostname << "\n";
@@ -188,18 +193,21 @@ std::lock_guard<std::mutex> lock(log_mutex);
 			std::cerr << "Host header not found!\n";
 			// Optionally respond with 400 Bad Request
 		}
-	
+		
 		// 	check if the destination is within the fordbidden list 
 			// if within the forbiden list 
+		if(isForbidden(hostname, forbiddenSet)){
 			// send 403 forbidden message
-
-			// if not in the fodbiden list 
+			sendHttpResponse(client_fd, 403, "Forbidden", "403 Forbidden: Access Denied.\n");
+			return;
+		}else{
 				// resolve domain name utilize dns function 
 					// if unable to resolve the domain name:
 						// "Return 502 Bad Gateway Message back to client 
 					// if able to resolve:
 						// send HTTP Request Message through SSL
 							// add header to HTTP Request
+		}
 	}else{
 		std::cout << "Unsupported HTTP method\n";
 		sendHttpResponse(client_fd, 501, "Not Implemented", "501 - Not Implemented\n");
@@ -256,3 +264,43 @@ bool isForbidden(const std::string& hostname, const std::unordered_set<std::stri
     std::transform(lowerHost.begin(), lowerHost.end(), lowerHost.begin(), ::tolower);
     return forbidden.find(lowerHost) != forbidden.end();
 }
+
+std::string resolveHostnameToIP(const std::string& hostname) {
+    struct addrinfo hints{}, *res;
+    hints.ai_family = AF_UNSPEC;  // IPv4 only. Use AF_UNSPEC for IPv4/IPv6
+    hints.ai_socktype = SOCK_STREAM;  // TCP
+
+    int result = getaddrinfo(hostname.c_str(), nullptr, &hints, &res);
+    if (result != 0) {
+        std::cerr << "DNS resolution failed: " << gai_strerror(result) << std::endl;
+        return "";
+    }
+
+    char ipStr[INET_ADDRSTRLEN];
+    void* addrPtr = &((struct sockaddr_in*)res->ai_addr)->sin_addr;
+
+    inet_ntop(AF_INET, addrPtr, ipStr, sizeof(ipStr));
+    freeaddrinfo(res);  // Clean up
+
+    return std::string(ipStr);
+}
+std::string reverseDNSLookup(const std::string& ip) {
+    struct sockaddr_in sa;
+    char host[NI_MAXHOST];
+
+    memset(&sa, 0, sizeof(sa));
+    sa.sin_family = AF_INET;
+    inet_pton(AF_INET, ip.c_str(), &sa.sin_addr);
+
+    int result = getnameinfo((struct sockaddr*)&sa, sizeof(sa),
+                             host, sizeof(host),
+                             nullptr, 0, NI_NAMEREQD);
+
+    if (result != 0) {
+        std::cerr << "Reverse DNS lookup failed: " << gai_strerror(result) << std::endl;
+        return "";
+    }
+
+    return std::string(host);
+}
+
