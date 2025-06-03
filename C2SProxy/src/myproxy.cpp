@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 #include <typeinfo>
 #include <sstream>
 #include <iomanip>
@@ -20,6 +22,7 @@
 #include <regex>
 //______________________________________________ Functions Decleration  _________________________________________
 std::mutex log_mutex;
+void initialize_ssl();
 std::string currentTimestamp();
 void handleRequest(std::string filename,const std::unordered_set<std::string>& forbiddenSet,int client_fd,struct sockaddr_in clientAddr);
 std::string getClientIP(struct sockaddr_in clientAddr);
@@ -38,6 +41,7 @@ std::string listenPort;
 std::string forbiddenFile;
 std::string logFile;
 int port;
+initialize_ssl();
 struct sockaddr_in clientAddr;
 socklen_t addrlen = sizeof(clientAddr);
 
@@ -354,4 +358,9 @@ void printForbiddenSet(const std::unordered_set<std::string>& forbiddenSet) {
 bool isValidIP(const std::string& ip) {
     std::regex ipv4Regex(R"(^(\d{1,3}\.){3}\d{1,3}$)");
     return std::regex_match(ip, ipv4Regex);
+}
+void initialize_ssl() {
+    SSL_library_init();              // Initializes OpenSSL
+    SSL_load_error_strings();       // Error strings for error messages
+    OpenSSL_add_all_algorithms();   // Load encryption algorithms
 }
