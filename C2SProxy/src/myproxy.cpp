@@ -29,6 +29,7 @@ int resolveHostnameToIP(const std::string& hostname);
 std::string reverseDNSLookup(const std::string& ip); 
 bool isValidIP(const std::string& ip);
 bool isValidHost(const std::string& hostname);
+void printForbiddenSet(const std::unordered_set<std::string>& forbiddenSet);
 //_______________________________________________ Main ____________________________________________
 
 int main(int argc, char* argv[]){
@@ -197,14 +198,19 @@ std::lock_guard<std::mutex> lock(log_mutex);
 			std::cerr << "Host header not found!\n";
 			// Optionally respond with 400 Bad Request
 		}
+		std::cout << "HostName" << hostname << "\n";
 		
 		// 	check if the destination is within the fordbidden list 
 		// note host name can be an IP address, if it's an IP Address make sure it's a valid IP 
 		// make sure the hostname is valid before checking if it's in the fordbidden list 
+		std::cout << "Valid HostName " << isValidHost(hostname) << "\n";
+		std::cout << "Valid Host IP "<< isValidIP(hostname) << "\n";
 		if((isValidHost(hostname) == true) || (isValidIP(hostname) == true)){
 			//if within the forbiden list 
+			std::cout << "Web Host is Fordbidden "<< isForbidden(hostname, forbiddenSet) << "\n";
 			if(isForbidden(hostname, forbiddenSet)){
 				// send 403 forbidden message
+				std::cout << "Web Host is Fordbidden " << "\n";
 				sendHttpResponse(client_fd, 403, "Forbidden", "403 Forbidden: Access Denied.\n");
 				return;
 			}else{
@@ -231,7 +237,7 @@ std::lock_guard<std::mutex> lock(log_mutex);
 					}else{
 						// send HTTP Request Message through SSL
 						// add header to HTTP Request
-						}
+					}
 				}
 			}
 		}
@@ -344,7 +350,12 @@ bool isValidHost(const std::string& hostname){
 	return std::regex_match(hostname, pattern);
 }
 
-
+void printForbiddenSet(const std::unordered_set<std::string>& forbiddenSet) {
+    std::cout << "Forbidden Set Contents:\n";
+    for (const std::string& entry : forbiddenSet) {
+        std::cout << " - " << entry << '\n';
+    }
+}
 
 
 
