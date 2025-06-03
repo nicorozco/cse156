@@ -200,31 +200,41 @@ std::lock_guard<std::mutex> lock(log_mutex);
 		}
 		
 		// 	check if the destination is within the fordbidden list 
-			// if within the forbiden list 
-		if(isForbidden(hostname, forbiddenSet)){
-			// send 403 forbidden message
-			sendHttpResponse(client_fd, 403, "Forbidden", "403 Forbidden: Access Denied.\n");
-			return;
-		}else{
+		// note host name can be an IP address, if it's an IP Address make sure it's a valid IP 
+		// make sure the hostname is valid before checking if it's in the fordbidden list 
+		if(isValidHost(hostname)) || isValidIP(hostname){
+			//if within the forbiden list 
+			if(isForbidden(hostname, forbiddenSet)){
+				// send 403 forbidden message
+				sendHttpResponse(client_fd, 403, "Forbidden", "403 Forbidden: Access Denied.\n");
+				return;
+			}else{
 				//if the host name is a string resolve to get IP
 				//use regex to ensure the hostname is a valid hostname and ip
-				if (typeid(hostname).name() == typeid(std::string).name()){ 
+				if (isValidHost(hostname)){
 					int hostIP = resolveHostnameToIP(hostname);
 					//resolve domain name utilize dns function 
 					if(host == 0){ 	
 					// if unable to resolve the domain name:
-						// "Return 502 Bad Gateway Message back to client 
+					//"Return 502 Bad Gateway Message back to client 
 						sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Bad Gateway.\n");
 						return;
-					} 
-				}else{
-				//if the host name is a IP, find the host to be able to send the request 
-
-					// if able to resolve:
+					}
+				}
+				//else we could have an IP as the host name  
+				if(isValidIP(hostname){
+					//resolve the ip
+					std::string hostResolved= reverseDNSLookup(hostname)
+					// if unable to resolve:
+					if(hostResolved.empty()){
+						sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Bad Gateway.\n");
+                        return;
+					}else{
 						// send HTTP Request Message through SSL
 						// add header to HTTP Request
+						}
 				}
-		
+			}
 		}
 	}else{
 		std::cout << "Unsupported HTTP method\n";
