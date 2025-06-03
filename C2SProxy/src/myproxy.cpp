@@ -43,7 +43,7 @@ socklen_t addrlen = sizeof(clientAddr);
             return 1;
         }
     }
-	
+	std::unordered_set<std::string> forbiddenSet = loadForbiddenHosts(forbiddenFile);
 
     // Debug output to check parsed values
     //std::cout << "Listen Port: " << listenPort << "\n";
@@ -101,7 +101,7 @@ socklen_t addrlen = sizeof(clientAddr);
 	return 0;
 }
 
-void handleRequest(const std::string& filename, std::string forbiddenFile, int client_fd,struct sockaddr_in clientAddr){
+void handleRequest(const std::string& filename,const std::unordered_set<std::string>& forbiddenSet, int client_fd,struct sockaddr_in clientAddr){
 char buffer[1024] = {0};
 ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
 std::string method,path,version;
@@ -168,6 +168,17 @@ std::lock_guard<std::mutex> lock(log_mutex);
 		// Valid method: GET or HEAD
 		std::cout << "Request method is GET or HEAD\n";	
 		// if GET or HEAD
+		//extract host:
+		std::string hostname;
+		auto it = header_map.find("Host");
+		if (it != header_map.end()) {
+			hostname = it->second;
+			std::cout << "Client requested host: " << hostname << "\n";
+		} else {
+			std::cerr << "Host header not found!\n";
+			// Optionally respond with 400 Bad Request
+		}
+		if ( 
 		// 	check if the destination is within the fordbidden list 
 			// if within the forbiden list 
 			// send 403 forbidden message
