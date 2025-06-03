@@ -46,6 +46,15 @@ int port;
 initialize_ssl();
 struct sockaddr_in clientAddr;
 socklen_t addrlen = sizeof(clientAddr);
+// Create an SSL context
+const SSL_METHOD* method = TLS_server_method();  // for server; use TLS_client_method() for clients
+SSL_CTX* ctx = SSL_CTX_new(method);
+if (!ctx) {
+        ERR_print_errors_fp(stderr);
+        exit(EXIT_FAILURE);
+ 	}
+
+
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -257,14 +266,27 @@ std::string hostIP;
 					}
 				}
 				//now that we have extracted the ip, create a TCP Connection with the server 
-				int serverConnect = createTCPConnection(hostIP, destPort);
+				int server_fd = createTCPConnection(hostIP, destPort);
 				//if unable to connec to server
-				if(serverConnect < 0){
+				if(server_fd < 0){
 					//send error message to client
 					sendHttpResponse(client_fd, 504, "Gateway Timeout", "504- Gateway Timedout.\n");
 					return;
 				}
-				//Note steps, setting connection to host
+				//connection is set up 
+				// Setting up SSL
+				// 1.) Create SSL Object for specific connection
+				SSL* ssl = SSL_new(ctx);
+				//2.) Bind SSL Object to socket
+				SSL_set_fd(ssl,server_fd);
+				//3.) Perform SSL Handshake
+				if(SSL_accept(ssl) <= 0){
+					ERR_print_errors_fp(stderr);
+				}else{
+					//start reading & writing in SSL
+					//SSL_write() securely send data from server
+					//SSL_read() securely recieved data from server
+				}
 			}
 		}
 	}else{
