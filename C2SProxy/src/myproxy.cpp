@@ -26,7 +26,7 @@ std::string getClientIP(struct sockaddr_in clientAddr);
 std::unordered_set<std::string> loadForbiddenHosts(const std::string& filename);
 bool isForbidden(const std::string& hostname, const std::unordered_set<std::string>& forbidden);
 void sendHttpResponse(int clientSocket, int statusCode, const std::string& reasonPhrase, const std::string& body);
-int resolveHostnameToIP(const std::string& hostname);
+std::string resolveHostnameToIP(const std::string& hostname);
 std::string reverseDNSLookup(const std::string& ip); 
 bool isValidIP(const std::string& ip);
 bool isValidHost(const std::string& hostname);
@@ -54,10 +54,8 @@ socklen_t addrlen = sizeof(clientAddr);
             std::cerr << "[USAGE]: ./myproxy -p listen-port -a forbidden-site-file -l access-log-file-path " << arg << "\n";
             return 1;
         }
-    }
-	std::cout << "Forbidden File" << forbiddenFile << "\n";
+    }	
 	std::unordered_set<std::string> forbiddenSet = loadForbiddenHosts(forbiddenFile);
-
     // Debug output to check parsed values
     //std::cout << "Listen Port: " << listenPort << "\n";
    	//std::cout << "Forbidden Sites File: " << forbiddenFile << "\n";
@@ -111,7 +109,7 @@ socklen_t addrlen = sizeof(clientAddr);
 		//use thread to handle this request 
     	std::thread(
 			handleRequest, 
-			forbiddenFile,
+			logFile,
 			std::ref(forbiddenSet), 
 			client_fd,
 			clientAddr)
@@ -180,8 +178,6 @@ std::lock_guard<std::mutex> lock(log_mutex);
 		current = next + 2;
 	}
 	
-	//print to log file 
-	file << currentTimestamp() << clientIP << "\n";
 	
 	std::regex method_regex(R"(^\s*(GET|HEAD)\s*$)", std::regex_constants::icase);
 	std::cout << "Method" << method << "\n";
@@ -205,12 +201,11 @@ std::lock_guard<std::mutex> lock(log_mutex);
 		// 	check if the destination is within the fordbidden list 
 		// note host name can be an IP address, if it's an IP Address make sure it's a valid IP 
 		// make sure the hostname is valid before checking if it's in the fordbidden list 
-		std::cout << "Valid HostName " << isValidHost(hostname) << "\n";
-		std::cout << "Valid Host IP "<< isValidIP(hostname) << "\n";
+		//std::cout << "Valid HostName " << isValidHost(hostname) << "\n";
+		//std::cout << "Valid Host IP "<< isValidIP(hostname) << "\n";
 		if((isValidHost(hostname) == true) || (isValidIP(hostname) == true)){
 			//if within the forbiden list 
 			std::cout << "Web Host is Fordbidden "<< isForbidden(hostname, forbiddenSet) << "\n";
-			printForbiddenSet(forbiddenSet);
 			if(isForbidden(hostname, forbiddenSet)){
 				// send 403 forbidden message
 				std::cout << "Web Host is Fordbidden " << "\n";
@@ -220,14 +215,15 @@ std::lock_guard<std::mutex> lock(log_mutex);
 				//if the host name is a string resolve to get IP
 				//use regex to ensure the hostname is a valid hostname and ip
 				if (isValidHost(hostname)){
-					int hostIP = resolveHostnameToIP(hostname);
+					std::string hostIP = resolveHostnameToIP(hostname);
 					//resolve domain name utilize dns function 
-					if(hostIP == 0){ 	
+					if(hostIP.empty()){ 	
 					// if unable to resolve the domain name:
 					//"Return 502 Bad Gateway Message back to client 
 						sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Bad Gateway.\n");
 						return;
 					}
+					std::cout << "Resolved Host to IP " << hostIP << "\n"; 
 				}
 				//else we could have an IP as the host name  
 				if(isValidIP(hostname)){
@@ -309,7 +305,7 @@ bool isForbidden(const std::string& hostname, const std::unordered_set<std::stri
     return forbidden.find(lowerHost) != forbidden.end();
 }
 
-int resolveHostnameToIP(const std::string& hostname) {
+std::string resolveHostnameToIP(const std::string& hostname) {
     struct addrinfo hints{}, *res;
     hints.ai_family = AF_UNSPEC;  // IPv4 only. Use AF_UNSPEC for IPv4/IPv6
     hints.ai_socktype = SOCK_STREAM;  // TCP
@@ -326,7 +322,7 @@ int resolveHostnameToIP(const std::string& hostname) {
     inet_ntop(AF_INET, addrPtr, ipStr, sizeof(ipStr));
     freeaddrinfo(res);  // Clean up
 
-    return std::stoi(ipStr);
+    return std::string(ipStr);
 }
 std::string reverseDNSLookup(const std::string& ip) {
     struct sockaddr_in sa;
