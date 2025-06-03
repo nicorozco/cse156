@@ -18,6 +18,8 @@ std::mutex log_mutex;
 std::string currentTimestamp();
 void handleRequest(const std::string& filename,int client_fd,struct sockaddr_in clientAddr);
 std::string getClientIP(struct sockaddr_in clientAddr);
+std::unordered_set<std::string> loadForbiddenHosts(const std::string& filename);
+bool isForbidden(const std::string& hostname, const std::unordered_set<std::string>& forbidden);
 void sendHttpResponse(int clientSocket, int statusCode, const std::string& reasonPhrase, const std::string& body);
 int main(int argc, char* argv[]){
 std::string listenPort;
@@ -99,7 +101,7 @@ socklen_t addrlen = sizeof(clientAddr);
 	return 0;
 }
 
-void handleRequest(const std::string& filename,int client_fd,struct sockaddr_in clientAddr){
+void handleRequest(const std::string& filename, std::string forbiddenFile, int client_fd,struct sockaddr_in clientAddr){
 char buffer[1024] = {0};
 ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
 std::string method,path,version;
@@ -109,6 +111,7 @@ std::lock_guard<std::mutex> lock(log_mutex);
     	std::cerr << "Error Recieving from Client" << "\n";
 		close(client_fd);
 	}
+	//open forbiddne li
 	//open logfile
 	std::ofstream file(filename,std::ios::app);
 
@@ -212,4 +215,24 @@ void sendHttpResponse(int clientSocket, int statusCode, const std::string& reaso
     if (sent < 0) {
         perror("Failed to send HTTP response");
     }
+}
+std::unordered_set<std::string> loadForbiddenHosts(const std::string& filename) {
+    std::unordered_set<std::string> forbidden;
+    std::ifstream infile(filename);
+    std::string line;
+
+    while (std::getline(infile, line)) {
+        // Remove trailing whitespace or newline
+        line.erase(line.find_last_not_of(" \r\n\t") + 1);
+        std::transform(line.begin(), line.end(), line.begin(), ::tolower); // lowercase
+        forbidden.insert(line);
+    }
+
+    return forbidden;
+}
+
+bool isForbidden(const std::string& hostname, const std::unordered_set<std::string>& forbidden) {
+    std::string lowerHost = hostname;
+    std::transform(lowerHost.begin(), lowerHost.end(), lowerHost.begin(), ::tolower);
+    return forbidden.find(lowerHost) != forbidden.end();
 }
