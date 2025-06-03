@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <netdb.h>
 #include <string>
+#include <algorithm>
 #include <iostream>
 #include <iostream>        
 #include <unistd.h>       
@@ -54,6 +55,7 @@ socklen_t addrlen = sizeof(clientAddr);
             return 1;
         }
     }
+	std::cout << "Forbidden File" << forbiddenFile << "\n";
 	std::unordered_set<std::string> forbiddenSet = loadForbiddenHosts(forbiddenFile);
 
     // Debug output to check parsed values
@@ -208,6 +210,7 @@ std::lock_guard<std::mutex> lock(log_mutex);
 		if((isValidHost(hostname) == true) || (isValidIP(hostname) == true)){
 			//if within the forbiden list 
 			std::cout << "Web Host is Fordbidden "<< isForbidden(hostname, forbiddenSet) << "\n";
+			printForbiddenSet(forbiddenSet);
 			if(isForbidden(hostname, forbiddenSet)){
 				// send 403 forbidden message
 				std::cout << "Web Host is Fordbidden " << "\n";
@@ -283,15 +286,23 @@ std::unordered_set<std::string> loadForbiddenHosts(const std::string& filename) 
     std::string line;
 
     while (std::getline(infile, line)) {
-        // Remove trailing whitespace or newline
-        line.erase(line.find_last_not_of(" \r\n\t") + 1);
-        std::transform(line.begin(), line.end(), line.begin(), ::tolower); // lowercase
+        // Trim trailing whitespace/newlines
+        size_t end = line.find_last_not_of(" \r\n\t");
+        if (end != std::string::npos) {
+            line.erase(end + 1);
+        } else {
+            continue; // skip empty/invalid lines
+        }
+
+        // Convert to lowercase
+        std::transform(line.begin(), line.end(), line.begin(), ::tolower);
+
+        // Insert clean hostname or IP
         forbidden.insert(line);
     }
 
     return forbidden;
 }
-
 bool isForbidden(const std::string& hostname, const std::unordered_set<std::string>& forbidden) {
     std::string lowerHost = hostname;
     std::transform(lowerHost.begin(), lowerHost.end(), lowerHost.begin(), ::tolower);
