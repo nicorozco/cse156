@@ -24,7 +24,7 @@ std::string getClientIP(struct sockaddr_in clientAddr);
 std::unordered_set<std::string> loadForbiddenHosts(const std::string& filename);
 bool isForbidden(const std::string& hostname, const std::unordered_set<std::string>& forbidden);
 void sendHttpResponse(int clientSocket, int statusCode, const std::string& reasonPhrase, const std::string& body);
-std::string resolveHostnameToIP(const std::string& hostname);
+int resolveHostnameToIP(const std::string& hostname);
 std::string reverseDNSLookup(const std::string& ip); 
 
 
@@ -201,9 +201,14 @@ std::lock_guard<std::mutex> lock(log_mutex);
 			sendHttpResponse(client_fd, 403, "Forbidden", "403 Forbidden: Access Denied.\n");
 			return;
 		}else{
+				//if the host name is a string resolve
+				int hostIP = resolveHostnameToIP(hostname);
 				// resolve domain name utilize dns function 
 					// if unable to resolve the domain name:
 						// "Return 502 Bad Gateway Message back to client 
+				//if the host name is a IP, find the host to be able to send the request 
+
+					sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Bad Gateway.\n");
 					// if able to resolve:
 						// send HTTP Request Message through SSL
 							// add header to HTTP Request
@@ -265,7 +270,7 @@ bool isForbidden(const std::string& hostname, const std::unordered_set<std::stri
     return forbidden.find(lowerHost) != forbidden.end();
 }
 
-std::string resolveHostnameToIP(const std::string& hostname) {
+int resolveHostnameToIP(const std::string& hostname) {
     struct addrinfo hints{}, *res;
     hints.ai_family = AF_UNSPEC;  // IPv4 only. Use AF_UNSPEC for IPv4/IPv6
     hints.ai_socktype = SOCK_STREAM;  // TCP
@@ -273,7 +278,7 @@ std::string resolveHostnameToIP(const std::string& hostname) {
     int result = getaddrinfo(hostname.c_str(), nullptr, &hints, &res);
     if (result != 0) {
         std::cerr << "DNS resolution failed: " << gai_strerror(result) << std::endl;
-        return "";
+        return 0;
     }
 
     char ipStr[INET_ADDRSTRLEN];
@@ -282,7 +287,7 @@ std::string resolveHostnameToIP(const std::string& hostname) {
     inet_ntop(AF_INET, addrPtr, ipStr, sizeof(ipStr));
     freeaddrinfo(res);  // Clean up
 
-    return std::string(ipStr);
+    return std::stoi(ipStr);
 }
 std::string reverseDNSLookup(const std::string& ip) {
     struct sockaddr_in sa;
