@@ -47,7 +47,7 @@ initialize_ssl();
 struct sockaddr_in clientAddr;
 socklen_t addrlen = sizeof(clientAddr);
 // Create an SSL context
-const SSL_METHOD* method = TLS_server_method();  // for server; use TLS_client_method() for clients
+const SSL_METHOD* method = TLS_client_method();  // for server; use TLS_client_method() for clients
 SSL_CTX* ctx = SSL_CTX_new(method);
 if (!ctx) {
         ERR_print_errors_fp(stderr);
