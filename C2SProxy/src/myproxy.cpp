@@ -10,17 +10,20 @@
 #include <netinet/in.h>    
 #include <arpa/inet.h>     
 #include <unordered_map>
+#include <unordered_set>
 #include <thread>         
 #include <fstream>
 #include <mutex>
 #include <regex>
+
 std::mutex log_mutex;
 std::string currentTimestamp();
-void handleRequest(const std::string& filename,int client_fd,struct sockaddr_in clientAddr);
+void handleRequest(std::string filename,const std::unordered_set<std::string>& forbiddenSet,int client_fd,struct sockaddr_in clientAddr);
 std::string getClientIP(struct sockaddr_in clientAddr);
 std::unordered_set<std::string> loadForbiddenHosts(const std::string& filename);
 bool isForbidden(const std::string& hostname, const std::unordered_set<std::string>& forbidden);
 void sendHttpResponse(int clientSocket, int statusCode, const std::string& reasonPhrase, const std::string& body);
+
 int main(int argc, char* argv[]){
 std::string listenPort;
 std::string forbiddenFile;
@@ -96,12 +99,18 @@ socklen_t addrlen = sizeof(clientAddr);
 			continue;
 		}
 		//use thread to handle this request 
-    	std::thread(handleRequest, forbiddenFile, client_fd,clientAddr).detach();  // non-blocking
+    	std::thread(
+			handleRequest, 
+			forbiddenFile,
+			std::ref(forbiddenSet), 
+			client_fd,
+			clientAddr)
+			.detach();  // non-blocking
 	}
 	return 0;
 }
 
-void handleRequest(const std::string& filename,const std::unordered_set<std::string>& forbiddenSet, int client_fd,struct sockaddr_in clientAddr){
+void handleRequest(std::string filename,const std::unordered_set<std::string>& forbiddenSet, int client_fd,struct sockaddr_in clientAddr){
 char buffer[1024] = {0};
 ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
 std::string method,path,version;
@@ -162,6 +171,7 @@ std::lock_guard<std::mutex> lock(log_mutex);
 	
 	//print to log file 
 	file << currentTimestamp() << clientIP << "\n";
+	
 	std::regex method_regex(R"(^\s*(GET|HEAD)\s*$)", std::regex_constants::icase);
 	std::cout << "Method" << method << "\n";
 	if (std::regex_search(method, method_regex)) {
@@ -178,7 +188,7 @@ std::lock_guard<std::mutex> lock(log_mutex);
 			std::cerr << "Host header not found!\n";
 			// Optionally respond with 400 Bad Request
 		}
-		if ( 
+	
 		// 	check if the destination is within the fordbidden list 
 			// if within the forbiden list 
 			// send 403 forbidden message
@@ -190,7 +200,6 @@ std::lock_guard<std::mutex> lock(log_mutex);
 					// if able to resolve:
 						// send HTTP Request Message through SSL
 							// add header to HTTP Request
-							// 	
 	}else{
 		std::cout << "Unsupported HTTP method\n";
 		sendHttpResponse(client_fd, 501, "Not Implemented", "501 - Not Implemented\n");
