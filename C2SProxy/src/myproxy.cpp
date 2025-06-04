@@ -552,23 +552,3 @@ std::string getLocalIP(int connectedSockFD) {
         return "";
     }
 }
-int extractHttpStatusCode(const std::string& httpResponse) {
-    std::istringstream responseStream(httpResponse);
-    std::string statusLine;
-
-    if (!std::getline(responseStream, statusLine)) {
-        std::cerr << "Failed to read status line from response\n";
-        return -1;
-    }
-
-    std::istringstream statusLineStream(statusLine);
-    std::string httpVersion;
-    int statusCode;
-
-    if (!(statusLineStream >> httpVersion >> statusCode)) {
-        std::cerr << "Failed to parse HTTP version and status code\n";
-        return -1;
-    }
-
-    return statusCode;
-}
