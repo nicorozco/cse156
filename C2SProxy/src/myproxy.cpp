@@ -364,7 +364,7 @@ std::string statusMessage;
 						}
 						totalBytesSent += sent;
 						//log into file 
-						file << currentTimestamp() << getClientIP(clientAddr) << request_line << statusCode;
+						file << currentTimestamp() << " " <<  getClientIP(clientAddr) << " " << method << hostname << httpVersion << " " << statusCode << " " << totalBytesSent;
 					} else if (bytesRead == 0) {
 						std::cout << "\n[Server closed the connection]\n";
 						break;
