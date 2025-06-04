@@ -333,7 +333,11 @@ std::string hostHeader;
 					int bytesRead = SSL_read(ssl, buffer, sizeof(buffer) - 1);
 					if (bytesRead > 0) {
 						buffer[bytesRead] = '\0';  // Null-terminate
-						std::cout << buffer;       // Output response to stdout or forward to client
+						ssize_t sent = send(client_fd, buffer, bytesRead, 0);
+						if (sent < 0) {
+							perror("Failed to send data back to client");
+							break;
+						}
 					} else if (bytesRead == 0) {
 						std::cout << "\n[Server closed the connection]\n";
 						break;

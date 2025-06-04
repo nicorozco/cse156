@@ -162,7 +162,7 @@ int main (int argc, char* argv[]) {
 		return 7;
 	}
 	
-	// 3.)Intiate a TCP connection to the server (.connect())	
+	// 3.)Intiate a TCP connection to the proxy (.connect())	
 	if (connect(clientSocket,(struct sockaddr*)&serverAddress,sizeof(serverAddress)) < 0){
 		// check for different error:
 		// if connections was sucessful connect returns 0, if error return -1
@@ -212,7 +212,7 @@ int main (int argc, char* argv[]) {
 		// 5.) recived the request (.recv())
 		//Step1: we are going to recieved until headers are complete headers are complete when we find \r\n\r\n
 		while((bytesrecv = recv(clientSocket, buffer, sizeof(buffer),0)) > 0) { 
-			//std::cout << "Recieving Data" << "\n";	
+			std::cout << "Recieving Data from server" << "\n";	
 			// insert chunked data into the vector	
 			
 			if(hOption){
