@@ -146,6 +146,13 @@ int destPort = 443;
 std::string hostIP;
 std::string hostname;
 std::string hostHeader;
+size_t totalBytesSent = 0;
+std::string httpVersion;
+int statusCode;
+std::string statusMessage;
+
+
+
 	if (bytes < 0) {
     	std::cerr << "Error Recieving from Client" << "\n";
 		close(client_fd);
@@ -341,15 +348,10 @@ std::string hostHeader;
 							if (pos != std::string::npos) {
 								std::string statusLine = partialBuffer.substr(0, pos);
 								std::istringstream statusStream(statusLine);
-								std::string httpVersion;
-								int statusCode;
-								std::string statusMessage;
-
 								statusStream >> httpVersion >> statusCode;
 								std::getline(statusStream >> std::ws, statusMessage);
 
 								std::cout << "Status Code: " << statusCode << "\n";
-								std::cout << "Status Message: " << statusMessage << "\n";
 
 								// Mark as parsed
 								statusParsed = true;
@@ -360,8 +362,9 @@ std::string hostHeader;
 							perror("Failed to send data back to client");
 							break;
 						}
+						totalBytesSent += sent;
 						//log into file 
-						file << currentTimestamp() << getClientIP(clientAddr) << request_line ;
+						file << currentTimestamp() << getClientIP(clientAddr) << request_line << statusCode;
 					} else if (bytesRead == 0) {
 						std::cout << "\n[Server closed the connection]\n";
 						break;
