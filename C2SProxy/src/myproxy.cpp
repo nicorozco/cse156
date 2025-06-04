@@ -364,47 +364,51 @@ std::string statusMessage;
 						}
 						totalBytesSent += sent;
 						//log into file 
-						file << currentTimestamp() << " " <<  getClientIP(clientAddr) << " " << method << hostname << httpVersion << " " << statusCode << " " << totalBytesSent;
-					} else if (bytesRead == 0) {
-						std::cout << "\n[Server closed the connection]\n";
-						break;
-					} else {
-						int err = SSL_get_error(ssl, bytesRead);
-						if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE) {
-							continue;  // Retry
-						} else {
-							std::cerr << "SSL_read error: " << ERR_reason_error_string(ERR_get_error()) << "\n";
+						file << currentTimestamp() << " " 
+						<< getClientIP(clientAddr) << " "
+						<< "\"" << method << " " << hostname << " " << httpVersion << "\" "
+						<< statusCode << " " 
+					 	<< totalBytesSent << "\n";
+						} else if (bytesRead == 0) {
+							std::cout << "\n[Server closed the connection]\n";
 							break;
+						} else {
+							int err = SSL_get_error(ssl, bytesRead);
+							if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE) {
+								continue;  // Retry
+							} else {
+								std::cerr << "SSL_read error: " << ERR_reason_error_string(ERR_get_error()) << "\n";
+								break;
+							}
 						}
-					}
-				}		
+					}		
+				}
 			}
+		}else{
+			std::cout << "Unsupported HTTP method\n";
+			sendHttpResponse(client_fd, 501, "Not Implemented", "501 - Not Implemented\n");
 		}
-	}else{
-		std::cout << "Unsupported HTTP method\n";
-		sendHttpResponse(client_fd, 501, "Not Implemented", "501 - Not Implemented\n");
 	}
-}
-std::string currentTimestamp(){
-    auto now = std::chrono::system_clock::now();
-    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
-    std::tm utc_tm = *std::gmtime(&now_c);
+	std::string currentTimestamp(){
+		auto now = std::chrono::system_clock::now();
+		std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+		std::tm utc_tm = *std::gmtime(&now_c);
 
-    std::ostringstream oss;
-    oss << std::put_time(&utc_tm, "%Y-%m-%dT%H:%M:%SZ");
-    return oss.str();
-}
+		std::ostringstream oss;
+		oss << std::put_time(&utc_tm, "%Y-%m-%dT%H:%M:%SZ");
+		return oss.str();
+	}
 
-std::string getClientIP(struct sockaddr_in clientAddr){
-	char ipStr[INET_ADDRSTRLEN];
-	inet_ntop(AF_INET,&(clientAddr.sin_addr), ipStr, INET_ADDRSTRLEN);
-	return std::string(ipStr);
-}
-void sendHttpResponse(int clientSocket, int statusCode, const std::string& reasonPhrase, const std::string& body) {
-    std::string statusLine = "HTTP/1.1 " + std::to_string(statusCode) + " " + reasonPhrase + "\r\n";
+	std::string getClientIP(struct sockaddr_in clientAddr){
+		char ipStr[INET_ADDRSTRLEN];
+		inet_ntop(AF_INET,&(clientAddr.sin_addr), ipStr, INET_ADDRSTRLEN);
+		return std::string(ipStr);
+	}
+	void sendHttpResponse(int clientSocket, int statusCode, const std::string& reasonPhrase, const std::string& body) {
+		std::string statusLine = "HTTP/1.1 " + std::to_string(statusCode) + " " + reasonPhrase + "\r\n";
 
-    std::string headers;
-    headers += "Content-Type: text/plain\r\n";
+		std::string headers;
+		headers += "Content-Type: text/plain\r\n";
     headers += "Content-Length: " + std::to_string(body.size()) + "\r\n";
     headers += "Connection: close\r\n";
     headers += "\r\n";
