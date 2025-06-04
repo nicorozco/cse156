@@ -24,6 +24,7 @@
 //______________________________________________ Functions Decleration  _________________________________________
 std::mutex log_mutex;
 void initialize_ssl();
+int extractHttpStatusCode(const std::string& httpResponse);
 std::string currentTimestamp();
 std::string getLocalIP(int connectedSockFD);
 void handleRequest(std::string filename,const std::unordered_set<std::string>& forbiddenSet,int client_fd,struct sockaddr_in clientAddr,SSL_CTX* ctx);
@@ -157,6 +158,7 @@ std::string hostHeader;
 		std::cerr << "Failed to open access.log for writing." << std::endl;
 		return;
 	}
+
 	// parse HTTP message
 	std::string request(buffer,bytes);
 	size_t headers_end = request.find("\r\n\r\n");
@@ -200,7 +202,7 @@ std::string hostHeader;
 	
 	
 	std::regex method_regex(R"(^\s*(GET|HEAD)\s*$)", std::regex_constants::icase);
-	std::cout << "Method" << method << "\n";
+	std::cout << "Method " << method << "\n";
 	if (std::regex_search(method, method_regex)) {
 		// Valid method: GET or HEAD
 		std::cout << "Request method is GET or HEAD\n";	
@@ -303,15 +305,12 @@ std::string hostHeader;
 
 				// Request line
 				request << "GET " << path << " HTTP/1.1\r\n";
-
 				// Required headers
 				request << "Host: " << hostname << "\r\n";
 				request << "User-Agent: ProxyClient/1.0\r\n";
 				request << "Connection: close\r\n";
-
 				// Add the X-Forwarded-For header
 				request << "X-Forwarded-For: " << clientIP << ", " << proxyIP << "\r\n";
-
 				// End of headers
 				request << "\r\n";
 
@@ -328,16 +327,41 @@ std::string hostHeader;
 					std::cout << "Sent " << bytesSent << " bytes to server.\n";
 				}
 				char buffer[4096];
+				std::string partialBuffer;
+				bool statusParsed = false;
 				//read response from server
 				while (true) {
 					int bytesRead = SSL_read(ssl, buffer, sizeof(buffer) - 1);
-					if (bytesRead > 0) {
+					if (bytesRead > 0){
 						buffer[bytesRead] = '\0';  // Null-terminate
+						if (!statusParsed) {
+							partialBuffer += std::string(buffer, bytesRead);
+
+							size_t pos = partialBuffer.find("\r\n");
+							if (pos != std::string::npos) {
+								std::string statusLine = partialBuffer.substr(0, pos);
+								std::istringstream statusStream(statusLine);
+								std::string httpVersion;
+								int statusCode;
+								std::string statusMessage;
+
+								statusStream >> httpVersion >> statusCode;
+								std::getline(statusStream >> std::ws, statusMessage);
+
+								std::cout << "Status Code: " << statusCode << "\n";
+								std::cout << "Status Message: " << statusMessage << "\n";
+
+								// Mark as parsed
+								statusParsed = true;
+							}
+						}
 						ssize_t sent = send(client_fd, buffer, bytesRead, 0);
 						if (sent < 0) {
 							perror("Failed to send data back to client");
 							break;
 						}
+						//log into file 
+						file << currentTimestamp() << getClientIP(clientAddr) << request_line ;
 					} else if (bytesRead == 0) {
 						std::cout << "\n[Server closed the connection]\n";
 						break;
@@ -521,4 +545,23 @@ std::string getLocalIP(int connectedSockFD) {
         return "";
     }
 }
+int extractHttpStatusCode(const std::string& httpResponse) {
+    std::istringstream responseStream(httpResponse);
+    std::string statusLine;
 
+    if (!std::getline(responseStream, statusLine)) {
+        std::cerr << "Failed to read status line from response\n";
+        return -1;
+    }
+
+    std::istringstream statusLineStream(statusLine);
+    std::string httpVersion;
+    int statusCode;
+
+    if (!(statusLineStream >> httpVersion >> statusCode)) {
+        std::cerr << "Failed to parse HTTP version and status code\n";
+        return -1;
+    }
+
+    return statusCode;
+}
