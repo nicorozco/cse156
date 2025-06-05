@@ -266,11 +266,12 @@ std::string statusMessage;
 				if(isValidIP(hostname)){
 					std::string resolved = reverseDNSLookup(hostname);
 					if (resolved.empty()) {
-						sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Bad Gateway.\n");
-						return;
+						std::cerr << "Reverse DNS lookup failed for IP: " << hostname << "\n";
+						// still use the IP directly, just log the failure
+					} else {
+						std::cout << "Resolved reverse DNS: " << resolved << "\n";
 					}
-					std::cout << "Resolved reverse DNS: " << resolved << "\n";
-					hostIP = hostname;  // No need to resolve again
+					hostIP = hostname;  // proceed regardless of reverse DNS result
 				}else{
 					//It's a hostname — resolve it to IP
 					std::string resolvedIP = resolveHostnameToIP(hostname);
