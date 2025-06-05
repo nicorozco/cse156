@@ -57,9 +57,6 @@ if (!ctx) {
         ERR_print_errors_fp(stderr);
         exit(EXIT_FAILURE);
  	}
-
-
-
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
 
@@ -74,7 +71,7 @@ if (!ctx) {
             return 1;
         }
     }	
-	std::unordered_set<std::string> forbiddenSet = loadForbiddenHosts(forbiddenFile);
+	std::unordered_set<std::string> forbiddenSet = loadForbiddenHosts(forbiddenFile);//load the forbidden sites into a set
     // Debug output to check parsed values
     //std::cout << "Listen Port: " << listenPort << "\n";
    	//std::cout << "Forbidden Sites File: " << forbiddenFile << "\n";
@@ -115,7 +112,6 @@ if (!ctx) {
 
     std::cout << "Server listening on port " << port << "...\n";
 
-	
 	while (true) {
 
 		//create fd for connection made 
@@ -181,7 +177,8 @@ std::string statusMessage;
 	if (line_end == std::string::npos) {
     	std::cerr << "Malformed HTTP request: no line break\n";
     	close(client_fd);
-    	return;
+		sendHttpResponse(client_fd, 400, "Bad Request", "400 - Malformed request line.\n");
+		statusCode = 400;
 	}
 	std::string request_line = request.substr(0, line_end);
 	// 2. Now safely parse the request line
@@ -191,12 +188,12 @@ std::string statusMessage;
 	if (headers_end == std::string::npos){
 		sendHttpResponse(client_fd, 400, "Bad Request", "400 - Malformed request line.\n");
 		close(client_fd);
-		return;
+    	statusCode = 400;
 	}
-	if (method.empty() || path.empty() || httpVersion.empty()) {
+	if (method.empty() || path.empty() || version.empty()) {
     	sendHttpResponse(client_fd, 400, "Bad Request", "400 - Malformed request line.\n");
-    	close(client_fd);
-		return;
+		close(client_fd);
+    	statusCode = 400;
 	}
 	//parse individual header
 	std::unordered_map<std::string, std::string> header_map;
@@ -216,7 +213,6 @@ std::string statusMessage;
 		current = next + 2;
 	}
 	
-	
 	std::regex method_regex(R"(^\s*(GET|HEAD)\s*$)", std::regex_constants::icase);
 	std::cout << "Method " << method << "\n";
 	if (std::regex_search(method, method_regex)) {
@@ -230,7 +226,7 @@ std::string statusMessage;
 			std::cerr << "Host header not found!\n";
 			sendHttpResponse(client_fd, 400, "Bad Request", "400 Bad Request: Host header missing.\n");
 			close(client_fd);
-			return;
+    		statusCode = 400;
 		}
 
 		// Extract hostname and optional port
@@ -244,7 +240,6 @@ std::string statusMessage;
 				std::cerr << "Invalid port in Host header: " << portStr << "\n";
 				sendHttpResponse(client_fd, 400, "Bad Request", "400 Bad Request: Invalid port.\n");
 				close(client_fd);
-				return;
 			}
 		} else {
 			hostname = hostHeader; // no port specified
@@ -260,12 +255,11 @@ std::string statusMessage;
 		//std::cout << "Valid Host IP "<< isValidIP(hostname) << "\n";
 		if(isValidHost(hostname) == true){
 			//if within the forbiden list 
-			std::cout << "Web Host is Fordbidden "<< isForbidden(hostname, forbiddenSet) << "\n";
 			if(isForbidden(hostname, forbiddenSet)){
 				// send 403 forbidden message
 				std::cout << "Web Host is Fordbidden " << "\n";
 				sendHttpResponse(client_fd, 403, "Forbidden", "403 Forbidden: Access Denied.\n");
-				return;
+				statusCode = 403;
 			}else{
 				//if the host name is an IP, find the hostname 
 				if(isValidIP(hostname)){
@@ -283,7 +277,7 @@ std::string statusMessage;
 					std::cout << "Resolved host to IP: " << resolvedIP << "\n";
 					if ((resolvedIP.empty() || resolvedIP.find_first_not_of(" \t\r\n") == std::string::npos)) {
 						sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Could not resolve hostname.\n");
-						return;
+						statusCode = 502;
 					}
 						std::cout << "Resolved host to IP: " << resolvedIP << "\n";
 						hostIP = resolvedIP;	
@@ -294,7 +288,6 @@ std::string statusMessage;
 				if(!ssl){
 					ERR_print_errors_fp(stderr);
 					cleanupConnection(client_fd,-1,nullptr);
-					return;
 				}
 
 				//now that we have extracted the ip, create a TCP Connection with the server 
@@ -304,7 +297,7 @@ std::string statusMessage;
 					//send error message to client
 					sendHttpResponse(client_fd, 504, "Gateway Timeout", "504- Gateway Timedout.\n");
 					cleanupConnection(client_fd,-1,ssl); //if error setting up TCP conenction clean
-					return;
+    				statusCode = 504;
 				}
 				std::string proxyIP = getLocalIP(server_fd);
 				if(proxyIP.empty()){
@@ -383,13 +376,6 @@ std::string statusMessage;
 							break;
 						}
 						totalBytesSent += sent;
-						std::lock_guard<std::mutex> lock(logMutex);
-						//log into file 
-						file << currentTimestamp() << " " 
-						<< getClientIP(clientAddr) << " "
-						<< "\"" << method << " " << hostname << " " << httpVersion << "\" "
-						<< statusCode << " " 
-					 	<< totalBytesSent << "\n";
 						} else if (bytesRead == 0) {
 							std::cout << "\n[Server closed the connection]\n";
 							break;
@@ -408,9 +394,17 @@ std::string statusMessage;
 		}else{
 			std::cout << "Unsupported HTTP method\n";
 			sendHttpResponse(client_fd, 501, "Not Implemented", "501 - Not Implemented\n");
+			statusCode = 501;
 		}
 		
-		//SSL Connection CleanUp 
+		//SSL Connection CleanUp & File Loggign
+		std::lock_guard<std::mutex> lock(logMutex);
+    file << currentTimestamp() << " "
+         << getClientIP(clientAddr) << " "
+         << "\"" << method << " " << hostname << " " << httpVersion << "\" "
+         << statusCode << " "
+         << totalBytesSent << "\n";
+ 
 		cleanupConnection(client_fd,server_fd,ssl);
 }
 std::string currentTimestamp(){
