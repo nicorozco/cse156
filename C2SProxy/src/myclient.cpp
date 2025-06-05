@@ -42,6 +42,7 @@ int main (int argc, char* argv[]) {
 	std::string proxyIP;
 	std::string proxyPortStr;
 	bool hOption = false;
+	bool pOption = false;
 	char buffer[4096];
 	std::string ip, path;
 	path = "/";
@@ -77,6 +78,11 @@ int main (int argc, char* argv[]) {
 			proxyIP = argv[1];
 			proxyPortStr = argv[2];
 			url = argv[3];	
+		}else if (flag == "-p"){
+			pOption = true;
+            proxyIP = argv[1];
+            proxyPortStr = argv[2];
+ 	        url = argv[3];
 		}else{
 			std::cerr << "Error: '-h' flag must be in the correct position (the last argument)."<< "\n";
 			return 11;
@@ -196,6 +202,8 @@ int main (int argc, char* argv[]) {
 		//  4a.) if the h option is set the http request METHOD TO head
 			httpRequest = "HEAD " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "X-UCSC-Student-ID: norozco6 \r\n" + "Connection: close\r\n" +"\r\n";
 			//std::cout << httpRequest << "\n";
+		} else if (pOption) {
+			  httpRequest = "PUT " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "X-UCSC-Student-ID: norozco6 \r\n" + "Connection: close\r\n" +"\r\n";
 		}else{
 		
 			// 4b.) else use the regular GET METHOD
