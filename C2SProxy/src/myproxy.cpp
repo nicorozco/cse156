@@ -22,12 +22,11 @@
 #include <mutex>
 #include <regex>
 //______________________________________________ Functions Decleration  _________________________________________
-std::mutex log_mutex;
 void initialize_ssl();
 int extractHttpStatusCode(const std::string& httpResponse);
 std::string currentTimestamp();
 std::string getLocalIP(int connectedSockFD);
-void handleRequest(std::string filename,const std::unordered_set<std::string>& forbiddenSet,int client_fd,struct sockaddr_in clientAddr,SSL_CTX* ctx);
+void handleRequest(std::string filename,const std::unordered_set<std::string>& forbiddenSet,int client_fd,struct sockaddr_in clientAddr,SSL_CTX* ctx,std::mutex& logMutex);
 std::string getClientIP(struct sockaddr_in clientAddr);
 std::unordered_set<std::string> loadForbiddenHosts(const std::string& filename);
 bool isForbidden(const std::string& hostname, const std::unordered_set<std::string>& forbidden);
@@ -41,6 +40,7 @@ int createTCPConnection(const std::string& ip, int port);
 //_______________________________________________ Main ____________________________________________
 
 int main(int argc, char* argv[]){
+std::mutex logMutex;
 std::string listenPort;
 std::string forbiddenFile;
 std::string logFile;
@@ -130,18 +130,19 @@ if (!ctx) {
 			std::ref(forbiddenSet), 
 			client_fd,
 			clientAddr,
-			ctx)
+			ctx,
+			std::ref(logMutex)
+			)
 			.detach();  // non-blocking
 	}
 	return 0;
 }
 
 //______________________________________________ Functions Definition  _________________________________________
-void handleRequest(std::string filename,const std::unordered_set<std::string>& forbiddenSet, int client_fd,struct sockaddr_in clientAddr,SSL_CTX* ctx){
+void handleRequest(std::string filename,const std::unordered_set<std::string>& forbiddenSet, int client_fd,struct sockaddr_in clientAddr,SSL_CTX* ctx,std::mutex& logMutex){
 char buffer[1024] = {0};
 ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
 std::string method,path,version;
-std::lock_guard<std::mutex> lock(log_mutex);
 int destPort = 443;
 std::string hostIP;
 std::string hostname;
@@ -363,6 +364,7 @@ std::string statusMessage;
 							break;
 						}
 						totalBytesSent += sent;
+						std::lock_guard<std::mutex> lock(logMutex);
 						//log into file 
 						file << currentTimestamp() << " " 
 						<< getClientIP(clientAddr) << " "
