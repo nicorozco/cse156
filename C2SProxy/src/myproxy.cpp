@@ -294,6 +294,13 @@ std::string statusMessage;
 				// Setting up SSL
 				// 1.) Create SSL Object for specific connection
 				SSL* ssl = SSL_new(ctx);
+				//Error Handling:
+				if(!ssl){
+					ERR_print_errors_fp(stderr);
+					close(client_fd);
+					return;
+				}
+
 				//2.) Bind SSL Object to socket
 				SSL_set_fd(ssl,server_fd);
 				//3.) Perform SSL Handshake
@@ -383,6 +390,10 @@ std::string statusMessage;
 								break;
 							}
 						}
+						//SSL Connection CleanUp 
+						SSL_shutdown(ssl); //Graceful shutdown
+						SSL_free(ssl); //Free SSL Structure
+						close(client_fd); // close the client socket
 					}		
 				}
 			}
@@ -391,7 +402,7 @@ std::string statusMessage;
 			sendHttpResponse(client_fd, 501, "Not Implemented", "501 - Not Implemented\n");
 		}
 	}
-	std::string currentTimestamp(){
+std::string currentTimestamp(){
 		auto now = std::chrono::system_clock::now();
 		std::time_t now_c = std::chrono::system_clock::to_time_t(now);
 		std::tm utc_tm = *std::gmtime(&now_c);
