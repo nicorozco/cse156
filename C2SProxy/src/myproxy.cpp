@@ -21,6 +21,7 @@
 #include <fstream>
 #include <mutex>
 #include <regex>
+#include <fcntl.h> 
 //______________________________________________ Functions Decleration  _________________________________________
 void initialize_ssl();
 int extractHttpStatusCode(const std::string& httpResponse);
@@ -273,12 +274,13 @@ std::string statusMessage;
 				}else{
 					//It's a hostname — resolve it to IP
 					std::string resolvedIP = resolveHostnameToIP(hostname);
-					if (resolvedIP.empty()) {
+					std::cout << "Resolved host to IP: " << resolvedIP << "\n";
+					if ((resolvedIP.empty() || resolvedIP.find_first_not_of(" \t\r\n") == std::string::npos)) {
 						sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Could not resolve hostname.\n");
 						return;
 					}
 						std::cout << "Resolved host to IP: " << resolvedIP << "\n";
-					hostIP = resolvedIP;
+						hostIP = resolvedIP;	
 				}
 				// 1.) Create SSL Object for specific connection
 				//Error Handling:
@@ -527,33 +529,76 @@ void initialize_ssl() {
     OpenSSL_add_all_algorithms();   // Load encryption algorithms
 }
 int createTCPConnection(const std::string& ip, int port) {
-    int sockfd = socket(AF_INET, SOCK_STREAM, 0);  // TCP socket
+int sockfd = socket(AF_INET, SOCK_STREAM, 0);  // TCP socket
     if (sockfd < 0) {
         perror("Socket creation failed");
         return -1;
     }
 
-    struct sockaddr_in serverAddr;
-    std::memset(&serverAddr, 0, sizeof(serverAddr));
+    // Set socket to non-blocking
+    int flags = fcntl(sockfd, F_GETFL, 0);
+    if (flags < 0 || fcntl(sockfd, F_SETFL, flags | O_NONBLOCK) < 0) {
+        perror("Failed to set non-blocking mode");
+        close(sockfd);
+        return -1;
+    }
 
+    struct sockaddr_in serverAddr {};
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(port);  // Convert port to network byte order
-
+    serverAddr.sin_port = htons(port);
     if (inet_pton(AF_INET, ip.c_str(), &serverAddr.sin_addr) <= 0) {
-        perror("Invalid address / Address not supported");
+        perror("Invalid IP address");
         close(sockfd);
         return -1;
     }
 
-    if (connect(sockfd, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
-        perror("Connection to server failed");
+    // Begin non-blocking connect
+    int result = connect(sockfd, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
+    if (result < 0 && errno != EINPROGRESS) {
+        perror("Immediate connection error");
         close(sockfd);
         return -1;
     }
 
-    std::cout << "Connected to " << ip << ":" << port << "\n";
+    // Wait for connect to complete using select()
+    fd_set wfds;
+    FD_ZERO(&wfds);
+    FD_SET(sockfd, &wfds);
+    struct timeval tv;
+    tv.tv_sec = 5;  // 5-second timeout
+    tv.tv_usec = 0;
+
+    result = select(sockfd + 1, nullptr, &wfds, nullptr, &tv);
+    if (result <= 0) {
+        perror("Connection timeout or select error");
+        close(sockfd);
+        return -1;
+    }
+
+    // Check if the connection was successful
+    int so_error = 0;
+    socklen_t len = sizeof(so_error);
+    if (getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &so_error, &len) < 0) {
+        perror("getsockopt failed");
+        close(sockfd);
+        return -1;
+    }
+    if (so_error != 0) {
+        std::cerr << "Connection failed: " << strerror(so_error) << "\n";
+        close(sockfd);
+        return -1;
+    }
+
+    // Restore socket to blocking mode
+    if (fcntl(sockfd, F_SETFL, flags) < 0) {
+        perror("Failed to restore blocking mode");
+        close(sockfd);
+        return -1;
+    }
+
     return sockfd;
 }
+
 std::string getLocalIP(int connectedSockFD) {
     struct sockaddr_in localAddr;
     socklen_t addrLen = sizeof(localAddr);
