@@ -24,6 +24,7 @@
 #include <fcntl.h> 
 //______________________________________________ Functions Decleration  _________________________________________
 void initialize_ssl();
+void logRequest(std::ofstream& file, std::mutex& logMutex,const sockaddr_in& clientAddr, const std::string& method,const std::string& hostname, const std::string& httpVersion,int statusCode, int totalBytesSent); 
 int extractHttpStatusCode(const std::string& httpResponse);
 std::string currentTimestamp();
 void cleanupConnection(int client_fd, int server_fd, SSL* ssl);
@@ -179,6 +180,8 @@ std::string statusMessage;
     	close(client_fd);
 		sendHttpResponse(client_fd, 400, "Bad Request", "400 - Malformed request line.\n");
 		statusCode = 400;
+		logRequest(file, logMutex, clientAddr, method, hostname, version, statusCode, totalBytesSent);
+
 	}
 	std::string request_line = request.substr(0, line_end);
 	// 2. Now safely parse the request line
@@ -189,11 +192,15 @@ std::string statusMessage;
 		sendHttpResponse(client_fd, 400, "Bad Request", "400 - Malformed request line.\n");
 		close(client_fd);
     	statusCode = 400;
+		logRequest(file, logMutex, clientAddr, method, hostname, version, statusCode, totalBytesSent);
+		return;
 	}
 	if (method.empty() || path.empty() || version.empty()) {
     	sendHttpResponse(client_fd, 400, "Bad Request", "400 - Malformed request line.\n");
 		close(client_fd);
     	statusCode = 400;
+		logRequest(file, logMutex, clientAddr, method, hostname, version, statusCode, totalBytesSent);
+		return;
 	}
 	//parse individual header
 	std::unordered_map<std::string, std::string> header_map;
@@ -227,6 +234,8 @@ std::string statusMessage;
 			sendHttpResponse(client_fd, 400, "Bad Request", "400 Bad Request: Host header missing.\n");
 			close(client_fd);
     		statusCode = 400;
+			logRequest(file, logMutex, clientAddr, method, hostname, version, statusCode, totalBytesSent);
+			return;
 		}
 
 		// Extract hostname and optional port
@@ -240,6 +249,7 @@ std::string statusMessage;
 				std::cerr << "Invalid port in Host header: " << portStr << "\n";
 				sendHttpResponse(client_fd, 400, "Bad Request", "400 Bad Request: Invalid port.\n");
 				close(client_fd);
+				return;
 			}
 		} else {
 			hostname = hostHeader; // no port specified
@@ -260,6 +270,8 @@ std::string statusMessage;
 				std::cout << "Web Host is Fordbidden " << "\n";
 				sendHttpResponse(client_fd, 403, "Forbidden", "403 Forbidden: Access Denied.\n");
 				statusCode = 403;
+				logRequest(file, logMutex, clientAddr, method, hostname, version, statusCode, totalBytesSent);
+				return;
 			}else{
 				//if the host name is an IP, find the hostname 
 				if(isValidIP(hostname)){
@@ -278,6 +290,8 @@ std::string statusMessage;
 					if ((resolvedIP.empty() || resolvedIP.find_first_not_of(" \t\r\n") == std::string::npos)) {
 						sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Could not resolve hostname.\n");
 						statusCode = 502;
+						logRequest(file, logMutex, clientAddr, method, hostname, version, statusCode, totalBytesSent);
+						return;
 					}
 						std::cout << "Resolved host to IP: " << resolvedIP << "\n";
 						hostIP = resolvedIP;	
@@ -298,6 +312,7 @@ std::string statusMessage;
 					sendHttpResponse(client_fd, 504, "Gateway Timeout", "504- Gateway Timedout.\n");
 					cleanupConnection(client_fd,-1,ssl); //if error setting up TCP conenction clean
     				statusCode = 504;
+					logRequest(file, logMutex, clientAddr, method, hostname, version, statusCode, totalBytesSent);
 				}
 				std::string proxyIP = getLocalIP(server_fd);
 				if(proxyIP.empty()){
@@ -395,16 +410,11 @@ std::string statusMessage;
 			std::cout << "Unsupported HTTP method\n";
 			sendHttpResponse(client_fd, 501, "Not Implemented", "501 - Not Implemented\n");
 			statusCode = 501;
+			logRequest(file, logMutex, clientAddr, method, hostname, version, statusCode, totalBytesSent);
 		}
 		
 		//SSL Connection CleanUp & File Loggign
-		std::lock_guard<std::mutex> lock(logMutex);
-    file << currentTimestamp() << " "
-         << getClientIP(clientAddr) << " "
-         << "\"" << method << " " << hostname << " " << httpVersion << "\" "
-         << statusCode << " "
-         << totalBytesSent << "\n";
- 
+		logRequest(file, logMutex, clientAddr, method, hostname, version, statusCode, totalBytesSent);
 		cleanupConnection(client_fd,server_fd,ssl);
 }
 std::string currentTimestamp(){
@@ -625,5 +635,15 @@ void cleanupConnection(int client_fd, int server_fd, SSL* ssl) {
 		 close(server_fd);
 	}
 }
-
+void logRequest(std::ofstream& file, std::mutex& logMutex,
+                const sockaddr_in& clientAddr, const std::string& method,
+                const std::string& hostname, const std::string& httpVersion,
+                int statusCode, int totalBytesSent) {
+    std::lock_guard<std::mutex> lock(logMutex);
+    file << currentTimestamp() << " "
+         << getClientIP(clientAddr) << " "
+         << "\"" << method << " " << hostname << " " << httpVersion << "\" "
+         << statusCode << " "
+         << totalBytesSent << "\n";
+}
 
