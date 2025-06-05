@@ -189,8 +189,13 @@ std::string statusMessage;
 	request_line_stream >> method >> path >> version;
 
 	if (headers_end == std::string::npos){
-		std::cerr << "Malformed HTTP Request\n";
+		sendHttpResponse(client_fd, 400, "Bad Request", "400 - Malformed request line.\n");
 		close(client_fd);
+		return;
+	}
+	if (method.empty() || path.empty() || httpVersion.empty()) {
+    	sendHttpResponse(client_fd, 400, "Bad Request", "400 - Malformed request line.\n");
+    	close(client_fd);
 		return;
 	}
 	//parse individual header
