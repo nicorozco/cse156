@@ -279,12 +279,22 @@ std::string statusMessage;
                         return;
 					}
 				}
+				// 1.) Create SSL Object for specific connection
+				//Error Handling:
+				ssl = SSL_new(ctx);// create a new ssl object 
+				if(!ssl){
+					ERR_print_errors_fp(stderr);
+					cleanupConnection(client_fd,-1,nullptr);
+					return;
+				}
+
 				//now that we have extracted the ip, create a TCP Connection with the server 
 				int server_fd = createTCPConnection(hostIP, destPort);
 				//if unable to connec to server
 				if(server_fd < 0){
 					//send error message to client
 					sendHttpResponse(client_fd, 504, "Gateway Timeout", "504- Gateway Timedout.\n");
+					cleanupConnection(client_fd,-1,ssl); //if error setting up TCP conenction clean
 					return;
 				}
 				std::string proxyIP = getLocalIP(server_fd);
@@ -294,22 +304,12 @@ std::string statusMessage;
 				std::string XHeader = "X-Forwarded-For: " + clientIP + std::string(", ") + proxyIP + "\r\n";
 				//connection is set up 
 				// Setting up SSL
-				// 1.) Create SSL Object for specific connection
-				//Error Handling:
-				ssl = SSL_new(ctx);// create a new ssl object 
-				if(!ssl){
-					ERR_print_errors_fp(stderr);
-					close(client_fd);
-					return;
-				}
-
 				//2.) Bind SSL Object to socket
 				SSL_set_fd(ssl,server_fd);
 				//3.) Perform SSL Handshake
 				if(SSL_connect(ssl) <= 0){
 					ERR_print_errors_fp(stderr);
-					close(server_fd);
-					SSL_free(ssl);
+					cleanupConnection(client_fd,server_fd,ssl);
 					return;
 				}
 				//write http request to server
@@ -346,6 +346,7 @@ std::string statusMessage;
 				char buffer[4096];
 				std::string partialBuffer;
 				bool statusParsed = false;
+
 				//read response from server
 				while (true) {
 					int bytesRead = SSL_read(ssl, buffer, sizeof(buffer) - 1);
@@ -401,10 +402,8 @@ std::string statusMessage;
 		}
 		
 		//SSL Connection CleanUp 
-		SSL_shutdown(ssl); //Graceful shutdown
-		SSL_free(ssl); //Free SSL Structure
-		close(client_fd); // close the client socket
-	}
+		cleanupConnection(client_fd,server_fd,ssl);
+}
 std::string currentTimestamp(){
 		auto now = std::chrono::system_clock::now();
 		std::time_t now_c = std::chrono::system_clock::to_time_t(now);
