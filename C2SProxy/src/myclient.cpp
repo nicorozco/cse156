@@ -320,7 +320,7 @@ int main (int argc, char* argv[]) {
 			
 		if (hOption == false){
 			body.insert(body.end(),fullData.begin() + headerEndIndex, fullData.begin() + headerEndIndex + contentLenght); 
-			std::reverse(body.begin(), body.end());
+			//std::reverse(body.begin(), body.end());
 			std::ofstream outfile("slug_download_norozco6.dat",std::ios::binary);
 			if (!outfile) {
 				std::cerr << "Failed to open file for writing" << "\n";
