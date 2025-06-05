@@ -145,7 +145,7 @@ char buffer[1024] = {0};
 ssize_t bytes = read(client_fd, buffer, sizeof(buffer));
 std::string method,path,version;
 int destPort = 443;
-std::string hostIP;
+std::string hostIP = " ";
 std::string hostname;
 std::string hostHeader;
 size_t totalBytesSent = 0;
@@ -261,23 +261,24 @@ std::string statusMessage;
 				sendHttpResponse(client_fd, 403, "Forbidden", "403 Forbidden: Access Denied.\n");
 				return;
 			}else{
-				//if the host name is a string resolve to get IP
-				if(!isValidIP(hostname)){
-					hostIP = resolveHostnameToIP(hostname);
-					if(hostIP.empty()){ 	
-					// if unable to resolve the domain name:
+				//if the host name is an IP, find the hostname 
+				if(isValidIP(hostname)){
+					std::string resolved = reverseDNSLookup(hostname);
+					if (resolved.empty()) {
 						sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Bad Gateway.\n");
 						return;
 					}
-					std::cout << "Resolved Host to IP " << hostIP << "\n"; 
+					std::cout << "Resolved reverse DNS: " << resolved << "\n";
+					hostIP = hostname;  // No need to resolve again
 				}else{
-					//it's an IP and we need to resolve the hostname
-					std::string hostResolved= reverseDNSLookup(hostname);
-					// if unable to resolve:
-					if(hostResolved.empty()){
-						sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Bad Gateway.\n");
-                        return;
+					//It's a hostname — resolve it to IP
+					std::string resolvedIP = resolveHostnameToIP(hostname);
+					if (resolvedIP.empty()) {
+						sendHttpResponse(client_fd, 502, "Bad Gateway", "502 - Could not resolve hostname.\n");
+						return;
 					}
+						std::cout << "Resolved host to IP: " << resolvedIP << "\n";
+					hostIP = resolvedIP;
 				}
 				// 1.) Create SSL Object for specific connection
 				//Error Handling:
@@ -471,8 +472,7 @@ std::string resolveHostnameToIP(const std::string& hostname) {
 
     int result = getaddrinfo(hostname.c_str(), nullptr, &hints, &res);
     if (result != 0) {
-        std::cerr << "DNS resolution failed: " << gai_strerror(result) << std::endl;
-        return 0;
+        return " ";
     }
 
     char ipStr[INET_ADDRSTRLEN];
