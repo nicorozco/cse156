@@ -25,6 +25,7 @@
 void initialize_ssl();
 int extractHttpStatusCode(const std::string& httpResponse);
 std::string currentTimestamp();
+void cleanupConnection(int client_fd, int server_fd, SSL* ssl);
 std::string getLocalIP(int connectedSockFD);
 void handleRequest(std::string filename,const std::unordered_set<std::string>& forbiddenSet,int client_fd,struct sockaddr_in clientAddr,SSL_CTX* ctx,std::mutex& logMutex);
 std::string getClientIP(struct sockaddr_in clientAddr);
@@ -150,8 +151,9 @@ std::string hostHeader;
 size_t totalBytesSent = 0;
 std::string httpVersion;
 int statusCode;
+SSL* ssl = nullptr;
+int server_fd = -1; 
 std::string statusMessage;
-SSL* ssl = SSL_new(ctx);
 
 
 	if (bytes < 0) {
@@ -227,7 +229,7 @@ SSL* ssl = SSL_new(ctx);
 
 		// Extract hostname and optional port
 		size_t colonPos = hostHeader.find(':');
-		if (colonPos != std::string::npos) {
+	if (colonPos != std::string::npos) {
 			hostname = hostHeader.substr(0, colonPos);
 			std::string portStr = hostHeader.substr(colonPos + 1);
 			try {
@@ -294,6 +296,7 @@ SSL* ssl = SSL_new(ctx);
 				// Setting up SSL
 				// 1.) Create SSL Object for specific connection
 				//Error Handling:
+				ssl = SSL_new(ctx);// create a new ssl object 
 				if(!ssl){
 					ERR_print_errors_fp(stderr);
 					close(client_fd);
@@ -565,3 +568,18 @@ std::string getLocalIP(int connectedSockFD) {
         return "";
     }
 }
+
+void cleanupConnection(int client_fd, int server_fd, SSL* ssl) {
+    if (ssl) { //if the pointer to ssl is null //clean it
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
+    }
+    if (client_fd >= 0){ //if recv() is
+		close(client_fd);
+	}
+    if (server_fd >= 0){
+		 close(server_fd);
+	}
+}
+
+
