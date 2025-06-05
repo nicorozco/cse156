@@ -47,6 +47,7 @@ int main (int argc, char* argv[]) {
 	std::string ip, path;
 	path = "/";
 	int port = 80;
+	int proxyPort;
 	int bytesrecv;
 	std::vector<char> fullData; //vector to hold all the data to pass into file
 	bool headerParse = false;
@@ -96,11 +97,18 @@ int main (int argc, char* argv[]) {
 		std::cout << proxyIP << "\n";
 		std::cout << proxyPortStr << "\n";
 		std::cout << url << "\n";
-	} else {
+		 // Validate proxyPortStr is numeric
+		try {
+			proxyPort = std::stoi(proxyPortStr);
+		} catch (const std::exception& e) {
+			std::cerr << "Error: Invalid proxy port '" << proxyPortStr << "'\n";
+			return 1;
+		}
+
+	}else {
 		std::cerr << "Error: Invalid Arguments" << "\n";
 		return 11;
 	}
-	int proxyPort = std::stoi(proxyPortStr);
 	
 	//split the url into multiple parts 
     colonPos = url.find(':');
