@@ -151,7 +151,7 @@ size_t totalBytesSent = 0;
 std::string httpVersion;
 int statusCode;
 std::string statusMessage;
-
+SSL* ssl = SSL_new(ctx);
 
 
 	if (bytes < 0) {
@@ -293,7 +293,6 @@ std::string statusMessage;
 				//connection is set up 
 				// Setting up SSL
 				// 1.) Create SSL Object for specific connection
-				SSL* ssl = SSL_new(ctx);
 				//Error Handling:
 				if(!ssl){
 					ERR_print_errors_fp(stderr);
@@ -390,10 +389,6 @@ std::string statusMessage;
 								break;
 							}
 						}
-						//SSL Connection CleanUp 
-						SSL_shutdown(ssl); //Graceful shutdown
-						SSL_free(ssl); //Free SSL Structure
-						close(client_fd); // close the client socket
 					}		
 				}
 			}
@@ -401,6 +396,11 @@ std::string statusMessage;
 			std::cout << "Unsupported HTTP method\n";
 			sendHttpResponse(client_fd, 501, "Not Implemented", "501 - Not Implemented\n");
 		}
+		
+		//SSL Connection CleanUp 
+		SSL_shutdown(ssl); //Graceful shutdown
+		SSL_free(ssl); //Free SSL Structure
+		close(client_fd); // close the client socket
 	}
 std::string currentTimestamp(){
 		auto now = std::chrono::system_clock::now();
