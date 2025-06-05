@@ -245,6 +245,7 @@ std::string statusMessage;
 			std::string portStr = hostHeader.substr(colonPos + 1);
 			try {
 				destPort = std::stoi(portStr);
+				std::cout << "Port: " << destPort << "\n";	
 			} catch (...) {
 				std::cerr << "Invalid port in Host header: " << portStr << "\n";
 				sendHttpResponse(client_fd, 400, "Bad Request", "400 Bad Request: Invalid port.\n");
@@ -256,7 +257,6 @@ std::string statusMessage;
 		}
 
 		std::cout << "Hostname: " << hostname << "\n";
-		std::cout << "Port: " << destPort << "\n";	
 		
 		// 	check if the destination is within the fordbidden list 
 		// note host name can be an IP address, if it's an IP Address make sure it's a valid IP 
@@ -305,6 +305,7 @@ std::string statusMessage;
 				}
 
 				//now that we have extracted the ip, create a TCP Connection with the server 
+				std::cout << destPort << "\n";	
 				int server_fd = createTCPConnection(hostIP, destPort);
 				//if unable to connec to server
 				if(server_fd < 0){

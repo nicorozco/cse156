@@ -47,7 +47,7 @@ int main (int argc, char* argv[]) {
 	std::string ip, path;
 	path = "/";
 	int port = 80;
-	int proxyPort;
+	int proxyPort = -1;
 	int bytesrecv;
 	std::vector<char> fullData; //vector to hold all the data to pass into file
 	bool headerParse = false;
@@ -61,7 +61,7 @@ int main (int argc, char* argv[]) {
 	size_t slashPos;
 	std::vector<char> body; //vector to hold the body message
 	
-	if (argc < 3){
+	if (argc < 4){
 		std::cerr << "Error: not enough arguments.\n";
 		std::cerr << "Usage: ./main <hostname> <IP Address:Port Number(Optional)> <-h (for headers only)>" << "\n";
 		return 11;
@@ -87,7 +87,6 @@ int main (int argc, char* argv[]) {
 		}else{
 			std::cerr << "Error: '-h' flag must be in the correct position (the last argument)."<< "\n";
 			return 11;
-
 		}
 	}else if (argc == 4){
 		//no -h option given
@@ -97,19 +96,21 @@ int main (int argc, char* argv[]) {
 		std::cout << proxyIP << "\n";
 		std::cout << proxyPortStr << "\n";
 		std::cout << url << "\n";
-		 // Validate proxyPortStr is numeric
-		try {
-			proxyPort = std::stoi(proxyPortStr);
-		} catch (const std::exception& e) {
-			std::cerr << "Error: Invalid proxy port '" << proxyPortStr << "'\n";
-			return 1;
-		}
-
-	}else {
+	
+	}else{
 		std::cerr << "Error: Invalid Arguments" << "\n";
 		return 11;
 	}
 	
+	try {
+		proxyPort = std::stoi(proxyPortStr);
+	} catch (const std::invalid_argument& e) {
+		std::cerr << "Error: Invalid proxy port: " << proxyPortStr << std::endl;
+		return 1;
+	} catch (const std::out_of_range& e) {
+		std::cerr << "Error: Proxy port out of range: " << proxyPortStr << std::endl;
+		return 1;
+	}
 	//split the url into multiple parts 
     colonPos = url.find(':');
     slashPos = url.find('/');
