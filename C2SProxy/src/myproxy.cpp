@@ -58,6 +58,7 @@ if (!ctx) {
         ERR_print_errors_fp(stderr);
         exit(EXIT_FAILURE);
  	}
+	
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
 
@@ -71,7 +72,12 @@ if (!ctx) {
             std::cerr << "[USAGE]: ./myproxy -p listen-port -a forbidden-site-file -l access-log-file-path " << arg << "\n";
             return 1;
         }
-    }	
+    }
+	// Check if any required argument is missing
+	if (listenPort.empty() || forbiddenFile.empty() || logFile.empty()) {
+		std::cerr << "[USAGE]: ./myproxy -p listen-port -a forbidden-site-file -l access-log-file-path\n";
+		return 1;
+	}	
 	std::unordered_set<std::string> forbiddenSet = loadForbiddenHosts(forbiddenFile);//load the forbidden sites into a set
     // Debug output to check parsed values
     //std::cout << "Listen Port: " << listenPort << "\n";
@@ -237,7 +243,7 @@ std::string statusMessage;
 			logRequest(file, logMutex, clientAddr, method, hostname, version, statusCode, totalBytesSent);
 			return;
 		}
-
+		std::cout << "[DEBUG] Raw Host header received: " << hostHeader << std::endl;
 		// Extract hostname and optional port
 		size_t colonPos = hostHeader.find(':');
 	if (colonPos != std::string::npos) {

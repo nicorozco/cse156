@@ -205,21 +205,28 @@ int main (int argc, char* argv[]) {
 				break;
 			}
 		}
-		
-		if (hOption){
-			//std::cout << "Sending HEAD request" << "\n";
-		//  4a.) if the h option is set the http request METHOD TO head
-			httpRequest = "HEAD " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "X-UCSC-Student-ID: norozco6 \r\n" + "Connection: close\r\n" +"\r\n";
-			//std::cout << httpRequest << "\n";
-		} else if (pOption) {
-			  httpRequest = "PUT " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "X-UCSC-Student-ID: norozco6 \r\n" + "Connection: close\r\n" +"\r\n";
-		}else{
-		
-			// 4b.) else use the regular GET METHOD
-			//std::cout << "Sending Get Request" << "\n";
-			httpRequest = "GET " + path + " HTTP/1.1\r\n" + "Host: " + hostname + "\r\n" + "X-UCSC-Student-ID: norozco6 \r\n" + "Connection: close\r\n" + "\r\n";
-			//std::cout << httpRequest << "\n";
+		// 🔧 Construct fullHost including port if needed
+		std::string fullHost = hostname;
+		if (port != 80) {
+			fullHost += ":" + std::to_string(port);
 		}
+
+		if (hOption) {
+			httpRequest = "HEAD " + path + " HTTP/1.1\r\n"
+						+ "Host: " + fullHost + "\r\n"
+						+ "X-UCSC-Student-ID: norozco6\r\n"
+						+ "Connection: close\r\n\r\n";
+		} else if (pOption) {
+			httpRequest = "PUT " + path + " HTTP/1.1\r\n"
+						+ "Host: " + fullHost + "\r\n"
+						+ "X-UCSC-Student-ID: norozco6\r\n"
+						+ "Connection: close\r\n\r\n";
+		} else {
+			httpRequest = "GET " + path + " HTTP/1.1\r\n"
+						+ "Host: " + fullHost + "\r\n"
+						+ "X-UCSC-Student-ID: norozco6\r\n"
+						+ "Connection: close\r\n\r\n";
+		}	
 		// the second argument is a pointer to where you want to store the response
 		if ((send(clientSocket, httpRequest.c_str(), httpRequest.length(), 0)) < 1){
 			std::cerr << "Error Sending HTTP Request" << "\n";
