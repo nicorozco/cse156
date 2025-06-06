@@ -1,0 +1,100 @@
+DOCUMENTATION - Proxy and Client Project  
+Student Name: Nicolas Orozco  
+Student ID: 1874497  
+
+---
+
+## Overview
+
+This project implements a multithreaded proxy server (`myproxy`) and a custom HTTP client (`myclient`) that can send GET, HEAD, and PUT requests through the proxy. The proxy supports HTTPS connections via SSL/TLS and filters access to forbidden domains using a blacklist.
+
+---
+
+## How to Use
+
+### Compile:
+
+g++ -o myproxy myproxy.cpp -lssl -lcrypto -pthread  
+g++ -o myclient myclient.cpp
+
+### Run the Proxy:
+
+./myproxy -p <listen-port> -a <forbidden-file> -l <access-log>
+
+Example:  
+./myproxy -p 9090 -a file.txt -l log.txt
+
+### Run the Client:
+
+./myclient <proxy-ip> <proxy-port> <url> [-h | -p]
+
+Examples:  
+./myclient 127.0.0.1 9090 www.example.com/index.html  
+./myclient 127.0.0.1 9090 www.example.com:8080/index.html  
+./myclient 127.0.0.1 9090 www.example.com/index.html -h
+
+---
+
+## Internal Design
+
+### Proxy (`myproxy.cpp`)
+- Accepts client connections on a specified port.
+- Uses threads to handle multiple clients concurrently.
+- Parses HTTP requests and extracts the host and port from the `Host:` header.
+- Connects to destination servers using TCP and SSL.
+- Forwards the request and response securely using OpenSSL.
+- Logs the transaction to a specified access log.
+- Checks against a forbidden list and responds with HTTP 403 if blocked.
+
+### Client (`myclient.cpp`)
+- Parses user input for proxy and destination information.
+- Builds an HTTP request based on the URL and request type.
+- Automatically includes the port in the `Host:` header if non-default.
+- Connects to the proxy and sends the request.
+- Receives and optionally saves the response (headers or body).
+
+---
+
+## Test Cases
+
+### Test Case 1: Basic GET Request  
+**Command:**  
+./myclient 127.0.0.1 9090 www.example.com/index.html  
+**Expected:**  
+Proxy connects to www.example.com:80, forwards request, and logs status 200.
+
+---
+
+### Test Case 2: GET with Custom Port  
+**Command:**  
+./myclient 127.0.0.1 9090 www.example.com:8080/index.html  
+**Expected:**  
+Proxy uses port 8080 for destination and logs status (success or timeout).
+
+---
+
+### Test Case 3: HEAD Request  
+**Command:**  
+./myclient 127.0.0.1 9090 www.example.com/index.html -h  
+**Expected:**  
+Only HTTP headers are printed. No content is saved. Proxy logs the transaction.
+
+---
+
+### Test Case 4: Forbidden Host  
+**Steps:**  
+- Add `www.blockedsite.com` to `file.txt`  
+- Run:  
+./myclient 127.0.0.1 9090 www.blockedsite.com/index.html  
+**Expected:**  
+Proxy returns HTTP 403 Forbidden, no connection to server is made.
+
+
+### Test Case 5: SSL Forwarding  
+**Command:**  
+./myclient 127.0.0.1 9090 www.google.com/index.html  
+**Expected:**  
+Proxy establishes SSL connection to destination, forwards request, and logs the response.
+
+
+## Shortcomings
